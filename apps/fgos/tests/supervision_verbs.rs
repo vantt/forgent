@@ -761,6 +761,11 @@ lead: lead:S6A\n\
         &["rev-parse", "refs/heads/main"],
     );
     assert_eq!(commit_sha, remote_tip);
+    assert_eq!(
+        git(&project, &["rev-parse", "refs/remotes/origin/main"]),
+        git(&project, &["rev-parse", "main"]),
+        "the trunk reader must see the landed widened plan"
+    );
 
     let committed_plan = git(&project, &["show", "main:plans/260101-0000-demo/plan.md"]);
     assert!(

@@ -12,13 +12,13 @@ discussion: settled
 ```txt
 HAND-OFF (planner)
 discussion: settled
-source: p-adv35azsca; ds-zfqskcns7j §4 CAS-D1..CAS-D13, §6 #design, §7 #task-layerings-in-model
+source: p-adv35azsca; ds-zfqskcns7j §4 CAS-D1..CAS-D15, §6 #design, §7 #task-layerings-in-model
 outcome: component-authority khai bốn layering (hexagon, stack, orchestration-ring, domain-scope) như dữ liệu có định nghĩa trong mô hình; giá trị nằm trên hàng component (tên trường = id layering, ngoại lệ qua `exceptions`); luật chạy theo ba loại cố định trong code (order-downward, isolation, port-wiring); hết danh sách hạng viết cứng ở layers.yaml, contracts/model.v1.json, rust/src/declare.rs.
 constraints: RUL104 (không bộ thông dịch luật tổng quát, không cơ chế không ai dùng; source chỉ declared và fromPaths, CAS-D12); L10 (gom guard layering viết tay vào layering, xoá tierExceptions, đổi trường layer/tier thì chuyển mọi caller cùng đợt); CAS-D4 năm luật hexagon, callback qua port được phép; design principle 7 (văn bản layering render từ mô hình); spec docs/platform/component-authority/spec.md cập nhật trước code.
 non-goals: bước B (`fgos authority check`) và Q2 (component-authority sở hữu những gì); `paths: []` của ba component Domain; tách hết mọi component trộn vai trò (áp dần, phần chưa tách ghi nợ có tên, CAS-D10).
 acceptance: (1) layers.yaml khai bốn layering đủ trường CAS-D8, mỗi giá trị có meaning; (2) mọi component khai hexagon, stack, orchestration-ring; schema và Rust đọc giá trị từ mô hình (rg LAYER_NAMES|TIER_RANGE không còn danh sách viết cứng); (3) mỗi loại luật có một fixture vi phạm bị bắt; guard A4 Work-layer và 'tầng thấp không import Dispatch' chạy qua layering của chúng; (4) runner khai ngoại lệ hexagon theo path; port khai qua chỉ mục contract; (5) npm test và cargo test --workspace xanh; (6) component-boundary.md §4, architecture-map.md §3, vision.md §6 Known gaps sửa theo từ vựng mới.
 open (chặn phần sau, không chặn task này): Q2 + bước B; `paths: []` của domain-components, coding-domain, group-thinking (§3 hàng 22); `supervision` chỉ map `src/portfolio/`, crate `packages/supervision/` và `packages/portfolio/` không thuộc component nào (Q2).
-also in A: CAS-D13 đổi chỗ T7/T8 (acceptance (7): Work ở T8, Domain ở T7, supervision ở T8, vision.md §6 Known gaps đóng).
+also in A: CAS-D13 đổi chỗ T7/T8 (acceptance (7): Work ở T8, Domain ở T7, supervision ở T8, vision.md §6 Known gaps đóng); CAS-D14 nhìn mọi lát cắt (acceptance (8): declare thiếu một layering declared bị từ chối; declare tạo lệch giữa orchestration-ring và stack bị từ chối với thông báo nêu hai lát và cặp component; locate trả đủ bốn lát); CAS-D15 (acceptance (9): `sameAs` khai trên các giá trị trùng chữ và cửa khai từ chối khi hai bên lệch; `orchestration-ring` suy từ `stack` qua `fromLayering`, không thêm trường trên component; T8 tên `T8-delivery`; ngoại lệ path của `work-driver` cho phần chọn việc). Khi CAS-D15 khác các dòng trên (giá trị ring, `T8-work`, `fromLayering`), CAS-D15 thắng.
 authority: component-authority (row sở hữu mô hình); không cần declare mới.
 ```
 
@@ -34,6 +34,10 @@ open owner questions: chưa đặt vào question store (đang thảo luận tr�
 ```
 
 ## 1. Trạng thái hiện tại
+
+2026-11-27 13:18 bổ sung CAS-D15 (định nghĩa layering là các góc nhìn lên cùng một hệ thống; `T8-delivery`; luật `sameAs`; ring suy từ `stack`); vẫn `settled`, chưa planner nào nhận.
+
+2026-11-27 12:55 bổ sung CAS-D14 (declare và locate nhìn mọi lát cắt).
 
 2026-11-27 12:45 bổ sung CAS-D13 (đổi chỗ T7/T8 trong bước A, `supervision` ở T8) trước khi planner nhận; vẫn `settled`.
 
@@ -111,6 +115,8 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 | CAS-D11 | **Layering `orchestration-ring`** gộp `product-band` và bốn decision ring. Giá trị, từ trên xuống theo chiều phụ thuộc: `surface`, `strategic`, `activation`, `domain`, `workflow`, `execution`, `foundation`. `source: declared` (tier không ánh xạ sạch: `work-driver` T6 làm cả strategic và workflow, `supervision` T8 là strategic). Luật `order-downward` trên chiều phụ thuộc; gọi ngược qua port (callback) được phép (CAS-D4). Kiểm chéo với `stack`. Chữ `domain` dùng được vì tên trường phân biệt (`hexagon: domain` khác `orchestration-ring: domain`). | 2026-11-27 | Chủ dự án 12:08 (gộp), 12:16-12:22 (giá trị, `workflow`, `domain`), 12:22 (tên); §3 hàng 15, 23 |
 | CAS-D12 | **Bỏ `fromLayering` khỏi `source`.** Sau CAS-D11 không layering nào suy từ layering khác; `source` chỉ còn `declared` và `fromPaths`; thêm lại khi có layering thật cần (RUL104). Sửa CAS-D9 ở phần này. | 2026-11-27 | Chủ dự án 12:30 ('ok'), hệ quả của CAS-D11 |
 | CAS-D13 | **Đổi chỗ T7 và T8, làm trong bước A.** `T7-domain`: ba component Domain và các hàng Domain-like (`domain-components`, `coding-domain`, `group-thinking`, `domain-registry-loader`, `enduser-docs-*`) giữ tier 7; `T8-work`: `work-state`, `runner` và 8 subcomponent của nó lên tier 8; `supervision` ở lại T8 (xếp qua cả bốn layering: chỉ phụ thuộc T0-T3, `orchestration-ring` là strategic nên phải ở trên activation, kiểm chéo đòi `stack` không đặt nó dưới Work; T8 thỏa cả hai). Ngoại lệ `src/report/knowledge-resolver.mjs` tier 7 → 8 (nó import `src/state/`). Không code nào viết cứng tier 7/8; tài liệu chỉ `vision.md` §6 Known gaps; bảng render sinh lại. Bổ sung sau khi settle, trước khi planner nhận. | 2026-11-27 | Chủ dự án 12:45 ('đồng ý gộp T7 và T8 vào bước A') |
+| CAS-D14 | **Xếp component phải nhìn mọi lát cắt cùng lúc.** (1) `fgos authority declare` khai hay đổi một component phải nêu giá trị cho mọi layering `declared` (`hexagon`, `stack`, `orchestration-ring`; `domain-scope` tự suy); thiếu một lát thì từ chối. (2) Cửa khai kiểm chéo ngay lúc khai: `orchestration-ring` đặt A trên B mà `stack` đặt A dưới B thì từ chối, nói rõ hai lát và cặp component lệch. (3) `fgos authority locate` khi gợi ý chỗ đặt code trả lời đủ bốn lát. | 2026-11-27 | Chủ dự án 12:50 ('khi phân một component vào layering, cần nhìn nhiều lát cắt, đừng nhìn 1'), đồng ý cách làm 12:55 |
+| CAS-D15 | **Layering là các góc nhìn lên cùng một hệ thống; `T8-delivery`; luật `sameAs`; ring suy từ `stack`.** (1) Định nghĩa: một layering là một góc nhìn, bằng ngôn ngữ riêng, lên cùng một hệ thống; mọi layering nhìn cùng một tập component (mỗi layering xếp được mọi component); các góc có thể trùng nhau; nhìn một component qua mọi góc cùng lúc cho thấy vai trò của nó và việc nó có được tổ chức hợp lý hay không (component cần nhiều ngoại lệ hoặc trải nhiều giá trị của một layering là dấu hiệu làm nhiều vai). (2) `stack` T8 tên `T8-delivery` (đưa việc từ lúc được chọn tới lúc giao xong và bền trên main; 'delivery lifecycle' trong repo), thay `T8-work` của CAS-D13. (3) Cùng chữ ở hai layering phải khớp nghĩa tuyệt đối, khai bằng `sameAs` trên giá trị và kiểm ở cửa khai; ngoại lệ duy nhất có khai báo: hạng `domain` của `hexagon` (giữ theo CAS-D3) mang `distinctFrom` tới `stack.T7-domain`, `orchestration-ring.domain`, `domain-scope.domain`. (4) `orchestration-ring` giữ là một góc nhìn bằng ngôn ngữ điều phối; giá trị `surface`, `delivery`, `domain`, `workflow`, `execution` (mỗi cái `sameAs` giá trị `stack` cùng tên) và `foundation` (T0-T4); `source: fromLayering stack`, `rules: []` (stack đã kiểm). Supersede phần giá trị và nguồn của CAS-D11. (5) Thêm lại `fromLayering` vào `source`; supersede CAS-D12. (6) Phần chọn việc của `work-driver` khai ngoại lệ path lên `T8-delivery`. | 2026-11-27 | Chủ dự án 13:00-13:18 ('ok chốt T8-delivery'; 'layering cung cấp một góc nhìn … các góc nhìn khác có thể có cùng việc nhìn'; 'xoay nó để có các góc nhìn khác nhau'; 'nhìn rõ hơn vai trò và sự tổ chức hợp lý của một component'; giữ `domain` 13:03; 'đồng ý, ghi CAS-D15 đi') |
 
 ## 5. Q&A log
 
@@ -161,10 +167,14 @@ Mô hình `packages/component-authority/model/` là nơi duy nhất trả lời 
 - 2026-11-27 12:22 — Chủ dự án: "chổ đặt tên ring thì anh nói là orchestration-ring hoặc là responsibility-ring. anh nghiêng orchestrate". Shaper đồng ý; mint CAS-D6 đến CAS-D11, viết lại §6, nháp §7.
 - 2026-11-27 12:30 — Chủ dự án: "ok" (bỏ `fromLayering`, settle). Shaper mint CAS-D12, settle, giao planner.
 - 2026-11-27 12:45 — Chủ dự án: "supervision em nghĩ để đâu?", "đổi chỗ T7 và T8 việc này gây xáo trộn nhiều không hay chỉ tài liệu?", "thật ra khi phân một component vào layering, cần nhìn nhiều lát cắt, đừng nhìn 1", "đồng ý gộp T7 và T8 vào bước A". Shaper thêm CAS-D13, cập nhật hand-off; discussion giữ `settled`.
+- 2026-11-27 12:55 — Chủ dự án: "ủa, sao không thảo luận ở đây luôn cho xong?", rồi "đồng ý, ghi CAS-D14 đi". Shaper thêm CAS-D14; discussion giữ `settled`.
+- 2026-11-27 13:00-13:18 — Bàn tên T8 (`orchestration` hay `delivery`), luật cùng chữ cùng nghĩa, tên hạng `domain` của hexagon (giữ `domain`), có gộp ring vào `stack` không. Chủ dự án: layering là các góc nhìn lên cùng một hệ thống, không cần giá trị riêng; nhiều góc nhìn cho thấy vai trò và sự tổ chức hợp lý của component. "đồng ý, ghi CAS-D15 đi". Shaper ghi CAS-D14 (chưa land được lần trước) và CAS-D15.
 
 ## 6. Thiết kế đã chốt {#design}
 
 Viết lại 2026-11-27 12:25 sau CAS-D6 đến CAS-D11.
+
+**Layering là gì (CAS-D15).** Chỉ có một hệ thống: tập component và file. Một layering là một góc nhìn, bằng ngôn ngữ riêng, lên cùng hệ thống đó; mọi layering nhìn cùng một tập component, các góc có thể trùng nhau (cùng chữ thì `sameAs`, suy được thì `fromLayering`). Nhìn một component qua mọi góc cùng lúc cho thấy vai trò của nó và việc nó có được tổ chức hợp lý hay không. Các bảng dưới viết trước CAS-D15; chỗ khác nhau (giá trị và nguồn của `orchestration-ring`, tên T8, `fromLayering`) theo CAS-D15.
 
 **Từ vựng.** Component là đơn vị sở hữu; module là đơn vị đóng gói vật lý (crate, package, thư mục), mỗi module thuộc đúng một component (CAS-D1). Một **layering** là một lát cắt của toàn hệ trả lời một nhóm câu hỏi, có các giá trị theo thứ tự và luật riêng; các layering đồng thời, độc lập. Chữ "layer" không đứng một mình (CAS-D2).
 
@@ -211,6 +221,6 @@ flowchart LR
 
 - **Mục tiêu:** component-authority khai bốn layering có định nghĩa, giá trị trên hàng component, luật chạy theo loại cố định trong code (bước A của CAS-D5).
 - **§6:** toàn bộ.
-- **D-ID:** CAS-D1 đến CAS-D13.
+- **D-ID:** CAS-D1 đến CAS-D15 (CAS-D15 supersede một phần CAS-D11, CAS-D12, CAS-D13).
 - **Quan hệ:** bước B (`fgos authority check`) và Q2 là việc sau, không thuộc task này; đổi chỗ T7/T8 nằm trong task này (CAS-D13).
 - **Verify nháp:** `node --test test/architecture.test.mjs` và `cargo test -p component-authority` xanh; một fixture vi phạm cho mỗi loại luật bị bắt; `rg -n "LAYER_NAMES|TIER_RANGE" packages/component-authority/rust/src` không còn danh sách viết cứng.

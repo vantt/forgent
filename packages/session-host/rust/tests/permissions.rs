@@ -184,6 +184,8 @@ fn only_the_read_rows_may_be_used_before_a_rotation_successor_holds_the_role() {
 fn the_policy_verbs_are_node_rows_and_the_supervisors_own_are_native() {
     let policy = |persona, line| decide(persona, &argv(line)).unwrap().rule.unwrap().policy;
     assert_eq!(policy("lead", "land"), Policy::Node);
+    assert_eq!(policy("lead", "supervisor widen"), Policy::Node);
+    assert_eq!(policy("supervisor", "supervisor widen"), Policy::Forward);
     assert_eq!(policy("secretary", "session start"), Policy::Node);
     assert_eq!(policy("supervisor", "session write"), Policy::Native);
     assert_eq!(policy("planner", "session bind session"), Policy::Native);
@@ -278,6 +280,7 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
             "run",
             "land",
             "worktree create",
+            "supervisor widen",
             "request result",
         ],
     );
@@ -304,6 +307,7 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
         &[
             "supervisor handled",
             "supervisor done",
+            "supervisor widen",
             "session read",
             "session type",
             "watcher tune",
@@ -316,6 +320,7 @@ fn the_verbs_each_persona_held_before_are_still_allowed() {
     // Never held: the lead starts no session; a planner answers no question.
     assert_ne!(decision("lead", "session start"), Decision::Allow);
     assert_eq!(decision("planner", "questions answer"), Decision::Deny);
+    assert_eq!(decision("planner", "supervisor widen"), Decision::Ask);
 }
 
 #[test]

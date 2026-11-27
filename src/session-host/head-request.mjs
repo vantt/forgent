@@ -28,6 +28,8 @@ import { assignmentDir, readStoredUnitSummary, unitRunFacts } from '../native/ex
 import { installOnce, nativeDoor, replaceDurably } from '../native/door.mjs';
 import { markSuccessorAnswered, requestRotation, rotationHolds } from '../session-rotation/rotate.mjs';
 
+export const HEAD_SUPERVISOR_WIDEN_VERB = 'supervisor widen';
+
 const canonicalizeWriteEntry = (raw) => nativeDoor().writeScope('canonicalize', { raw });
 const matchesWriteScope = (candidate, scope) => nativeDoor().writeScope('matches', { path: candidate, scope });
 
@@ -316,6 +318,59 @@ async function landVerb({ args, envelope, projectRoot, id, ports }) {
   return startTicket({ id, verb: HEAD_LAND_VERB, argv, envelope, projectRoot, ports });
 }
 
+async function widenVerb({ args, envelope, projectRoot, id, ports }) {
+  const lead = personaOf(envelope) === 'lead';
+  if (!lead) throw roleErr('only a lead widens a plan footprint');
+
+  exactKeys(args, ['plan', 'phase', 'path', 'paths', 'criterion']);
+
+  const { plan: planArg, phase: phaseArg, criterion: criterionArg } = args;
+  const paths = [];
+  if (args.path !== undefined) {
+    if (typeof args.path !== 'string') throw badArgs('path must be a string');
+    paths.push(args.path);
+  }
+  if (args.paths !== undefined) {
+    if (!Array.isArray(args.paths)) throw badArgs('paths must be an array of strings');
+    paths.push(...args.paths);
+  }
+
+  if (planArg === undefined || planArg === null || planArg === '') throw badArgs('plan is required');
+  if (typeof planArg !== 'string') throw badArgs('plan must be a string');
+  noDash('plan', planArg);
+
+  const callerPlan = await planOfCaller(envelope, projectRoot, ports);
+  const normalizedPlanArg = planArg.replace(/^plans\//, '').replace(/\/+$/, '');
+  if (normalizedPlanArg !== callerPlan.dir) {
+    throw Object.assign(new Error(`plan ${JSON.stringify(planArg)} is not this lead's own plan (${callerPlan.dir})`), { code: 'plan-not-own' });
+  }
+
+  if (phaseArg === undefined || phaseArg === null || phaseArg === '') throw badArgs('phase is required');
+  if (typeof phaseArg !== 'string' && typeof phaseArg !== 'number') throw badArgs('phase must be a string or number');
+  const phaseStr = String(phaseArg);
+  if (phaseStr === '') throw badArgs('phase must be non-empty');
+  noDash('phase', phaseStr);
+
+  if (paths.length === 0) throw badArgs('at least one path is required');
+  for (const p of paths) {
+    if (!plainEntry(p)) throw badArgs(`invalid path entry ${JSON.stringify(p)}`);
+    noDash('path', p);
+  }
+
+  if (criterionArg === undefined || criterionArg === null || criterionArg === '') throw badArgs('criterion is required');
+  if (typeof criterionArg === 'string' && criterionArg.startsWith('-')) throw badArgs('criterion must not start with "-"');
+  const criterionNum = typeof criterionArg === 'number' ? criterionArg : Number(criterionArg);
+  if (!Number.isInteger(criterionNum) || criterionNum < 1) throw badArgs('criterion must be a positive integer at least 1');
+
+  const hostArgv = ['supervisor', 'widen', callerPlan.dir, '--phase', phaseStr];
+  for (const p of paths) {
+    hostArgv.push('--path', p);
+  }
+  hostArgv.push('--criterion', String(criterionNum), '--json');
+
+  return startTicket({ id, verb: HEAD_SUPERVISOR_WIDEN_VERB, argv: hostArgv, envelope, projectRoot, ports });
+}
+
 /** The two coordinators; they share the stop rule and the `secretary.run.*` ceilings of their own run. */
 const COORDINATORS = new Set(['secretary', 'supervisor']);
 const TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
@@ -414,7 +469,7 @@ export function runTicket(file, ports = {}) {
   const ticket = readTicketFile(file);
   if (!ticket || ticket.state !== 'running') return null;
   writeTicket(file, { ...ticket, runner: (ports.selfRecord ?? selfRecord)() });
-  const env = { ...process.env };
+  const env = { ...process.env, ...(ports.env ?? {}) };
   delete env.FGOS_DISPATCH_DEPTH;
   const run = (ports.exec ?? spawnSync)(ticket.hostBin, ticket.argv, { cwd: ticket.cwd, env, encoding: 'utf8', timeout: RUNNER_TIMEOUT_MS, maxBuffer: MAX_REQUEST_BYTES });
   const line = lastJsonLine(run.stdout);
@@ -591,7 +646,7 @@ export async function runStopSelf({ persona, name, projectRoot, waitPid }, ports
  * Runs the verb of one request for the attempt in `runDir`, in this attempt's project: `session start`, `session rotate`,
  * `session answered`, `session restore role` (which only checks its arguments: the supervisor registers the role), a
  * `questions ask|ack|cancel|answer` verb (served by the host route, `ports.questions` replacing it in a test), or one of the
- * policy verbs `land`, `run`, `request result`, `worktree create`, `session stop`, `supervisor done` and `metrics record`.
+ * policy verbs `land`, `supervisor widen`, `run`, `request result`, `worktree create`, `session stop`, `supervisor done` and `metrics record`.
  * The verbs that only forward an `fgos` argv are not here: the run supervisor decides and runs them itself
  * (`packages/session-host/rust`, the `fgos` frame of `head-request.v1.json`). Returns `{ exit, line }`: the one JSON line to print, `{result: 'done', data}` or
  * `{result: 'error', code, message}`, and the exit code (0 done, 70 error). Who may ask and for what was decided by
@@ -644,6 +699,9 @@ export async function runHeadRequest({ runDir, request, requestHostBin }, ports 
       }
       case HEAD_LAND_VERB:
         data = await landVerb({ args, envelope, projectRoot, id: request.id, ports });
+        break;
+      case HEAD_SUPERVISOR_WIDEN_VERB:
+        data = await widenVerb({ args, envelope, projectRoot, id: request.id, ports });
         break;
       case HEAD_RUN_VERB:
         data = await runVerb({ args, envelope, projectRoot, id: request.id, ports });

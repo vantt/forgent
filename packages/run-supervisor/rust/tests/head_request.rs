@@ -1258,6 +1258,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "path-outside-grant",
             "path-symlink",
             "peer-uid",
+            "plan-not-own",
             "recipient-not-allowed",
             "release-in-progress",
             "reply-too-large",
@@ -1310,6 +1311,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "session stop",
             "session write",
             "supervisor done",
+            "supervisor widen",
             "worktree create"
         ]
     );

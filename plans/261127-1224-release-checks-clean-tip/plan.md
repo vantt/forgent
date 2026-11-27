@@ -1,10 +1,10 @@
 ---
 contract: plan-v1
 title: "Release checks run on a clean, exact checkout of the trunk tip they release"
-status: ready
+status: running
 priority: P0
 blockedBy: []
-base: 9077b11189eb9e0056db399809818d4e9c00cb04
+base: 98f70f24a6797f067bf55fb94c2b0351b8925a93
 footprint:
   - plans/261127-1224-release-checks-clean-tip/**
   - packages/git/rust/src/land.rs
@@ -24,6 +24,7 @@ source:
   - plans/discussions/ds-r2sv5l5vnu-release-checks-clean-tip/DISCUSSION.md
   - p-sqppgb2jhq
 created: 2026-11-27
+lead: head:lead-forgent-261127-1224-releas-15e5c
 ---
 
 # Release checks run on a clean, exact checkout of the trunk tip they release

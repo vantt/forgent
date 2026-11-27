@@ -192,6 +192,22 @@
       "identity": "held",
       "rule": "refusals (verb-failed detail): the host verb's own code (events still unhandled)"
     },
+    "supervisor widen": {
+      "args": {
+        "plan": "string, required: the plan directory name; must match the caller's own plan from envelope role (plan-not-own); must not start with '-'",
+        "phase": "string, required: the phase id to widen; must not start with '-'",
+        "path": "string, optional: a repo-relative path to add to the footprint; repeatable or as paths",
+        "paths": "array of strings, optional: repo-relative paths to add to the footprint; at least one path or paths is required",
+        "criterion": "integer, required: the 1-based number of the acceptance criterion this widening serves; at least 1"
+      },
+      "does": "answers at once with a ticket (the request id) as land does: the route child writes the ticket file and starts a detached runner that runs the host verb `fgos supervisor widen <plan> --phase <phase> --path <paths...> --criterion <criterion> --json` to its end and rewrites the ticket; `request result` reads it. A lead only; resolves the caller's own plan from the envelope role (`planOfHead`) and refuses `plan-not-own` when the plan argument differs. Any other key is bad-args, and so is any string that becomes one argv token and starts with '-'. The lead's write grant is not widened",
+      "data": {
+        "ticket": "the request id",
+        "state": "running"
+      },
+      "identity": "held",
+      "rule": "refusals (verb-failed detail): bad-args, role-mismatch (not a lead), plan-not-own, ticket-used, plan-not-found, plan-not-widenable, phase-not-found, criterion-not-found, footprint-entry-invalid"
+    },
     "metrics record": {
       "args": {
         "records": "array of 1 to 10 record objects, required: observe.record.v2 objects whose `kind` is `fgos.coordination.*`; v, id, ts, basis and origin may be left out as for `fgos metrics record`. The request frame's own bounds (256 values, depth 8) apply to the whole array"
@@ -226,6 +242,7 @@
   },
   "refusalCodes": {
     "peer-uid": "the connection is not from the supervisor's own user",
+    "plan-not-own": "supervisor widen only: a lead naming a plan directory other than its own",
     "bad-frame": "oversize, not one JSON object, no REQUEST type, an id outside the rule, a verb that is not a string or args that is not an object",
     "role-not-held": "Identity does not give this attempt's session the envelope's role; when Identity could not answer the detail is its refusal code only (its text goes to supervisor.log, never to the client)",
     "role-pending-rotation": "a role-gated verb from a rotation successor (same persona and name as the live holder, a higher generation) whose role its live predecessor still holds, the move of `session answered` or `session restore role` not done yet; detail names the predecessor. Retryable: every client (the JS `requestHead` and the Rust `head_client::request_head`) waits with doubling backoff (0.5 s up to 4 s) for at most 60 s, then reports the code; the rotation stop hook passes no wait. The read rows of the permission table (`read: true`, `questions`) and `can-i` are exempt: a pending successor gets them answered; every write verb keeps this refusal. Any other caller without the role stays role-not-held",
@@ -256,7 +273,7 @@
     "land-branch-lead-only": "land only: a branch land asked by a persona that is not a lead",
     "path-outside-grant": "land only: a path that lies in no entry of envelope.session.writes",
     "write-outside-footprint": "run only: a writes path the lead's plan footprint (read at the trunk tip) does not cover",
-    "footprint-change-refused": "land only: a lead's paths land that changes the footprint of its own plan's plan.md against the trunk tip",
+    "footprint-change-refused": "land only: a lead's paths land that changes the footprint of its own plan's plan.md against the trunk tip; the widen verb is the one door a lead changes its footprint through",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",
     "verb-timeout": "the verb ran longer than verbTimeoutMs",
     "reply-too-large": "the verb answered, but its data does not fit one reply frame (maxReplyBytes); the detail names the size. A route child that sees a host answer over its own bound refuses with this code too"
