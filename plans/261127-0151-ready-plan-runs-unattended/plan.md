@@ -1,13 +1,13 @@
 ---
 contract: plan-v1
 title: "A ready plan runs to done without the owner: the standing rule as rule units, an Unattended run section the contract check enforces, and a full-gate door the lead calls"
-status: ready
+status: running
 priority: P0
 blockedBy:
   - 261126-2318-plan-footprint-overlap-warns
   - 261127-0143-widen-running-plan-footprint
   - 261127-0144-when-to-ask-owner-rule
-base: 09a2a89882ec273a1abda2062e0cfe6b044f0a8b
+base: a18928ae4f56ac14453eb5fa47027b548f82255d
 footprint:
   - plans/261127-0151-ready-plan-runs-unattended/**
   - core/instructions/ready-plan-runs-unattended.md
@@ -39,6 +39,8 @@ source:
   - plans/discussions/ds-que32ftgg6-ready-plan-runs-unattended/DISCUSSION.md
   - p-u3nndr6vsh
 created: 2026-11-27
+lead: head:lead-forgent-261127-0151-ready-c75c2
+host: fg-server2-jdp2bv
 ---
 
 # A ready plan runs to done without the owner
