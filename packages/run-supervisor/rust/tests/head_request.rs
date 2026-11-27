@@ -1291,6 +1291,7 @@ fn release_check_runs_only_the_checks_in_the_named_worktree_and_a_red_check_is_a
     // A red check does not fail the ticket: it is the answer, and every check still ran.
     assert_eq!(settled["state"], "done", "{settled}");
     assert_eq!(settled["result"]["green"], false, "{settled}");
+    assert_eq!(settled["exit"], 1, "red carries a non-zero exit: {settled}");
     assert_eq!(
         settled["result"]["checks"],
         json!([{"argv": ["sh", "-c", "pwd > \"$OUT/check-cwd\""], "exit": 0}, {"argv": ["false"], "exit": 1}])

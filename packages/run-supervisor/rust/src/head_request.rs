@@ -2399,6 +2399,15 @@ fn release_check(cfg: &Arc<Config>, request: &Request) -> Outcome {
                 Ok(report) => {
                     ticket["state"] = json!("done");
                     ticket["result"] = report.to_value();
+                    // Red is still an answer (state done, result carried), but the ticket's exit is the first
+                    // red check's own non-zero exit, or 1 when that check could not be run.
+                    if !report.green {
+                        let first_red = report.checks.iter().find(|c| c.exit != Some(0));
+                        ticket["exit"] = json!(first_red
+                            .and_then(|c| c.exit)
+                            .filter(|code| *code != 0)
+                            .unwrap_or(1));
+                    }
                 }
                 Err(why) => {
                     ticket["state"] = json!("failed");
