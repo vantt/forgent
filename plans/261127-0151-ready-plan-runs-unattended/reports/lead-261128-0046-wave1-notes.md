@@ -85,3 +85,19 @@ Set phases 1-3 `done` with `fgos land --paths`, then start wave 2 (phase 4).
   and total checks out; no claimed run overstated.
 - Three nits, all accepted and fixed by the lead: line 99 wrongly said phase 11 removes worktrees; the summary
   overstated cleanup coverage (3 of 7); a per-class caught / partial / not-caught table was added for criterion 4.
+
+## Phase 5 (wave 3), in progress
+
+- Worktree p05 (`/home/vantt/projects/forgent-worktrees/261127-0151-ready-plan-runs-unattended-p05`, branch
+  `ready-plan-runs-unattended/p05`, base `42707f49ce`, which holds phases 1-4) carries the changelog fragment
+  `15a54a7326`.
+- Contract checks, run from the main checkout (inside a worktree the check tries to stage the git addon on a read-only
+  path): `--plan` this plan prints `ok`. `--all` exits 1 only on pre-existing errors of plans 261118-1117 (7) and
+  261123-0815 (1), the same as on main.
+- Release sha256:bdba9819 (main `da775af821`) is active, but `fgos release check --worktree <p05>` is refused
+  `verb-not-granted`. The head's request server (`fgos internal gate`, started 00:01:59 from release sha256:460a9af0)
+  compiles the permission table in (`include_str!` in `packages/session-host/rust/src/permissions.rs`), so it keeps the
+  table from before the lead's `release check` row until it is restarted on the new release.
+- Remaining: green gate on p05 through the door; red proof in a scratch worktree (main unchanged, no release record);
+  `reports/integration.md`; land p05; set phase 5 and the plan `done`; list p01-p04 worktrees and merged branches for
+  the supervisor (U3).
