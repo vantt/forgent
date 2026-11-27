@@ -149,6 +149,8 @@ item steps (bootstrap, `Mode:` lane, split specs, verify sync) and:
 2. Write `plans/<dir>/plan.md` and its phase files per `../_shared/plan-contract.md`; take `<dir>`
    from `fgos convention path --kind plan`. Before the phase table, run `fgos authority locate` for each new
    thing and write the Authority map (Step 2); `authority: inactive` where the project has no model.
+   Write `host` (an Identity machine id) only when the discussion or the owner names the machine that must run the
+   plan; otherwise leave it out, so any machine may claim it.
 3. Run `node scripts/plan-contract-check.mjs --plan plans/<dir>` and fix every error.
 4. Land the plan directory with `fgos land --paths plans/<dir> --message "..."`, with `status: draft`, then set
    `status: ready` last with a second `fgos land --paths` of `plan.md` alone. The `ready` flip is what wakes the
