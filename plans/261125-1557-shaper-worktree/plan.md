@@ -180,7 +180,8 @@ to `ready`, drop the `blockedBy`, and land the plan dir. Nothing else in the pla
 | 7 | [The shaper worktree works on a fresh project and runs its hooks](phase-07-shaper-worktree-live-fixes.md) | 4 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 4 | done |
 | 8 | [The rotation hook finds the head's lineage from a worktree](phase-08-rotation-hook-project-root.md) | 7 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_rotation_hook.rs, `packages/agent-start-context/goldens/NOTES.md` | 5 | done |
 | 9 | [A head's requests act on its launch project, not its working checkout](phase-09-request-handler-project-root.md) | 8 | packages/execution/rust/src/seat_session.rs, packages/execution/engine/tests/transport_round.rs, packages/execution/contracts/transport-round/session-attempt.v1.json, packages/run-supervisor/contracts/envelope.v3.json, src/session-host/head-request.mjs, test/session-host/head-request.test.mjs | 6 | done |
-| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7, 8, 9 | plans/261125-1557-shaper-worktree/reports | 7 | ready |
+| 10 | [Two test fixes from the suites on main (session fields, save identity)](phase-10-head-of-test-expectation.md) | 9 | test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_write_publish.rs | 7 | ready |
+| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7, 8, 9, 10 | plans/261125-1557-shaper-worktree/reports | 8 | ready |
 
 Phase 7 was opened on 2026-11-27 by the phase 6 live proof (`reports/live-proof.md`): defect A (a fresh project has no
 `<project>-worktrees/`, so the first shaper start fails) and defect B (the project hooks look for
