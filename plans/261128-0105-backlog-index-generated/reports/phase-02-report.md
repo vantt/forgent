@@ -137,3 +137,30 @@ Change (one owned marker, no copied tag lists):
 Verification: `cargo fmt --all --check` clean; `cargo check -p fgos --tests` passes (warnings only, none new from
 these files). Tests were not run in this fix round, so `session_write_publish` duplicate-id case is unconfirmed here
 (linking can fail with OrtGetApiBase in this sandbox).
+
+## Verify run 2
+
+Command, run on the tree after fix round 3:
+
+```
+ORT_LIB_LOCATION=/home/vantt/.cache/fgos/ort-static/1.31.1 cargo test -p fgos --test session_write_publish --test portfolio_check
+```
+
+Cargo exited `0`. `test result:` lines, exactly as printed:
+
+`tests/portfolio_check.rs`:
+
+```
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+
+`tests/session_write_publish.rs`:
+
+```
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.96s
+```
+
+No failure output: neither binary printed `FAILED`, a `panicked at` line or an `error:` line. The
+`a_secretary_heads_write_is_fast_forwarded_committed_alone_pushed_and_never_forced_or_silently_lost` case that failed in
+"Verify run" (refusal code `land-backlog-index-failed` where the test expected `write-item-invalid`) now passes, so the
+fix round 3 mapping closed that gap. Both binaries are green on this tree: 21 tests, 0 failed.
