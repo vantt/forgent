@@ -21,17 +21,6 @@ import { lineageDirOf, writeHeadPlacement } from '../../src/session-host/head-st
 import { fgosDirFromRoot } from '../../src/util/fgos-file-registry.mjs';
 import { HEAD_REQUEST_SOCKET_ENV } from '../../src/session-host/head-grants.mjs';
 
-try {
-  if (process.env.FGOS_STATE_ROOT) {
-    fs.accessSync(process.env.FGOS_STATE_ROOT, fs.constants.W_OK);
-  }
-} catch {
-  const scratchState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-state-'));
-  fs.chmodSync(scratchState, 0o700);
-  fs.writeFileSync(path.join(scratchState, 'machine-id'), 'm-test\n', { mode: 0o600 });
-  process.env.FGOS_STATE_ROOT = scratchState;
-}
-
 ensureGitAddon();
 
 const scratch = (t) => {
@@ -975,15 +964,6 @@ test('e2e: a lead widens its own running plan footprint and subsequent run --wri
   const stateDir = path.join(temp, 'state');
   fs.mkdirSync(homeDir, { recursive: true });
   fs.mkdirSync(stateDir, { recursive: true, mode: 0o700 });
-  fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(path.join(stateDir, 'machine-id'), 'm-test\n', { mode: 0o600 });
-  fs.writeFileSync(path.join(stateDir, 'fgos', 'machine-id'), 'm-test\n', { mode: 0o600 });
-  const priorStateRoot = process.env.FGOS_STATE_ROOT;
-  process.env.FGOS_STATE_ROOT = path.join(stateDir, 'fgos');
-  t.after(() => {
-    if (priorStateRoot === undefined) delete process.env.FGOS_STATE_ROOT;
-    else process.env.FGOS_STATE_ROOT = priorStateRoot;
-  });
 
   const remote = path.join(temp, 'remote.git');
   execFileSync('git', ['init', '-q', '--bare', '--initial-branch=main', remote]);
@@ -1051,6 +1031,10 @@ lead: head:lead-proj-${planDir}
     path.join(root, '.git', 'info', 'exclude'),
     '.fgos/*.yaml\n.fgos/locks/\n.fgos/runtime/\n.fgos/observe/\n',
   );
+
+  fs.mkdirSync(path.join(stateDir, 'fgos'), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(stateDir, 'machine-id'), 'm-test\n', { mode: 0o600 });
+  fs.writeFileSync(path.join(stateDir, 'fgos', 'machine-id'), 'm-test\n', { mode: 0o600 });
 
   const hostEnv = {
     ...process.env,
