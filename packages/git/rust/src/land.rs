@@ -577,38 +577,15 @@ impl GitDriver {
             // Worker allocation deliberately strips .fgos and marks its tracked
             // entries skip-worktree. A Land candidate is an exact commit checkout:
             // materialize those immutable target bytes before merge/verification.
-            let state = self.land_call(
-                &candidate_repo,
-                &session.slot,
-                &["ls-files", "-z", "--", ".fgos"],
-                &[],
-            )?;
-            if !state.success {
-                return Err(state.error("land-state-paths-unreadable"));
-            }
-            if !state.stdout.is_empty() {
-                self.land_text(
-                    &candidate_repo,
-                    &session.slot,
-                    &["update-index", "--no-skip-worktree", "-z", "--stdin"],
-                    &state.stdout,
-                )?;
-                self.land_text(
-                    &candidate_repo,
-                    &session.slot,
-                    &[
-                        "--literal-pathspecs",
-                        "restore",
-                        "--source",
-                        &req.target,
-                        "--staged",
-                        "--worktree",
-                        "--pathspec-from-file=-",
-                        "--pathspec-file-nul",
-                    ],
-                    &state.stdout,
-                )?;
-            }
+            self.materialize_committed_state(&candidate_repo, held(&session.slot)?, &req.target)
+                .map_err(|mut e| {
+                    if e.cause == "worktree-state-paths-unreadable" {
+                        e.cause = "land-state-paths-unreadable".into();
+                    } else if e.cause == "worktree-command-failed" {
+                        e.cause = "land-git-failed".into();
+                    }
+                    e
+                })?;
             let merged = self.land_call(
                 &candidate_repo,
                 &session.slot,

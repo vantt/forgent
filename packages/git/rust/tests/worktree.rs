@@ -825,6 +825,67 @@ mod wal_backed {
     }
 
     #[test]
+    fn committed_state_refuses_main_checkout_and_untouched_checkout_removes_cleanly() {
+        let f = Fixture::new();
+        let err = f
+            .driver
+            .materialize_committed_state(&f.repo, vec![], f.tip.as_str())
+            .unwrap_err();
+        assert_eq!(err.cause, "worktree-identity-refused");
+
+        fs::write(f.path.join(".fgos/rules.json"), "{\"rule\":\"active\"}\n").unwrap();
+        git(&f.path, &["add", ".fgos/rules.json"]);
+        git(&f.path, &["commit", "-qm", "tracked fgos rules"]);
+        let tip = git(&f.path, &["rev-parse", "HEAD"]);
+        let tip_oid = Oid::parse(&tip, f.repo.object_format()).unwrap();
+
+        let path = f.root.join("worker");
+        f.driver
+            .create_worktree(
+                &f.repo,
+                vec![],
+                &WorktreeCreate {
+                    path: path.clone(),
+                    branch: None,
+                    base: tip_oid.clone(),
+                    session_id: None,
+                },
+                "fixture",
+                "create-worker",
+            )
+            .unwrap();
+
+        assert!(!path.join(".fgos/rules.json").exists());
+        let worker_repo = match f.driver.resolve_repo(&path, &f.path).unwrap() {
+            ResolveRepo::Repository(r) => r,
+            _ => panic!("worker repo missing"),
+        };
+        f.driver
+            .materialize_committed_state(&worker_repo, vec![], &tip)
+            .unwrap();
+        assert!(path.join(".fgos/rules.json").exists());
+
+        let discarded = f
+            .driver
+            .remove_worktree(
+                &f.repo,
+                vec![],
+                &path,
+                &WorktreeDelivery {
+                    expected_tip: tip_oid.clone(),
+                    delivered_to: tip_oid,
+                    evidence_digest: "a".repeat(64),
+                },
+                "fixture",
+                "remove-untouched",
+                IgnoredBytes::Discard,
+            )
+            .unwrap();
+        assert_eq!(discarded, DiscardedIgnored::default());
+        assert!(!path.exists());
+    }
+
+    #[test]
     fn discarding_refuses_a_worktree_with_tracked_or_untracked_changes_and_keeps_its_ignored_bytes()
     {
         for change in ["tracked", "untracked"] {
