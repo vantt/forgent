@@ -49,7 +49,7 @@ Case boundaries (what the harness cannot do for you):
 - Edits you make in your own session (Edit, Write, a subagent) are outside the ledger; the case does not see them. The approve door still guards landing.
 - Close a conductor case with `fgos workflow close <caseId>` when its closure milestones hold and no consent gate is parked. A Playbook case closes itself when it completes with a pass; a failed, blocked or parked case stays open.
 
-Ask a person only when the case cannot go on without them: a consent gate the guide marks human, an ambiguity about the request itself, a frame that must be widened, or repeated refusals across distinct approaches. How to ask: Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json (priority 2), in the template of `decision-question.md`.
+Ask a person only when the case cannot go on without them: a consent gate the guide marks human, an ambiguity about the request itself, a change to the approved goal (`decision-question.md#when-to-ask`), or repeated refusals across distinct approaches. How to ask: Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json (priority 2), in the template of `decision-question.md`.
 
 ### Step 4: Verify Evidence
 

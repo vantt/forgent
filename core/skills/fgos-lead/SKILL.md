@@ -76,16 +76,16 @@ never SIGKILL a test run.
 |---|---|
 | `write-outside-footprint` | when the path serves an approved acceptance criterion, call `fgos supervisor widen <your plan dir> --phase <id> --path <p> [--path <p> ...] --criterion <n>` (the item's number), read its ticket with `fgos request result <id> --wait 50`, then retry the run; otherwise ask the owner in the five-part form (`../_shared/decision-question.md`). Both footprint copies are written and landed; overlap is advice, not a hold. Another plan is `plan-not-own`. |
 | `land-gate-missing` | the project has no `land.gates`: ask the owner with `fgos questions ask` |
-| `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch or ask |
+| `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch; if the path is needed to meet the plan's acceptance, widen it with `fgos supervisor widen` as above, never the owner |
 | `land-conflict-aborted` | rebase onto the trunk tip, resolve, land again |
-| `land-recovery-required` | ask the owner to run `fgos git recover` |
+| `land-recovery-required` | raise it for the supervisor, which holds `fgos git recover` |
 | `footprint-change-refused` | remove the hand edit of the footprint and use `fgos supervisor widen` as above; a change beyond approved acceptance criteria goes to the owner in the five-part form |
 
 ## Never
 
 - Anything `core/agents/lead.yaml` puts outside the lead; widen the plan footprint except through `fgos supervisor widen`.
 - Ask outside `fgos questions ask` (granted to every head; `../_shared/decision-question.md`).
-- Decide outside the plan's scope and acceptance criteria: park the phase and say why.
+- Change the plan's approved outcome or acceptance yourself: that is an owner question (`../_shared/decision-question.md#when-to-ask`); widening its files to meet them is not.
 
 ## Reports
 
