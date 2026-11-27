@@ -11,7 +11,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 7 (2026-11-27 16:51). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+Round 10 (2026-11-27 17:40). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
 no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
 work and owner questions (D3).
 
@@ -28,6 +28,18 @@ Open now:
 - **Event Store vs event bus** — settled as D5 (16:50): durable first in the Event Store; the bus (the gateway
   cluster) carries only copies of such events or signals safe to lose; the received copy is a volatile read-side
   buffer of the Event Store.
+- **Event bus is its own crate** — settled as D6 (17:10): the bus core is a separate crate and component in a low
+  layer; the gateway is its cross-machine connector. Where the bus runs (its own small daemon, or inside the gateway
+  process) is open, next question.
+- **Machine daemon** — settled as D7 (17:40): one long-lived daemon per machine kept alive by the OS; each part (the
+  gateway = REST + MCP only, the bus) is a child process the daemon supervises. Open: the daemon's name (working
+  `fgosd`), which process holds the bus's cross-machine connector, the lifecycle verb's name.
+- **Timers** — design settled as D8 (one managed-unit door, timers stay as the floor). On fg-server the mailbox-sync
+  timer is installed but disabled (doctor FAIL) and the watcher has no timer (`watcher.enabled: false`); raised to the
+  supervisor (`dd5ea57dfb8b5f53`). Open: where "which machine watches which project" is stated.
+- **Project naming across machines** — provisional default (17:00, no objection yet): Identity's project id, which
+  travels with the repository (`docs/platform/identity/spec.md:94`); the machine registry maps project id to local
+  clones; two clones on one machine differ by their Event Store store id.
 - **Gateway assessment** (read-only agent, checked against source by the shaper) is in §3 rows "Gateway today" and
   "Proposed split"; the split needs owner answers on C, D, E and F before any `authority declare`.
 - D4 (naming) settled; the rename itself is outside this discussion, raised to the supervisor (event
@@ -84,21 +96,24 @@ coordination.
 | What travels ahead of git, and the no-error rule | settled, D2 | §4 |
 | What is broadcast first | settled, D3: events of mail, work and owner questions | §4 |
 | Plan and backlog | provisional: A (owner 16:20 "tạm A đi", not sure yet); reversal trigger: the event-bus framing below changes the shape, or a receiver needs to act before fetching | Their truth is a file on origin (`plan.md`, `plans/backlog.md`), not an event, so D2's same-hash rule does not apply to them as is. A plan claim is already safe: one commit that reaches origin or is undone, first push wins (plan `261127-1535-plan-claim-who-and-where`). Today another machine learns of the change only at its watcher tick: `watcher.activeIntervalSec` 60 s while it has live work, `idleIntervalSec` 900 s idle (`core/config-standard/watcher.yaml`, not overridden here; fetch at `packages/supervision/rust/src/watcher.rs:366`), plus the supervisor's wake. A: one event per push, "origin `main` moved to commit Z" (optionally with the changed paths, A′), receivers fetch and tick at once, about 1-2 s. B: one typed event per change, receivers act before fetching; safe only when sent after origin accepted Z and carrying Z; costs one event type per kind of change. C (file content travels) rejected by the shaper as a second truth |
-| Event bus framing | shaper proposal, asked in chat 16:30 | Owner 16:20 recalls "event bus" and the watcher, keeper and an action queue. What exists: the **Event Store** is the durable log (per project, crossing machines by git refs); the **supervision event queue** is "raised minus handled" over it (`packages/supervision/rust/src/queue.rs`), the action queue the owner remembers; the **watcher** is a per-project timer that fetches, runs detection definitions and raises events once; the **keeper** is a pure scheduler over scheduling records and its own past decisions; the **mailbox** wakes heads through hooks. Every consumer learns of a change by polling a timer (sync 60 s, watcher 60/900 s); nothing pushes. A bus is a log plus a push fan-out: the log exists, the push is missing. Framing: the gateway's changes broadcast is that push half, and "trunk moved" (A) is one more event on it whose subscriber is the watcher (tick now instead of at the timer); mail and questions events wake their own subscribers. No new store, no new queue |
+| Event bus framing | settled in D5, D6 | Owner 16:20 recalls "event bus" and the watcher, keeper and an action queue. What exists: the **Event Store** is the durable log (per project, crossing machines by git refs); the **supervision event queue** is "raised minus handled" over it (`packages/supervision/rust/src/queue.rs`), the action queue the owner remembers; the **watcher** is a per-project timer that fetches, runs detection definitions and raises events once; the **keeper** is a pure scheduler over scheduling records and its own past decisions; the **mailbox** wakes heads through hooks. Every consumer learns of a change by polling a timer (sync 60 s, watcher 60/900 s); nothing pushes. A bus is a log plus a push fan-out: the log exists, the push is missing. Framing: the gateway's changes broadcast is that push half, and "trunk moved" (A) is one more event on it whose subscriber is the watcher (tick now instead of at the timer); mail and questions events wake their own subscribers. No new store, no new queue |
 | Event bus: shaper's assessment | proposal; owner 16:28 "keep going that way, judge whether it is good" | Strengths: no new store, queue or second truth; A, mail and questions share one mechanism; failure only slows (timers stay as the net); subscribers exist. Three conditions: (1) received events go into an Event Store tier "received, not yet fetched", because watcher, queue and mailbox read only the Event Store; a cache inside the gateway would be invisible to them, and a fetch cannot bring an unsealed event (seal coalesces 30 s). The gateway only carries. (2) Push inside one machine too: today a local append wakes nothing either. Either every writer notifies the gateway, or the gateway watches each project's open logs (no writer change; needs the project registry); shaper leans to watching, unmeasured. (3) Each subscriber coalesces wakes through its own door and keeps the keeper's caps; a watcher tick is a process, a supervisor wake can start an LLM session. Unmeasured: watch vs append-hook cost; the coalescing window |
 | Event Store vs supervision queue | observed, owner asked 16:29 | Not a duplicate write path. The Event Store is a shared write mechanism for events only (append-only facts of any registered consumer: work, porting, identity, mailbox, supervision, questions; `packages/event-store/contracts/consumers.v1.json`); plans and backlog are files, not in it. The supervision queue appends only `supervision.event-raised` and `supervision.event-handled` through the Event Store's `append` on the `project` stream; the queue is "raised minus handled", with no store and no cache of its own (`packages/supervision/rust/src/queue.rs:1-21`). The confusion was the word "event": settled by D4 |
 | Mailbox's own record | observed in code | Two write paths: local mail is a snapshot record written under the `mailbox` mutex (`packages/mailbox/rust/store/src/record/mod.rs`), remote mail is an Event Store event (`apps/fgos/src/wiring/mailbox_remote.rs:787`, `log.append(MESSAGE_SENT, ...)`). Part of the local record is legitimate machine state (live heads, registration, delivery state). Under the bus rule: the wake is a bus signal; whether a letter must survive a restart decides whether it belongs in the Event Store. Open |
 | Event Store vs event bus | settled, D5 | Owner 16:41: "eventbus cũng ko phải là loại bền vĩnh viễn, trong khi eventstore ... là sự kiện bền". The two are separate: the Event Store is durable truth (fsync, sealed git objects, kept forever, slow across machines); the bus is a fast transient channel (may lose, empty after restart); the gateway cluster is the bus. Rule: durable first (Event Store append), then the bus may carry a copy; bus-only items must be safe to lose. The received copy is a volatile read-side buffer of the Event Store, not a durable tier |
 | Gateway today (assessment) | observed, agent read checked by the shaper | Product code about 1,420 lines of `gateway.rs` (rest is tests): verb chokepoint `spawn_fgos_verb` (361) and `FgosCliGateway{root}` (413); auth bearer + Cloudflare Access (434-537, `cf_access.rs`); REST under `/v1`: work, questions, reads, sessions (501 stubs, 1140-1161), `/runner/tick` (spawns `fgos-runner`), `/runtime` (only `distribution.build.show`, `remote_invocation.rs`), `/contract` (unauthenticated); MCP `search`/`execute` (`mcp.rs`); embedded web bundle (`apps/fgos-gateway/web`, about 3,000 lines TS). One project per process in six places: cwd root (`main.rs`), `AppState.root` ("multi-project routing ... future work", `gateway.rs:1252`), `/contract` and MCP `search` read the YAML from the root, lock `locks/gateway.lock` and registry `gateway.json` under the project `.fgos` (`apps/fgos/src/wiring/gateway_control.rs:89-96`), logs under the project `.fgos/logs`, release build from the project checkout. Already machine-level: token, port 4170, bind, Cloudflare pair. The web client is already specified to hold more than one gateway, one per machine (`herdr-web-dashboard/spec.md:99`). The 2026-10-25 stop leaves no trace: the gateway logs nothing on shutdown or panic |
 | Authority model today | observed | `fgos-gateway` live, layer entry, `paths: []`; `herdr-web-dashboard` retired yet still the spec's area owner and the only consumer of CTR010; `host-surface` also claims "gateway entrypoints" and "auth"; door `control-the-gateway-process` covers the lifecycle (`gateway_control.rs`); no row for auth, the caller record, `/runtime`, peer link, broadcast or a machine project registry; no decision kind for the gateway; `/runner/tick` conflicts with the row's `mustNotOwn: in-process runner` |
-| Proposed split | proposal (agent, shaper agrees in outline), not discussed with the owner | One binary `fgos-gateway`, a small workspace: **A** entry door + verb relay, REST and MCP together (same port, auth and verb chokepoint); row `fgos-gateway` updated, new door `relay-to-fgos-verbs`; per request a project id instead of `root`. **B** auth as a module and a door `gateway-admits-callers`, not a component. **C** dashboard: hosting only; fold the retired `herdr-web-dashboard` row into `fgos-gateway` (owner answer: changes the area map). **D** machine project registry: a module and door under `fgos-gateway`, home `~/.fgos`; lock, registry and logs move to machine scope (owner answer; holder-lock's lock registry changes; needs the project naming question). **E** peer link + membership: new crate and component `gateway-peers`, trust by Identity pins, new contract `gateway-peer.v1`; `remote_invocation.rs` deleted unless a peer-invocation job is confirmed. **F** changes broadcast: new crate and component, depends on E; the Event Store side (volatile received buffer, notify/watch of appends, fold by hash) stays in `packages/event-store` behind a door the gateway calls; subscribers subscribe through the Event Store, never through the gateway. **G** lifecycle `fgos gateway start/stop/status` stays in `apps/fgos` under `host-surface`, scope changes to machine. New components (E, F) need an answered owner question before `fgos authority declare` |
+| Proposed split | proposal (agent, shaper agrees in outline), not discussed with the owner | One binary `fgos-gateway`, a small workspace: **A** entry door + verb relay, REST and MCP together (same port, auth and verb chokepoint); row `fgos-gateway` updated, new door `relay-to-fgos-verbs`; per request a project id instead of `root`. **B** auth as a module and a door `gateway-admits-callers`, not a component. **C** dashboard: hosting only; fold the retired `herdr-web-dashboard` row into `fgos-gateway` (owner answer: changes the area map). **D** machine project registry: a module and door under `fgos-gateway`, home `~/.fgos`; lock, registry and logs move to machine scope (owner answer; holder-lock's lock registry changes; needs the project naming question). **E** peer link + membership: new crate and component `gateway-peers`, trust by Identity pins, new contract `gateway-peer.v1`; `remote_invocation.rs` deleted unless a peer-invocation job is confirmed. **F** split by D6: **F1** event bus core, its own crate and component in a low layer (publish, subscribe, wake coalescing; the Event Store publishes, subscribers subscribe); **F2** the gateway's bus connector, beside E, bridging the bus to peer gateways. The Event Store side (volatile received buffer, fold by hash) stays in `packages/event-store`. **G** lifecycle `fgos gateway start/stop/status` stays in `apps/fgos` under `host-surface`, scope changes to machine. New components (E, F1) need an answered owner question before `fgos authority declare` |
 | Gateway risks (assessment) | open | Silent stops (no shutdown log, no supervision); bind 0.0.0.0 with bearer and no TLS, so the peer link needs its own transport auth (Q2); dependency advisories p-7e41b0d3 should be audited before crates are added; `/runner/tick` and the 501 session routes need a keep-or-drop decision |
+| Machine daemon | settled in outline, D7; details open | Owner 17:22 (verbatim): "thiết kế gateway cho tốt để nó sống dai, và nó duy trì sự sống của mcp, rest, và bus. nếu cần có thể đặt lại tên phù hợp hơn, thực chất chỉ có mcp và rest là gateway". Shaper's shape: (1) **Names**: the per-machine process is the machine daemon (working name `fgosd`); "gateway" means only the REST + MCP door it hosts; the bus (D6) is a separate part it hosts. (2) **Two levels of keeping alive**: the OS keeps the daemon alive as a user service (systemd user service with restart, launchd agent with KeepAlive), rendered and checked through the existing `managed timer` door (`packages/distribution/rust/src/timer.rs`, door `packages/component-authority/model/doors/managed-timer.yaml`, already writes per-project systemd/launchd units) extended to a service, not a second mechanism beside it (L10); inside, the daemon supervises its parts (gateway, bus core, bus connector) and restarts one failed part without stopping the others. (3) **Never silent**: every part start, stop, panic and restart is recorded with its reason (today the gateway logs nothing on exit); `status` reports each part; a doctor row for the service (install gate). (4) **What it runs**: the activated release's binary, never a `cargo build` from a checkout (today's `fgos gateway start` builds from the project checkout, `gateway_control.rs:389-401`). (5) **If the daemon is down**: subscribers fall back to their timers (D5), so a dead daemon only slows. Process model settled by D7: one child process per part. Open: the daemon's name; whether the bus's cross-machine connector runs in the bus process or its own child (the gateway is REST + MCP only); the lifecycle verb's new name (`fgos daemon start/stop/status`?) |
+| Timers | observed 17:32; design settled, D8 | Correction: the round-4 note "watcher ticks every 60 s busy, 900 s idle" holds only where `watcher.enabled` is true; on fg-server it is false (`core/config-standard/watcher.yaml:6`, not overridden), so no OS timer runs `fgos watcher tick` there and the keeper runs only when something calls `supervisor wake`. `fgos doctor`: `mailbox-sync-timer` FAIL, unit `fgos-mailbox-sync-e9756c48.timer` installed but disabled, so cross-machine mail waits for a session to run a tool; `account-probe-timer` and `watcher-timer` OK because both are off. Raised `dd5ea57dfb8b5f53`. Design: the `managed timer` door (`packages/distribution/rust/src/timer.rs`) becomes one managed-unit door with two kinds, timer and service, and the daemon's service goes through it (L10); timers stay as the floor and run independently of the daemon (D5), their periods may grow once the bus pushes; doctor checks "installed but not running" for the service as for timers; which machine runs the watcher of which project is stated in one place, tied to the plan `host` rule |
+| Watcher vs keeper | observed | Watcher: per-project OS timer tick, no LLM; fetches the trunk, runs detection definitions, raises attention items once, runs the action per row kind (`watcher.rs`). Keeper: a pure decision function over scheduling records, clock, actor state, caps and its own past decisions; decides start, wake, hold or raise; runs inside `fgos supervisor wake` after admission (`wake.rs:143-164`). Chain: timer, watcher tick, supervisor wake (admission, keeper), supervisor LLM session only for judgement. The watcher is the bus subscriber; the keeper speeds up with it |
 | One gateway per machine vs today | observed | Today one gateway serves one project: `run(root)` and `FgosCliGateway { root }` (`gateway.rs:1394-1408`), lock `.fgos/locks/gateway.lock` and logs under that project's `.fgos/`, fixed port 4170 (`gateway.rs:1935`); a second project on the same machine collides on the port. One-per-machine needs a machine-level home (state under `~/.fgos`, not a project's `.fgos`) and a registry of the machine's projects, each request and each broadcast naming its project |
 | Network path between machines | owner-stated 16:51, not yet a D-ID | Owner: "local network and tailscale". Tailscale runs on fg-server (backend `Running`, MagicDNS name under a `.ts.net` tailnet, 8 peers, 5 online at 16:52). So a peer link can reach other gateways by tailnet name with no public exposure; the LAN is a faster path where both machines share it. Transport auth stays Identity pins (D-pending), independent of the network; whether to stop binding 0.0.0.0 in favour of the tailnet and loopback is a follow-up |
 | Trust between cluster members | observed, reusable | Identity holds confirmed per-machine ssh-ed25519 pins (`fgos identity pins`, e.g. `design-lap-iezwlz` confirmed 2026-10-25); a peer link can authenticate with them |
 | Plan placement and admission travel only through git pushes of `plan.md` | observed | `ds-izibwo45vm`, plan `261127-1535-plan-claim-who-and-where`; a gateway signal would run ahead of this, never replace it |
 | Component split | open, next round | Shaper's first cut, to discuss: (1) peer link and membership (who is in the cluster, authenticated by Identity pins); (2) changes broadcast (send and receive the acked events; the fast cache on the receiving side); (5) project registry (which projects this machine serves); (3) entry door and verb relay (REST + MCP, today's routes); (4) dashboard (web bundle). Which of these is a crate vs a module, and which component row owns each, is not decided; `fgos authority locate` to run once the shape holds |
-| Many projects on one gateway | open, next round | The event store and mailbox are per project (per clone); the gateway becomes per machine. Every broadcast and every relayed request names its project; how projects are identified across machines (same repo cloned on several machines vs different repos) is not decided |
+| Many projects on one gateway | provisional default 17:00 | Key: Identity project id, which travels with the repository, so one repo cloned on several machines has one id (`fgos identity project`: `forgent` = `08b07657...`; `docs/platform/identity/spec.md:94`). The machine registry maps project id to its local clones; two clones on one machine differ by Event Store store id. Every relayed request and every bus item names the project id |
 
 ## 4. Quyết định đã chốt
 
@@ -109,6 +124,9 @@ coordination.
 | D3 | The first things broadcast are event-store events: mail, work and owner questions. Plan and backlog changes are not covered by D3 and are discussed separately | 2026-11-27 | shaper 16:10, owner agreed 16:13 |
 | D4 | Naming: keep the name **Event Store** (already generic: the append-only store of facts of any domain; a rename would touch 843 files, 5,081 mentions, the published `refs/fgos/events/*` refs, the `eventStore` key and the `fgos events` verbs). The supervision "event queue" becomes the **attention queue** and its rows **attention items**, matching `core/attention/`; "event" keeps one meaning. The rename is its own item, outside this discussion | 2026-11-27 | shaper 16:30, owner agreed 16:31 |
 | D5 | The Event Store and the event bus are separate. The Event Store is the durable truth (fsync, sealed git objects, kept forever, slow across machines). The event bus is a fast, transient channel that may lose items and is empty after a restart; the gateway cluster is the bus. Rule: whatever must survive is appended to the Event Store first, and only then may the bus carry a copy; anything carried only by the bus is a signal that is safe to lose (for example "origin `main` moved to commit Z", liveness). The received copy of D2 is a volatile read-side buffer owned by the Event Store (never fsynced, never written to a ref, gone on restart), not a cache inside the gateway; subscribers read it through the Event Store. Refines where D2's cache lives | 2026-11-27 | owner 16:41, shaper 16:45, owner agreed 16:50 |
+| D6 | The event bus is its own crate and its own component, in a low layer just above the Event Store: its core owns publish, subscribe and wake coalescing; the Event Store publishes to it, subscribers (watcher, attention queue, mailbox, questions) subscribe to it. The gateway is one connector of the bus, the one that bridges it to other machines; a machine-local path is another. Reason: subscribers are lower layers and must never know the entry-layer gateway (design principle 2); the bus core stays transport-free (principle 3); the local fast path survives a gateway outage. Supersedes the part of D1 that said the gateway "is the changes broadcast": the gateway is the bus's cross-machine connector. Which process hosts the bus is not decided | 2026-11-27 | owner 17:05, shaper 17:06, owner agreed 17:10 |
+| D7 | One long-lived **machine daemon** per machine (working name `fgosd`), kept alive by the OS as a user service. Each part runs as a **child process the daemon supervises**: the **gateway**, which now means only the REST + MCP door, and the **event bus** (D6); a failed child is restarted alone, the others keep running. The daemon itself is the supervisor. Refines D1's wording: "gateway" no longer names the whole per-machine process | 2026-11-27 | owner 17:22 and 17:38, shaper 17:25 |
+| D8 | Timers and the daemon service go through one door: the `managed timer` door (`packages/distribution/rust/src/timer.rs`) becomes a managed-unit door with two kinds, timer and service; no systemd or launchd unit is written anywhere else (L10). Timers stay as the floor and run independently of the daemon, so a dead daemon only slows (D5); their periods may grow once the bus pushes, never to zero. Doctor checks "installed but not running" for the service as it does for timers. Which machine runs the watcher of which project is stated in one place, tied to the plan `host` rule (where that place is, is open) | 2026-11-27 | shaper 17:32, owner agreed 17:40 |
 
 ## 5. Q&A log
 
@@ -161,40 +179,70 @@ coordination.
   safe to lose". Minted D5; §6 regenerated.
 - 2026-11-27 16:51 — Owner answered Q2 in chat: "local network and tailscale". `q-pke5ht4y5e` cancelled as answered
   in chat. Shaper checked Tailscale is running on fg-server (§3).
+- 2026-11-27 17:00 — Shaper proposed Identity's project id as the project key across machines (provisional default).
+- 2026-11-27 17:05 — Owner: "có nên build event bus riêng và gateway là 1 đầu nối?" Shaper: yes, mainly for layering
+  (subscribers are lower layers and must not know the gateway); cost: a new component, a running process to place, D1
+  reworded.
+- 2026-11-27 17:10 — Owner: "eventbus phải là crate riêng, process thì tính tiếp". Minted D6; split F into F1 (bus
+  core) and F2 (gateway connector); §6 regenerated.
+- 2026-11-27 17:12-17:20 — Shaper: the round-8 land was refused `merge-slot-busy` three times; the edit was kept in
+  the session scratchpad and the main checkout restored, then reapplied in round 9.
+- 2026-11-27 17:22 — Owner: design it to live long and keep MCP, REST and the bus alive; rename where it fits, only MCP
+  and REST are the gateway. Shaper: proposal in §3 row "Machine daemon".
+- 2026-11-27 17:30 — Owner: does the timer side need anything to be proper? Shaper: found the mailbox-sync timer
+  disabled and no watcher timer on fg-server (raised `dd5ea57dfb8b5f53`), corrected the round-4 watcher claim, and
+  proposed one managed-unit door, timers as the floor, one place stating who watches which project.
+- 2026-11-27 17:35 — Owner: how does the keeper differ from the watcher? Shaper: watcher detects, keeper schedules,
+  supervisor judges (§3 row "Watcher vs keeper").
+- 2026-11-27 17:38 — Owner: "mỗi phần là một process con do daemon trông". Minted D7.
+- 2026-11-27 17:40 — Owner: "đồng ý chuẩn hóa thiết kế" on the timer proposal. Minted D8; §6 regenerated.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Each machine runs one fgOS gateway (D1). It is the machine's remote entry door: requests from outside (REST, MCP, the
-web dashboard) are relayed to the fgOS verbs of the project they name. The gateways of the owner's machines link into
-a cluster that is the **event bus**: a fast, transient channel, not a store (D5). Truth and durability stay in the
-**Event Store** and git: an event is appended and acked there first, and only then may the bus carry a copy of its
-exact bytes and hash to the other machines (D2). The first copies carried are mail, work and owner-question events
-(D3); plan and backlog changes are provisionally one signal, "origin `main` moved to commit Z", that makes receivers
-fetch and tick their watcher at once. On a receiving machine the copy goes into a volatile read-side buffer owned by
-the Event Store, so the existing subscribers (watcher, the attention queue, mailbox, questions) see it at once through
-the Event Store they already read; when git brings the sealed event it has the same hash and is folded once. Anything
-the bus carries alone is safe to lose; a lost item only falls back to timer speed. There is no leader and no lease.
+Each machine runs one long-lived **machine daemon** (working name `fgosd`), kept alive by the OS as a user service
+written through the one managed-unit door (D7, D8). The daemon is only a supervisor: each part runs as a child process
+it starts, watches and restarts alone, and every start, stop, panic and restart is recorded with its reason. The
+parts are:
+
+- the **gateway** — only the REST + MCP door: requests from outside (including the web dashboard it hosts) are
+  relayed to the fgOS verbs of the project they name, by Identity project id (D1, D7; project key provisional);
+- the **event bus** — its own crate and component in a low layer just above the Event Store (D6): publish, subscribe,
+  wake coalescing, plus the cross-machine connector that links the buses of the owner's machines over Tailscale or the
+  local network, trusted by Identity machine pins.
+
+The bus is transient; the **Event Store** and git stay the durable truth (D5). An event is appended and acked in the
+Event Store first; the Event Store then publishes it on the bus, and the subscribers (watcher, attention queue,
+mailbox, questions) are woken at once instead of at their timers. The connector carries the exact event bytes and hash
+to the other machines, where the copy enters a volatile read-side buffer owned by the Event Store; when git brings the
+sealed event it has the same hash and is folded once (D2). The first items are mail, work and owner-question events
+(D3); plan and backlog changes are provisionally one signal, "origin `main` moved to commit Z", whose subscriber is the
+watcher, which then runs the keeper through `supervisor wake`. The OS timers stay as the floor and run without the
+daemon (D8), so a dead daemon or a lost bus item only falls back to timer speed. There is no leader and no lease.
 Names: Event Store stays; the supervision queue becomes the attention queue (D4).
 
-Not settled yet: the component split (§3 "Proposed split": C, D, E, F need owner answers), how a project is named
-across machines, push inside one machine (append notify vs open-log watch), wake
-coalescing per subscriber, whether letters of local mail must survive a restart, and plan/backlog beyond the
-provisional signal.
+Not settled yet: the daemon's name and lifecycle verb; where the bus connector process sits; the component split C, D,
+E, F1 (owner answers before any `authority declare`); push inside one machine (append notify vs open-log watch); wake
+coalescing per subscriber; whether letters of local mail must survive a restart; who watches which project; plan and
+backlog beyond the provisional signal.
 
 ```mermaid
 flowchart LR
-  X[outside: REST, MCP, dashboard] --> D1
-  subgraph M1[machine A: one gateway]
-    D1[entry door / verb relay] --> V1[fgos verbs of project P]
-    ES1[Event Store of P: append, fsync, ack] -->|copy: event bytes + hash| B1[bus: changes broadcast]
+  X[outside: REST, MCP, dashboard] --> GW1
+  OS1[OS user service, managed-unit door] --> D1
+  subgraph M1[machine A]
+    D1[machine daemon: supervisor only] --> GW1[child: gateway REST + MCP]
+    D1 --> BUS1[child: event bus + connector]
+    GW1 --> V1[fgos verbs of project P]
+    ES1[Event Store of P: append, fsync, ack] --> BUS1
+    BUS1 --> S1[subscribers: watcher, attention queue, mailbox, questions]
+    T1[OS timers: the floor] --> S1
   end
-  subgraph M2[machine B: one gateway]
-    B2[bus: changes broadcast] --> R2[Event Store read-side buffer, volatile]
-    R2 --> S2[subscribers: watcher, attention queue, mailbox, questions]
-    ES2[Event Store of P: fetch, union by hash] --> S2
+  subgraph M2[machine B]
+    BUS2[child: event bus + connector] --> R2[Event Store read-side buffer, volatile]
+    R2 --> S2[subscribers]
   end
-  B1 <-->|peer link, Identity pins| B2
-  ES1 -. git: seal, push, fetch - durable truth, slower .-> ES2
+  BUS1 <-->|Tailscale / LAN, Identity pins| BUS2
+  ES1 -. git: seal, push, fetch - durable truth, slower .-> R2
 ```
 
 ## 7. Danh mục hạng mục / task {#tasks}
