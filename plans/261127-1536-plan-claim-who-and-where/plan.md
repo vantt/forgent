@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Claiming a plan: one host record on origin decides which machine runs it, and an admission either reaches origin or is undone"
-status: draft
+status: withdrawn
 priority: P1
 host: fg-server-sqs7es
 blockedBy:
@@ -36,6 +36,10 @@ created: 2026-11-27
 ---
 
 # Claiming a plan: who runs it, on which machine
+
+**Withdrawn as a duplicate (2026-11-27).** Two planner sessions wrote a plan for the same discussion at the same
+time. [261127-1535-plan-claim-who-and-where](../261127-1535-plan-claim-who-and-where/plan.md) landed first and is
+the plan that runs; this one is kept for history only and must not be admitted.
 
 Answers the settled discussion
 [ds-izibwo45vm](../discussions/ds-izibwo45vm-plan-claim-who-and-where/DISCUSSION.md) (decisions D2, D4-D9; D1 and
