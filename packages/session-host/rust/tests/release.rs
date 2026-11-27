@@ -27,6 +27,8 @@ struct Fixture {
     looks: RefCell<usize>,
     /// Argv lines that exit non-zero.
     failing: Vec<&'static str>,
+    /// Argv lines that cannot be started at all.
+    unrunnable: Vec<&'static str>,
     /// The owner question cannot be filed.
     ask_fails: bool,
     ran: RefCell<Vec<String>>,
@@ -52,6 +54,7 @@ impl Fixture {
             free_looks: 0,
             looks: RefCell::default(),
             failing: vec![],
+            unrunnable: vec![],
             ask_fails: false,
             ran: RefCell::default(),
             asked: RefCell::default(),
@@ -119,6 +122,9 @@ impl ReleasePorts for Fixture {
             dir.map_or("root".to_string(), |dir| dir.display().to_string())
         ));
         self.ran.borrow_mut().push(line.clone());
+        if self.unrunnable.contains(&line.as_str()) {
+            return Err("no such program".into());
+        }
         Ok(i32::from(self.failing.contains(&line.as_str())))
     }
     fn ask_owner(&self, apply: &[String]) -> Result<String, String> {
@@ -304,6 +310,21 @@ fn the_checks_run_in_a_checkout_of_the_tip_made_before_them_and_removed_after_th
             remove.clone(),
         ]
     );
+
+    // A check that cannot be started ends as not run; the checkout is still removed and nothing later runs.
+    let mut fixture = Fixture::with(reversible());
+    fixture.unrunnable = vec!["check one"];
+    assert_eq!(run(&fixture).code(), "check-not-run");
+    assert_eq!(
+        *fixture.events.borrow(),
+        [
+            "look".to_string(),
+            make.clone(),
+            format!("run check one in {CHECKOUT}"),
+            remove.clone(),
+        ]
+    );
+    assert!(fixture.steps_written.borrow().is_empty());
 
     // A rollback after a failed probe runs from the root too.
     let mut fixture = Fixture::with(reversible());
