@@ -69,8 +69,8 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
    Message a peer session only when a decision is needed from it, never for progress. A Claude session on this
    machine: SendMessage to it (ListAgents names who is alive); your sandbox reaches the peers' session sockets
    read-only, so you can send but peers cannot SendMessage you back. Another machine, a non-Claude agent, or mail
-   that must be signed or kept: `fgos mailbox send --to <role or handle>` (for example `--to lead:OPC`). Replies and
-   mail sent to you arrive through the mailbox hook.
+   that must be signed or kept: mail it as `../_shared/head-mail.md` says. Replies and mail sent to you arrive
+   through the mailbox hook.
 4. **Order.** Order the topics by the product priority (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json). A real tie goes to the owner as a question.
 
 A release the supervisor started and did not come back from is the secretary's to undo. You cannot read the
@@ -114,7 +114,7 @@ Local verbs, run in your own sandbox without the socket (the host routes only th
 |---|---|
 | `fgos identity mint backlog` | OK |
 | `fgos questions show <id>` | OK, but warns `questions.json: durable install failed ... Read-only file system` (the answer is complete; the warning is the view refresh failing, safe to ignore) |
-| `fgos mailbox send --to <role or handle>`, `fgos convention path ...` | not audited live |
+| `fgos mailbox send` (see `../_shared/head-mail.md`), `fgos convention path ...` | not audited live |
 
 `TMPDIR=/tmp` is writable (OK).
 
