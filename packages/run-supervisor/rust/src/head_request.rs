@@ -74,6 +74,9 @@ pub const BIND_VERB: &str = "session bind session";
 /// path must be named by `envelope.session.writes` (exactly, or as a plain file directly beneath the directory of a
 /// `<dir>/*` entry, which may create it) and be a regular file reached without a symlink, and the new content is installed atomically through the durable-file door ([`install_granted`]), then published through [`WritePublisher`].
 pub const WRITE_VERB: &str = "session write";
+/// The verb of a head committing paths of its own linked worktree: `{paths, message}`, every path inside
+/// `envelope.session.writes`; answered by the supervisor, one commit on the checked-out branch, nothing fetched or pushed.
+pub const SAVE_VERB: &str = "session save";
 
 /// The frame verb that carries an `fgos` argv: `args` is `{argv: [string]}`. The argv is decided by the permission
 /// table of `fgos_session_host::permissions` for the caller's persona and, when allowed, run by the host with no shell
@@ -157,6 +160,8 @@ type CatchesUp = Box<dyn Fn(&Path) -> Result<(), CatchUpRefusal> + Send + Sync>;
 type PathOid = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
 type PathClean = Box<dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync>;
 type PublishesWrite = Box<dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync>;
+type SavesCommit =
+    Box<dyn Fn(&Path, &[String], &str) -> Result<String, PublishRefusal> + Send + Sync>;
 
 pub use crate::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 
@@ -211,6 +216,9 @@ pub struct Config {
     /// [`WRITE_VERB`], after the write: publishes `path` and returns the commit. A refusal comes back in the reply by
     /// its own name, the file stays written, nothing is forced.
     pub publish_write: PublishesWrite,
+    /// [`SAVE_VERB`]: commits exactly the given paths (checked inside the grant) of the linked worktree `cwd` with the
+    /// message, as the head's writer, and returns the commit. `save-nothing-to-commit` is its refusal for no change.
+    pub save_commit: SavesCommit,
     /// One line per request, for `supervisor.log`.
     pub log: LogLine,
 }
@@ -387,6 +395,10 @@ impl HeadRequests {
                 let (publish, role, writer_id) =
                     (publisher.publish.clone(), role.clone(), writer_id.clone());
                 move |root, path| publish(root, path, &role, &writer_id)
+            }),
+            save_commit: Box::new({
+                let (save, writer_id) = (publisher.save.clone(), writer_id.clone());
+                move |checkout, paths, message| save(checkout, paths, message, &writer_id)
             }),
             take_role: Box::new({
                 let gate = gate.clone();
@@ -970,6 +982,63 @@ fn write_and_publish(cfg: &Config, args: &Value) -> Outcome {
     })
 }
 
+/// [`SAVE_VERB`] in full, in contract order: the arguments (`bad-args`, `path-invalid`), the working checkout is a
+/// linked worktree (`save-needs-linked-worktree`: its `.git` is a file, the main checkout's a directory), every path
+/// lies inside `writes` (`path-outside-grant`), then one commit of exactly those paths (`save-nothing-to-commit` when
+/// it changes nothing). Every refusal leaves nothing committed.
+fn save_paths(cfg: &Config, args: &Value) -> Outcome {
+    let refuse = |code: &'static str, detail: Option<String>| Outcome::Refused { code, detail };
+    let bad = || {
+        refuse(
+            "bad-args",
+            Some(
+                "args must be {paths, message}: a non-empty array of paths and a non-empty message"
+                    .into(),
+            ),
+        )
+    };
+    let Some(object) = args.as_object().filter(|o| o.len() == 2) else {
+        return bad();
+    };
+    let message = match object.get("message").and_then(Value::as_str) {
+        Some(message) if !message.trim().is_empty() => message,
+        _ => return bad(),
+    };
+    let paths: Vec<String> = match object.get("paths").and_then(Value::as_array) {
+        Some(list) if !list.is_empty() => {
+            match list
+                .iter()
+                .map(|v| v.as_str().map(String::from))
+                .collect::<Option<Vec<_>>>()
+            {
+                Some(paths) => paths,
+                None => return bad(),
+            }
+        }
+        _ => return bad(),
+    };
+    if let Some(path) = paths.iter().find(|path| !plain_relative(path)) {
+        return refuse("path-invalid", Some(path.clone()));
+    }
+    let linked = std::fs::symlink_metadata(cfg.cwd.join(".git")).is_ok_and(|m| m.is_file());
+    if !linked {
+        return refuse("save-needs-linked-worktree", None);
+    }
+    if let Some(path) = paths
+        .iter()
+        .find(|path| !cfg.writes.iter().any(|granted| names_grant(granted, path)))
+    {
+        return refuse("path-outside-grant", Some(path.clone()));
+    }
+    match (cfg.save_commit)(&cfg.cwd, &paths, message) {
+        Ok(commit) => Outcome::Done(json!({"commit": commit, "paths": paths})),
+        Err(why) if why.code == "save-nothing-to-commit" => {
+            refuse("save-nothing-to-commit", Some(why.detail))
+        }
+        Err(why) => refuse("save-failed", Some(format!("{}: {}", why.code, why.detail))),
+    }
+}
+
 /// The publish refusals raised before the publisher commits or lands anything: the content was judged invalid, nothing
 /// of it is in Git.
 const REFUSED_BEFORE_COMMIT: [&str; 2] = ["write-item-invalid", "write-index-failed"];
@@ -1369,7 +1438,7 @@ fn decide(cfg: &Arc<Config>, busy: &AtomicBool, request: &Request, peer: Option<
     if request.verb == CAN_I_VERB {
         return can_i(cfg, &request.args);
     }
-    if request.verb == WRITE_VERB {
+    if request.verb == WRITE_VERB || request.verb == SAVE_VERB {
         if let Err(why) = (cfg.caller_under_gate)(peer) {
             (cfg.log)(&format!(
                 "head-request {} peer {}: {}",
@@ -1405,6 +1474,9 @@ fn decide(cfg: &Arc<Config>, busy: &AtomicBool, request: &Request, peer: Option<
     }
     if request.verb == WRITE_VERB {
         return write_and_publish(cfg, &request.args);
+    }
+    if request.verb == SAVE_VERB {
+        return save_paths(cfg, &request.args);
     }
     if request.verb == FGOS_VERB {
         return forward(cfg, request);

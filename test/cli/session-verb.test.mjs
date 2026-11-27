@@ -30,6 +30,8 @@ test('a session call without a persona or --name, or with a malformed one, is re
     [['session', 'bogus', 'secretary', '--name', 'miu'], /sub-verb/],
     [['session', 'end', 'secretary', '--name', 'miu'], /unknown session sub-verb "end"/],
     [['session', 'write'], /requires a path/],
+    [['session', 'save'], /at least one path/],
+    [['session', 'save', 'docs/backlog.md'], /--message/],
     [['session', 'stop', 'secretary'], /--name/],
     [['session', 'stop', 'Bad_Persona', '--name', 'miu'], /bad-persona/],
     [['session', 'start', 'secretary', '--name', 'miu', '--for-question'], /--for-question/],
@@ -77,7 +79,7 @@ test('request result takes its wait as the separate-token form `--wait 50`, as t
 
 test('a confined caller without a request socket is refused as precondition by every subcommand, starting or writing nothing', () => {
   const cwd = project();
-  for (const args of [['start', 'secretary', '--name', 'miu'], ['rotate', 'secretary', '--name', 'miu'], ['stop', 'secretary', '--name', 'miu'], ['write', 'docs/backlog.md']]) {
+  for (const args of [['start', 'secretary', '--name', 'miu'], ['rotate', 'secretary', '--name', 'miu'], ['stop', 'secretary', '--name', 'miu'], ['write', 'docs/backlog.md'], ['save', 'docs/backlog.md', '--message', 'm']]) {
     const sub = args[0];
     const result = run(cwd, ['session', ...args], { FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: '' });
     assert.equal(result.status, EXIT_PRECONDITION, `${sub}: ${result.stderr}`);
@@ -113,6 +115,42 @@ test('a published session write prints the commit it landed as one line', async 
     const status = await new Promise((resolve) => child.on('close', resolve));
     assert.equal(status, 0, stderr);
     assert.equal(stdout, 'committed c0ffee\n');
+  } finally {
+    server.close();
+  }
+});
+
+test('a session save sends every path and the message as one session save request and prints the commit as one line', async () => {
+  const cwd = project();
+  const socketPath = path.join(cwd, 'req.sock');
+  let seen;
+  const server = net.createServer((conn) => {
+    let received = Buffer.alloc(0);
+    conn.on('data', (chunk) => {
+      received = Buffer.concat([received, chunk]);
+      if (received.length < 4 || received.length < 4 + received.readUInt32BE(0)) return;
+      const request = JSON.parse(received.subarray(4, 4 + received.readUInt32BE(0)).toString('utf8'));
+      seen = request;
+      const body = Buffer.from(JSON.stringify({ type: 'REPLY', id: request.id, result: 'done', data: { commit: 'c0ffee', paths: request.args.paths } }));
+      const head = Buffer.alloc(4);
+      head.writeUInt32BE(body.length);
+      conn.end(Buffer.concat([head, body]));
+    });
+  });
+  await new Promise((resolve) => server.listen(socketPath, resolve));
+  try {
+    const child = spawn(process.execPath, [FGOS, 'session', 'save', 'docs/a.md', 'docs/b.md', '--message', 'docs: save both'], {
+      cwd, env: { ...process.env, FGOS_CONFINED: '1', FGOS_HEAD_REQUEST_SOCKET: socketPath },
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => { stdout += chunk; });
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    const status = await new Promise((resolve) => child.on('close', resolve));
+    assert.equal(status, 0, stderr);
+    assert.equal(stdout, 'committed c0ffee\n');
+    assert.equal(seen.verb, 'session save');
+    assert.deepEqual(seen.args, { paths: ['docs/a.md', 'docs/b.md'], message: 'docs: save both' });
   } finally {
     server.close();
   }

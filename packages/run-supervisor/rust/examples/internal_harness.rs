@@ -25,6 +25,7 @@ fn main() {
         path_clean: Arc::new(|_, _| Err(no_land())),
         path_oid: Arc::new(|_, _| Err(no_land())),
         publish: Arc::new(|_, _, _, _| Err(no_land())),
+        save: Arc::new(|_, _, _, _| Err(no_land())),
     };
     let args: Vec<String> = std::env::args().skip(1).collect();
     let code = match (args.first().map(String::as_str), args.get(1)) {

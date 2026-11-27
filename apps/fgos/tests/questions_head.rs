@@ -436,6 +436,7 @@ impl ServedSupervisor {
             path_clean: Arc::new(|_, _| unreachable!("no session write here")),
             path_oid: Arc::new(|_, _| unreachable!("no session write here")),
             publish: Arc::new(|_, _, _, _| unreachable!("no session write here")),
+            save: Arc::new(|_, _, _, _| unreachable!("no session save here")),
         };
         let (path, server) =
             HeadRequests::from_envelope(&envelope, &run_dir, &scene.root.join("state"), &publisher)

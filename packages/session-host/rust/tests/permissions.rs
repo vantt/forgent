@@ -188,8 +188,24 @@ fn the_policy_verbs_are_node_rows_and_the_supervisors_own_are_native() {
     assert_eq!(policy("supervisor", "supervisor widen"), Policy::Forward);
     assert_eq!(policy("secretary", "session start"), Policy::Node);
     assert_eq!(policy("supervisor", "session write"), Policy::Native);
+    assert_eq!(policy("shaper", "session save"), Policy::Native);
     assert_eq!(policy("planner", "session bind session"), Policy::Native);
     assert_eq!(policy("supervisor", "supervisor raise"), Policy::Forward);
+}
+
+#[test]
+fn only_the_shaper_holds_session_save() {
+    let shaper_verdict = decide("shaper", &argv("session save")).expect("known persona");
+    assert_eq!(shaper_verdict.decision, Decision::Allow);
+    assert_eq!(shaper_verdict.rule.unwrap().policy, Policy::Native);
+
+    for persona in ["head", "lead", "planner", "supervisor", "secretary"] {
+        assert_ne!(
+            decision(persona, "session save"),
+            Decision::Allow,
+            "{persona}"
+        );
+    }
 }
 
 #[test]

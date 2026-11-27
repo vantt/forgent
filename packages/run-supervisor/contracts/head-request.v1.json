@@ -1,6 +1,6 @@
 {
   "contract": { "id": "run-supervisor-head-request", "version": 1 },
-  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role; what a persona may ask is the permission table of the session-host crate (`packages/session-host/contracts/head-permissions.v1.json`, read through `fgos_session_host::permissions` with the persona of the digest-protected envelope), and what it may write is `session.writes` of that envelope. An `fgos` argv is one frame (`fgos`): the table decides it (allow, ask or deny) and the supervisor execs the host's own `fgos` itself. `can-i` answers what the table would decide. `session bind session`, `session write`, `fgos` and `can-i` are answered by the supervisor; every other verb is a policy branch of the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
+  "description": "The request socket of one head session. A confined head cannot reach herdr, so it asks its own run supervisor, over one AF_UNIX socket the sandbox gets read-only, to perform a granted verb outside. The supervisor only transports and enforces: Identity decides who holds the role; what a persona may ask is the permission table of the session-host crate (`packages/session-host/contracts/head-permissions.v1.json`, read through `fgos_session_host::permissions` with the persona of the digest-protected envelope), and what it may write is `session.writes` of that envelope. An `fgos` argv is one frame (`fgos`): the table decides it (allow, ask or deny) and the supervisor execs the host's own `fgos` itself. `can-i` answers what the table would decide. `session bind session`, `session write`, `session save`, `fgos` and `can-i` are answered by the supervisor; every other verb is a policy branch of the Node payload behind `fgos internal head-request` (internal-route.run-supervisor.v1.json).",
   "framing": {
     "frame": "as gate-go.v1.json: 4-byte unsigned big-endian length N, then N bytes of UTF-8 JSON (one object)",
     "maxRequestBytes": 4194304,
@@ -103,6 +103,17 @@
       "data": "{path, bytes, commit} when published, or {path, bytes, publish: {refusal, detail}} when written but not published (refusal is the land refusal code, e.g. land-retries-exhausted or land-commit-contract-violation with the file written and uncommitted, land-gate-failed or land-gate-missing with the file uncommitted)",
       "identity": "held",
       "client": "`fgos session write <path> [--base <oid>]` with the new content on stdin; no --base sends the blob id of the file as it is on disk (src/session-host/head-request-client.mjs requestHeadWrite)"
+    },
+    "session save": {
+      "args": {
+        "paths": "array of strings, required, non-empty: project-relative paths, each inside an entry of envelope.session.writes",
+        "message": "string, required: commit message"
+      },
+      "does": "answered by the supervisor itself, no route child: commits exactly the named paths on the checked-out branch of the head's working checkout (the attempt cwd, which must be a linked worktree of the project) through ScopedCommit. The working checkout must not be the main checkout (save-needs-linked-worktree). Every path must lie inside envelope.session.writes (path-outside-grant). When ScopedCommit makes no change it answers save-nothing-to-commit. Main's tip is untouched in every case.",
+      "peer": "the connecting process (SO_PEERCRED pid) must be the attempt's gate or run under it, the check of session bind session and session write (caller-not-under-gate)",
+      "data": "{commit, paths}",
+      "identity": "held",
+      "client": "`fgos session save <path>... --message <text>`"
     },
     "session answered": {
       "args": { "persona": "string, required", "name": "string, required; spelled as the envelope's own role, as for session rotate", "sessionId": "string, required: the successor's Identity session id", "rotationId": "string, required: 16 lowercase hex characters, the id of the pending rotation exactly as the handoff's `Rotation id:` line carries it; the successor reads it from its handoff and echoes it, no other match is made", "message": "string, required: the successor's first assistant message, kept as evidence, at most 8000 characters" },
@@ -229,9 +240,9 @@
     "one request frame",
     "role: Identity resolves the role to the live session it names and that session must be this attempt's own (role-not-held otherwise, including when Identity cannot answer: the request fails closed; role-pending-rotation instead when the live holder is this head's own earlier generation; a read row of the permission table or `can-i` from such a successor is answered instead, from the same Identity fact and nothing in the request, while every other verb keeps role-pending-rotation). For `session answered`, `session restore role` and `session bind session` the step is instead: this attempt's own session is registered and live (session-not-registered, failing closed the same way)",
     "verb: a policy verb must be a `node` or `native` row the persona's rules allow (verb-not-granted); `fgos` and `can-i` ask the table about the argv instead (argv-not-allowed, asked)",
-    "peer (session write only): the connecting process runs under the gate (caller-not-under-gate)",
+    "peer (session write and session save): the connecting process runs under the gate (caller-not-under-gate)",
     "busy: at most one request runs at a time (busy)",
-    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `session bind session`, `session write`, `fgos` and `can-i` are answered by the supervisor itself instead"
+    "run: `<hostBin> internal head-request --protocol 1 --run-dir <attemptDir>`, request on stdin; `session bind session`, `session write`, `session save`, `fgos` and `can-i` are answered by the supervisor itself instead"
   ],
   "run": {
     "child": "started with exactly the step environment of the envelope, the envelope's cwd, its own process group, and the parent-death signal on Linux; stdout is its one JSON line, stderr goes to supervisor.log",
@@ -253,12 +264,12 @@
     "busy": "another request is running, or another large request (over maxReplyBytes) is being read or run",
     "session-not-registered": "session answered only: Identity does not list this attempt's own session as live; when Identity could not answer the detail is its refusal code only",
     "session-bind-failed": "session bind session only: Identity refused to bind the session; detail is its code",
-    "bad-args": "the args of a verb break its contract shape: for session write not {path, content} and optionally base, all strings, or a base that is not a 40 or 64 digit lowercase hex blob id; for any other verb a missing, unknown or mistyped key, or a string that becomes a host argv token and starts with '-'",
-    "path-invalid": "session write only: the path is empty, absolute, or has an empty, `.` or `..` segment",
+    "bad-args": "the args of a verb break its contract shape: for session write not {path, content} and optionally base, all strings, or a base that is not a 40 or 64 digit lowercase hex blob id; for session save not non-empty string paths array and non-empty string message; for any other verb a missing, unknown or mistyped key, or a string that becomes a host argv token and starts with '-'",
+    "path-invalid": "session write and session save: the path is empty, absolute, or has an empty, `.` or `..` segment",
     "path-not-granted": "session write only: no entry of envelope.session.writes names the path exactly",
     "path-symlink": "session write only: the file or a directory on the way to it is a symbolic link",
     "not-a-file": "session write only: the granted path does not exist or is not a regular file (a granted directory is written in the sandbox, not here)",
-    "caller-not-under-gate": "session write only: the connecting process is not the attempt's gate nor one of its descendants; detail is Identity's code (caller-not-under-head, head-not-live) or gate-unknown, peer-unknown",
+    "caller-not-under-gate": "session write and session save: the connecting process is not the attempt's gate nor one of its descendants; detail is Identity's code (caller-not-under-head, head-not-live) or gate-unknown, peer-unknown",
     "write-branch-ahead": "session write only: the main checkout's branch has commits its remote lacks (an earlier write was committed but not pushed); nothing was written; detail names both tips",
     "write-busy": "session write only: the catch-up stayed Busy (a live writer's Git operation pending, the merge slot or the main checkout held) through its bounded retries; retryable, nothing was written; detail is `<land refusal code>: <detail>`; retry the write later",
     "write-catch-up-refused": "session write only: the main checkout could not be fast-forwarded to its remote tip; nothing was written; detail is `<land refusal code>: <detail>`, e.g. main-checkout-catch-up-refused, resource-recovery-required, land-remote-outcome-unknown",
@@ -267,11 +278,14 @@
     "write-path-unreadable": "session write only: the state of the path in the main checkout could not be read; nothing was written; detail names why",
     "write-failed": "session write only: the durable write failed; detail names the error and the step (a failure after the rename means the new content may already be in place)",
     "role-take-failed": "session answered only: the route recorded the answer but Identity refused to move the role to this session (detail is its code, for example gate-unknown or head-not-live); the executor then finds no holder change and retires the successor",
+    "save-needs-linked-worktree": "session save only: attempt cwd is not a linked worktree (cannot save to the main checkout; use session write instead)",
+    "save-failed": "session save only: the commit could not be made; detail is `<git refusal code>: <detail>`; nothing was committed",
+    "save-nothing-to-commit": "session save only: working tree and index have no changes relative to HEAD for the specified paths",
     "release-in-progress": "release run only: another release run (either persona, the rollback included) holds the release flock",
     "ticket-used":"land and run only: a ticket with the request id already exists for this role",
     "ticket-unknown": "request result only: the role has no ticket with that id",
     "land-branch-lead-only": "land only: a branch land asked by a persona that is not a lead",
-    "path-outside-grant": "land only: a path that lies in no entry of envelope.session.writes",
+    "path-outside-grant": "land and session save: a path that lies in no entry of envelope.session.writes",
     "write-outside-footprint": "run only: a writes path the lead's plan footprint (read at the trunk tip) does not cover",
     "footprint-change-refused": "land only: a lead's paths land that changes the footprint of its own plan's plan.md against the trunk tip; the widen verb is the one door a lead changes its footprint through",
     "verb-failed": "the route child failed; detail is the entry's own code (for example head-key-used, bad-persona, start-refused) or the exit",

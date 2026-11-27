@@ -122,6 +122,7 @@ fn no_publisher() -> WritePublisher {
         path_clean: Arc::new(|_, _| unreachable!("no session write in this test")),
         path_oid: Arc::new(|_, _| unreachable!("no session write in this test")),
         publish: Arc::new(|_, _, _, _| unreachable!("no session write in this test")),
+        save: Arc::new(|_, _, _, _| unreachable!("no session save in this test")),
     }
 }
 
@@ -302,6 +303,17 @@ fn serve_config(
                     .lock()
                     .unwrap()
                     .push(format!("publish {path} {seen:?}"));
+                publish.commit.clone()
+            }
+        }),
+        save_commit: Box::new({
+            let publish = identity.publish.clone();
+            move |_, paths, message| {
+                publish
+                    .calls
+                    .lock()
+                    .unwrap()
+                    .push(format!("save {paths:?} {message:?}"));
                 publish.commit.clone()
             }
         }),
@@ -1265,6 +1277,9 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "role-not-held",
             "role-pending-rotation",
             "role-take-failed",
+            "save-failed",
+            "save-needs-linked-worktree",
+            "save-nothing-to-commit",
             "session-bind-failed",
             "session-not-registered",
             "ticket-unknown",
@@ -1307,6 +1322,7 @@ fn the_contract_names_exactly_the_refusal_codes_and_verbs_the_server_speaks() {
             "session bind session",
             "session restore role",
             "session rotate",
+            "session save",
             "session start",
             "session stop",
             "session write",
@@ -1805,6 +1821,7 @@ fn the_bind_verb_moves_the_role_to_the_agent_session_of_the_connecting_process_r
         path_clean: Box::new(|_, _| unreachable!("no session write in this test")),
         path_oid: Box::new(|_, _| unreachable!("no session write in this test")),
         publish_write: Box::new(|_, _| unreachable!("no session write in this test")),
+        save_commit: Box::new(|_, _, _| unreachable!("no session save in this test")),
         log: Box::new(|_| {}),
     });
     let stop = Arc::new(AtomicBool::new(false));
@@ -2450,6 +2467,175 @@ fn head_write_from_a_process_outside_the_gate_tree_is_refused_and_writes_nothing
         fs::read_to_string(served.dir.join("docs/backlog.md")).unwrap(),
         "old\n"
     );
+}
+
+// ---- session save: the supervisor commits named paths of the head's linked worktree ----------------------
+
+const SAVE_VERB: &str = "session save";
+
+/// A server for a shaper whose cwd is a linked worktree (its `.git` is a file) granted `docs/backlog.md` and the
+/// plain files directly under `plans/discussions/`.
+fn save_served(name: &str, publish: &Publish, linked: bool) -> Served {
+    let served = serve_config(
+        name,
+        DONE_LINE,
+        Ok(true),
+        Identity {
+            publish: publish.clone(),
+            ..Identity::default()
+        },
+        &[SAVE_VERB],
+        Duration::from_secs(5),
+        |mut cfg| {
+            cfg.persona = "shaper".into();
+            cfg.role = "head:shaper-x".into();
+            cfg.writes = vec!["docs/backlog.md".into(), "plans/discussions/*".into()];
+            cfg
+        },
+    );
+    if linked {
+        fs::write(served.dir.join(".git"), "gitdir: /elsewhere/worktrees/w\n").unwrap();
+    } else {
+        fs::create_dir(served.dir.join(".git")).unwrap();
+    }
+    served
+}
+
+fn save_request(served: &Served, args: Value) -> Value {
+    request(
+        &served.socket,
+        &json!({"type": "REQUEST", "id": "s1", "verb": SAVE_VERB, "args": args}),
+    )
+}
+
+#[test]
+fn head_save_commits_exactly_the_named_granted_paths_through_the_port_and_replies_the_commit() {
+    let publish = Publish::default();
+    let served = save_served("save-ok", &publish, true);
+    let reply = save_request(
+        &served,
+        json!({"paths": ["docs/backlog.md", "plans/discussions/a.md"], "message": "docs: save"}),
+    );
+    assert_eq!(reply["result"], "done", "{reply}");
+    assert_eq!(
+        reply["data"],
+        json!({"commit": "c0ffee", "paths": ["docs/backlog.md", "plans/discussions/a.md"]})
+    );
+    assert_eq!(
+        *publish.calls.lock().unwrap(),
+        [r#"save ["docs/backlog.md", "plans/discussions/a.md"] "docs: save""#],
+        "no catch-up, clean check or publish: a save fetches and pushes nothing"
+    );
+    assert!(!served.dir.join("argv").exists(), "no route child ran");
+}
+
+#[test]
+fn head_save_in_the_main_checkout_is_refused_before_the_grant_is_read_and_commits_nothing() {
+    let publish = Publish::default();
+    let served = save_served("save-main", &publish, false);
+    // The path is also outside the grant: the checkout refusal comes first.
+    let reply = save_request(&served, json!({"paths": ["docs/other.md"], "message": "m"}));
+    assert_eq!(reply["code"], "save-needs-linked-worktree", "{reply}");
+    assert!(publish.calls.lock().unwrap().is_empty());
+}
+
+#[test]
+fn head_save_of_a_path_outside_the_grant_is_refused_and_commits_nothing() {
+    let publish = Publish::default();
+    let served = save_served("save-grant", &publish, true);
+    for path in ["docs/other.md", "plans/discussions/sub/a.md"] {
+        let reply = save_request(
+            &served,
+            json!({"paths": ["docs/backlog.md", path], "message": "m"}),
+        );
+        assert_eq!(reply["code"], "path-outside-grant", "{path}: {reply}");
+        assert_eq!(reply["detail"], path);
+    }
+    assert!(publish.calls.lock().unwrap().is_empty());
+}
+
+#[test]
+fn head_save_that_changes_nothing_is_refused_save_nothing_to_commit() {
+    let publish = Publish {
+        commit: Err(refusal(
+            "save-nothing-to-commit",
+            "docs/backlog.md has no change",
+        )),
+        ..Publish::default()
+    };
+    let served = save_served("save-noop", &publish, true);
+    let reply = save_request(
+        &served,
+        json!({"paths": ["docs/backlog.md"], "message": "m"}),
+    );
+    assert_eq!(reply["code"], "save-nothing-to-commit", "{reply}");
+}
+
+#[test]
+fn head_save_with_malformed_args_is_a_bad_argument_and_a_non_shaper_never_reaches_it() {
+    let publish = Publish::default();
+    let served = save_served("save-bad", &publish, true);
+    for args in [
+        json!({"paths": [], "message": "m"}),
+        json!({"paths": ["docs/backlog.md"], "message": ""}),
+        json!({"paths": ["docs/backlog.md"]}),
+        json!({"paths": ["docs/backlog.md", 3], "message": "m"}),
+        json!({"paths": ["docs/backlog.md"], "message": "m", "extra": 1}),
+    ] {
+        let reply = save_request(&served, args.clone());
+        assert_eq!(reply["code"], "bad-args", "{args}: {reply}");
+    }
+    let reply = save_request(&served, json!({"paths": ["../x"], "message": "m"}));
+    assert_eq!(reply["code"], "path-invalid", "{reply}");
+    assert!(publish.calls.lock().unwrap().is_empty());
+
+    let secretary = serve(
+        "save-secretary",
+        DONE_LINE,
+        Ok(true),
+        &[SAVE_VERB],
+        Duration::from_secs(5),
+    );
+    let reply = save_request(
+        &secretary,
+        json!({"paths": ["docs/backlog.md"], "message": "m"}),
+    );
+    assert_eq!(reply["code"], "verb-not-granted", "{reply}");
+}
+
+#[test]
+fn head_save_from_a_process_outside_the_gate_tree_is_refused_and_commits_nothing() {
+    let mut outside = std::process::Command::new("sleep")
+        .arg("30")
+        .spawn()
+        .unwrap();
+    let publish = Publish::default();
+    let served = serve_config(
+        "save-outside",
+        DONE_LINE,
+        Ok(true),
+        Identity {
+            gate: head_of(outside.id()),
+            publish: publish.clone(),
+            ..Identity::default()
+        },
+        &[SAVE_VERB],
+        Duration::from_secs(5),
+        |mut cfg| {
+            cfg.persona = "shaper".into();
+            cfg.writes = vec!["docs/backlog.md".into()];
+            cfg
+        },
+    );
+    fs::write(served.dir.join(".git"), "gitdir: /elsewhere\n").unwrap();
+    let reply = save_request(
+        &served,
+        json!({"paths": ["docs/backlog.md"], "message": "m"}),
+    );
+    let _ = outside.kill();
+    let _ = outside.wait();
+    assert_eq!(reply["code"], "caller-not-under-gate", "{reply}");
+    assert!(publish.calls.lock().unwrap().is_empty());
 }
 
 #[test]

@@ -40,6 +40,7 @@ type CatchUpFn = dyn Fn(&Path, &str) -> Result<(), CatchUpRefusal> + Send + Sync
 type PathCleanFn = dyn Fn(&Path, &str) -> Result<bool, PublishRefusal> + Send + Sync;
 type PathOidFn = dyn Fn(&Path, &str) -> Result<String, PublishRefusal> + Send + Sync;
 type PublishFn = dyn Fn(&Path, &str, &str, &str) -> Result<String, PublishRefusal> + Send + Sync;
+type SaveFn = dyn Fn(&Path, &[String], &str, &str) -> Result<String, PublishRefusal> + Send + Sync;
 
 /// The port a head's `session write` is published through, filled by the composition root (`apps/fgos`) with the
 /// paths land and handed to [`main`] as a parameter. This crate commits, fetches and pushes nothing itself.
@@ -47,12 +48,14 @@ type PublishFn = dyn Fn(&Path, &str, &str, &str) -> Result<String, PublishRefusa
 /// - `path_clean(root, path)`: `path` has no uncommitted change in that main checkout.
 /// - `path_oid(root, path)`: the git blob id of the content `path` has in that main checkout, read through the Git port.
 /// - `publish(root, path, role, writer)`: commit only `path`, push without force, return the commit.
+/// - `save(checkout, paths, message, writer)`: commit exactly `paths` on the checked-out branch of `checkout` (which must be a linked worktree) with `message`, returning the commit sha.
 #[derive(Clone)]
 pub struct WritePublisher {
     pub catch_up: Arc<CatchUpFn>,
     pub path_clean: Arc<PathCleanFn>,
     pub path_oid: Arc<PathOidFn>,
     pub publish: Arc<PublishFn>,
+    pub save: Arc<SaveFn>,
 }
 
 /// The port the `attempt-step` route runs a step of a verified attempt through, filled by the composition root
@@ -297,7 +300,11 @@ mod tests {
                 let unused = unused.clone();
                 move |_, _| Err(unused.clone())
             }),
-            publish: Arc::new(move |_, _, _, _| Err(unused.clone())),
+            publish: Arc::new({
+                let unused = unused.clone();
+                move |_, _, _, _| Err(unused.clone())
+            }),
+            save: Arc::new(move |_, _, _, _| Err(unused.clone())),
         };
         assert_eq!(
             main("lock-fd", &argv(&["--probe"]), &publisher, &|_, _| {

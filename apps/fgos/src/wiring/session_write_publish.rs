@@ -19,8 +19,8 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use fgos_config::detect::PathDetectors;
 use fgos_git::{
-    GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo, Submodules,
-    Untracked,
+    CommitRequest, GitDriver, HeadFact, Ignored, Inspect, RemoteGrant, RepoHandle, ResolveRepo,
+    ResultCode, Submodules, Untracked,
 };
 use fgos_run_supervisor::route::{CatchUpRefusal, PublishRefusal, WritePublisher};
 use fgos_supervision::land::{
@@ -53,6 +53,61 @@ pub fn publisher() -> WritePublisher {
         path_clean: std::sync::Arc::new(path_clean),
         path_oid: std::sync::Arc::new(path_oid),
         publish: std::sync::Arc::new(publish),
+        save: std::sync::Arc::new(save),
+    }
+}
+
+/// Commits exactly `paths` of the linked worktree `checkout` on its checked-out branch with `message`, as `writer`:
+/// one ScopedCommit over the literal paths. Nothing is fetched or pushed and no merge slot is taken. A commit that
+/// changes nothing is refused `save-nothing-to-commit`.
+fn save(
+    checkout: &Path,
+    paths: &[String],
+    message: &str,
+    writer: &str,
+) -> Result<String, PublishRefusal> {
+    let (state, _) = fgos_holder_lock::state_root();
+    let driver = GitDriver::new(&state).map_err(|e| refusal("save-git-unavailable", e.cause))?;
+    let repo = match driver
+        .resolve_repo(checkout, checkout)
+        .map_err(|e| refusal("save-git-unavailable", e.cause))?
+    {
+        ResolveRepo::Repository(repo) => repo,
+        ResolveRepo::NotARepository => {
+            return Err(refusal(
+                "save-not-a-repository",
+                checkout.display().to_string(),
+            ))
+        }
+    };
+    let baseline = driver
+        .preflight_commit(&repo, Vec::new(), None)
+        .map_err(|e| refusal("save-preflight-refused", e.cause))?;
+    let request = CommitRequest {
+        writes: paths.to_vec(),
+        message: message.to_owned(),
+    };
+    let result = driver
+        .scoped_commit(
+            &repo,
+            Vec::new(),
+            &baseline,
+            &request,
+            writer,
+            &operation_id(),
+            &fgos_git::wal::OsFileSystem,
+        )
+        .map_err(|e| refusal("save-commit-refused", e.cause))?;
+    match (result.status, result.oid) {
+        (ResultCode::Unchanged, _) => Err(refusal(
+            "save-nothing-to-commit",
+            format!("{} has no change to commit", paths.join(", ")),
+        )),
+        (ResultCode::Committed, Some(oid)) => Ok(oid.as_str().to_owned()),
+        (status, _) => Err(refusal(
+            "save-commit-refused",
+            format!("the commit answered {status:?}"),
+        )),
     }
 }
 

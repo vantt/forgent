@@ -3847,6 +3847,7 @@ impl MailHost {
             path_clean: Arc::new(|_, _| unreachable!("no session write")),
             path_oid: Arc::new(|_, _| unreachable!("no session write")),
             publish: Arc::new(|_, _, _, _| unreachable!("no session write")),
+            save: Arc::new(|_, _, _, _| unreachable!("no session save")),
         };
         let (_, server) = HeadRequests::from_envelope(&envelope, &scene.root, root, &publisher)
             .unwrap()
