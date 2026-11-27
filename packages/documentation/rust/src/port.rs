@@ -10,6 +10,12 @@ use serde::Serialize;
 pub const PARTS_MAX: usize = 8;
 /// At most this many candidates per part.
 pub const CANDIDATES_MAX: usize = 10;
+/// At most this many terms are scanned per part; the rest are counted in `Part::dropped_terms`.
+pub const TERMS_MAX: usize = 16;
+/// At most this many sections are listed per term; `Mention::total` still counts them all.
+pub const MENTION_SECTIONS_MAX: usize = 20;
+/// A backticked span shorter than this is not a term.
+pub const TERM_MIN_CHARS: usize = 3;
 
 /// One locate question: draft passages in the corpus language, and the region the writer guesses.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -19,6 +25,9 @@ pub struct Query {
     pub area: Vec<String>,
     /// `question` values the writer guesses; empty means no guess.
     pub question: Vec<String>,
+    /// Literal strings the writer wants found wherever the corpus mentions them, besides the backticked spans of
+    /// each part.
+    pub exact: Vec<String>,
 }
 
 /// How far the search index is. Only `Ready` answers in full; every other state answers `partial`.
@@ -70,11 +79,47 @@ pub struct Place {
     pub candidates: usize,
 }
 
+/// One section of a document that holds a term.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MentionAt {
+    /// Repository-relative path (`docs/...`).
+    pub path: String,
+    /// Heading path of the section, outermost first; empty before the first heading.
+    pub section: Vec<String>,
+    /// 1-based line of the first occurrence in the section.
+    pub line: usize,
+    /// The document is not among the part's candidates: the search did not return what the scan found.
+    pub missed_by_search: bool,
+}
+
+/// Where the corpus holds one literal term.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Mention {
+    pub term: String,
+    /// Sections holding the term, listed or not.
+    pub total: usize,
+    /// `sections` holds fewer than `total`.
+    pub truncated: bool,
+    pub sections: Vec<MentionAt>,
+}
+
 /// The answer for one draft part.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Part {
     pub candidates: Vec<Candidate>,
     pub places: Vec<Place>,
+    /// Every term of the part with the sections that hold it, found by reading the corpus files themselves.
+    pub mentions: Vec<Mention>,
+    /// Terms found beyond `TERMS_MAX` and not scanned.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub dropped_terms: usize,
+}
+
+fn is_zero(n: &usize) -> bool {
+    *n == 0
 }
 
 /// Parts that share a home: a hint to write them together or apart. Part numbers start at 1.
@@ -127,6 +172,12 @@ impl<T: Locator + ?Sized> Locator for &T {
     fn state(&self) -> IndexState {
         (**self).state()
     }
+}
+
+/// Finds where the corpus holds literal terms, independent of any index.
+pub trait MentionScanner {
+    /// One `Mention` per term, in the order given; `missed_by_search` is left false for the caller to set.
+    fn scan(&self, terms: &[String]) -> Result<Vec<Mention>, LocateError>;
 }
 
 /// The index worker as a process: is one running for this corpus, and start one.

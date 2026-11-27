@@ -8,8 +8,9 @@ use super::agents::PayloadRoot;
 use crate::routing::Call;
 use fgos_documentation::locate::{ensure_worker, locate};
 use fgos_documentation::pkm::{self, EmbedderChoice, LocatePaths, PkmLocator, ResetOutcome};
-use fgos_documentation::port::{Answer, IndexKind, LocateError, Query, WorkerLauncher};
+use fgos_documentation::port::{Answer, IndexKind, LocateError, Query, WorkerLauncher, TERMS_MAX};
 use fgos_documentation::profile;
+use fgos_documentation::scan::FsMentionScanner;
 use fgos_host_runtime::cli_args::{parse_args_repeating, FlagScalar, FlagValue, ParsedArgs};
 use fgos_host_runtime::{
     CategorisedRefusal, ContractRef, EventSink, HostInvocation, InvocationControl, OperationId,
@@ -43,8 +44,9 @@ pub const INDEX_SUBCOMMANDS: &[&str] = &["reset", "run", "status", "stop"];
 pub const LOCATE_KIND: &str = "fgos.doc.locate";
 
 /// The redaction rule a locate record's `detail` follows: drafts only as sha256 digests, never their text, plus the
-/// repository paths of the top candidates.
-const DETAIL_REDACTION_REV: &str = "doc-locate-draft-digests.v1";
+/// repository paths of the top candidates and of the documents the scan found that the search did not return. A term
+/// is draft text, so it never appears.
+const DETAIL_REDACTION_REV: &str = "doc-locate-draft-digests.v2";
 
 /// How long a started worker gets to take the index lock before the locator opens anyway.
 const WORKER_LOCK_WAIT: Duration = Duration::from_secs(5);
@@ -131,7 +133,7 @@ fn validation(message: impl Into<String>) -> CategorisedRefusal {
 }
 
 /// The flags of `doc locate` that collect every use; the shared parser keeps only the last use of any other flag.
-const REPEATED_FLAGS: &[&str] = &["--draft", "--draft-file", "--area", "--question"];
+const REPEATED_FLAGS: &[&str] = &["--draft", "--draft-file", "--area", "--question", "--exact"];
 
 /// Every value of a flag that may repeat; a flag given without a value is refused.
 fn values(parsed: &ParsedArgs, name: &str, sub: &str) -> Result<Vec<String>, CategorisedRefusal> {
@@ -179,6 +181,7 @@ pub fn project_request(args: &[OsString], root: PathBuf) -> Result<DocRequest, C
                     parts,
                     area: values(&repeated, "area", "locate")?,
                     question: values(&repeated, "question", "locate")?,
+                    exact: values(&repeated, "exact", "locate")?,
                 },
                 json,
             }
@@ -323,6 +326,7 @@ fn answer_locate(root: &Path, query: &Query) -> Result<Answer, CategorisedRefusa
     locate(
         || PkmLocator::open(&paths, EmbedderChoice::Model),
         &launcher,
+        &FsMentionScanner::new(&paths.docs_root),
         query,
     )
     .map_err(|e| match e {
@@ -431,8 +435,63 @@ fn human(answer: &Answer) -> String {
                 axes.join(", ")
             );
         }
+        if part.dropped_terms > 0 {
+            let _ = writeln!(
+                out,
+                "  {} more terms were not scanned (at most {TERMS_MAX} per part)",
+                part.dropped_terms
+            );
+        }
+        for m in &part.mentions {
+            let _ = writeln!(
+                out,
+                "  mentions of `{}`: {} section{}{}",
+                m.term,
+                m.total,
+                if m.total == 1 { "" } else { "s" },
+                if m.truncated {
+                    format!(" (first {} listed)", m.sections.len())
+                } else {
+                    String::new()
+                }
+            );
+            let mut sections: Vec<_> = m.sections.iter().collect();
+            sections.sort_by_key(|s| !s.missed_by_search);
+            for s in sections {
+                let section = if s.section.is_empty() {
+                    String::new()
+                } else {
+                    format!(" § {}", s.section.join(" > "))
+                };
+                let mark = if s.missed_by_search {
+                    "[missed by search] "
+                } else {
+                    ""
+                };
+                let _ = writeln!(out, "    {mark}{}:{}{section}", s.path, s.line);
+            }
+        }
     }
     out
+}
+
+/// The sections the scan found in documents the search did not return, across parts: how many mentions in all, and
+/// the documents (each once, in order of first appearance).
+fn mention_counts(answer: &Answer) -> (usize, Vec<&str>) {
+    let mut total = 0;
+    let mut missed: Vec<&str> = Vec::new();
+    for at in answer
+        .parts
+        .iter()
+        .flat_map(|p| &p.mentions)
+        .flat_map(|m| &m.sections)
+    {
+        total += 1;
+        if at.missed_by_search && !missed.contains(&at.path.as_str()) {
+            missed.push(&at.path);
+        }
+    }
+    (total, missed)
 }
 
 /// One `fgos.doc.locate` record: what was asked (only digests of the drafts, never their text) and what came back.
@@ -449,6 +508,10 @@ fn locate_record(query: &Query, answer: &Answer, took: Duration) -> Record {
         if let Some(top) = part.candidates.first() {
             let _ = writeln!(detail, "top {}: {}", n + 1, top.path);
         }
+    }
+    let (mentions, missed) = mention_counts(answer);
+    for path in &missed {
+        let _ = writeln!(detail, "missed by search: {path}");
     }
     let mut cut = detail.len().min(DETAIL_MAX_BYTES);
     while !detail.is_char_boundary(cut) {
@@ -482,6 +545,8 @@ fn locate_record(query: &Query, answer: &Answer, took: Duration) -> Record {
             query.parts.iter().filter(|p| !p.trim().is_empty()).count() as u64,
         ),
         ("fgos.doc.locate.candidates", candidates as u64),
+        ("fgos.doc.locate.mentions", mentions as u64),
+        ("fgos.doc.locate.missed_by_search", missed.len() as u64),
     ];
     Record {
         v: RECORD_VERSION,
@@ -723,6 +788,10 @@ mod tests {
                 "git",
                 "--question",
                 "choice",
+                "--exact",
+                "a.b (c)",
+                "--exact",
+                "second",
                 "--json",
             ]),
             dir.clone(),
@@ -734,6 +803,7 @@ mod tests {
                 assert_eq!(query.parts, vec!["one", "two", "from a file"]);
                 assert_eq!(query.area, vec!["git"]);
                 assert_eq!(query.question, vec!["choice"]);
+                assert_eq!(query.exact, vec!["a.b (c)", "second"]);
                 assert!(*json);
             }
             other => panic!("expected locate, got {other:?}"),
@@ -752,6 +822,74 @@ mod tests {
         assert_eq!(bare.unwrap_err().category, "validation");
         let run = project_request(&os(&["doc", "index", "run"]), PathBuf::new()).unwrap();
         assert_eq!(run.operation_id(), INDEX_OPERATION_ID);
+    }
+
+    #[test]
+    fn the_record_counts_mentions_and_names_missed_documents_but_never_a_term() {
+        use fgos_documentation::port::{Candidate, Mention, MentionAt, Part};
+        let at = |path: &str, missed: bool| MentionAt {
+            path: path.into(),
+            section: vec!["H".into()],
+            line: 3,
+            missed_by_search: missed,
+        };
+        let query = Query {
+            parts: vec!["x".into()],
+            exact: vec!["topsecretterm".into()],
+            ..Query::default()
+        };
+        let answer = Answer {
+            partial: false,
+            state: IndexKind::Ready,
+            action: None,
+            parts: vec![Part {
+                candidates: vec![Candidate {
+                    rank: 1,
+                    path: "docs/found.md".into(),
+                    title: String::new(),
+                    section: Vec::new(),
+                    excerpt: None,
+                    axes: BTreeMap::new(),
+                    outside_region: false,
+                }],
+                mentions: vec![Mention {
+                    term: "topsecretterm".into(),
+                    total: 3,
+                    truncated: false,
+                    sections: vec![
+                        at("docs/found.md", false),
+                        at("docs/missed.md", true),
+                        at("docs/missed.md", true),
+                    ],
+                }],
+                ..Part::default()
+            }],
+            group: None,
+        };
+        let record = locate_record(&query, &answer, Duration::from_millis(1));
+        let detail = record.detail.clone().unwrap();
+        assert!(!detail.contains("topsecretterm"), "{detail}");
+        assert!(detail.contains("top 1: docs/found.md"), "{detail}");
+        assert_eq!(
+            detail.matches("missed by search: docs/missed.md").count(),
+            1
+        );
+        assert!(detail.find("top 1").unwrap() < detail.find("missed by").unwrap());
+        assert_eq!(
+            record.measures["fgos.doc.locate.mentions"].as_u64(),
+            Some(3)
+        );
+        assert_eq!(
+            record.measures["fgos.doc.locate.missed_by_search"].as_u64(),
+            Some(1)
+        );
+        assert_eq!(record.redaction.unwrap().rev, "doc-locate-draft-digests.v2");
+        let text = human(&answer);
+        assert!(
+            text.find("[missed by search] docs/missed.md:3").unwrap()
+                < text.find("docs/found.md:3").unwrap(),
+            "{text}"
+        );
     }
 
     #[test]

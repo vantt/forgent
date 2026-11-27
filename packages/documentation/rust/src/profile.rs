@@ -89,8 +89,8 @@ const REFERENCE_FOLDERS: &[&str] = &["distillery"];
 
 /// Folders the vault leaves out because they never answer a locate for a write: those whose documents record what was
 /// true before (`past-state`; document-identity spec section 5.4: past-state content is never a locate target) and the
-/// reference folders.
-fn excluded_globs() -> Vec<String> {
+/// reference folders. The mention scan reads the same corpus, so it asks `is_excluded_folder` too.
+fn excluded_folders() -> impl Iterator<Item = &'static str> {
     QUESTION_BY_FOLDER
         .iter()
         .filter(|(_, value)| {
@@ -100,6 +100,16 @@ fn excluded_globs() -> Vec<String> {
         })
         .map(|(folder, _)| *folder)
         .chain(REFERENCE_FOLDERS.iter().copied())
+}
+
+/// Whether the vault leaves out the folder `name` sitting `depth` folders below the docs root (0 is the root's own
+/// children); the profile's globs reach `FOLDER_DEPTH` levels.
+pub fn is_excluded_folder(name: &str, depth: usize) -> bool {
+    depth < FOLDER_DEPTH && excluded_folders().any(|folder| folder == name)
+}
+
+fn excluded_globs() -> Vec<String> {
+    excluded_folders()
         .flat_map(|folder| {
             (0..FOLDER_DEPTH).map(move |depth| format!("\"{}{folder}/**\"", "*/".repeat(depth)))
         })
