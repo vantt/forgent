@@ -11,7 +11,7 @@ discussion: open
 
 ## 1. Trạng thái hiện tại
 
-Round 11 (2026-11-27 17:40). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
+Round 12 (2026-11-27 17:45). Three points settled (§4): the gateway's roles and one gateway per machine (D1), the
 no-error rule between the fast copy and the persistent copy (D2), and what is broadcast first: the events of mail,
 work and owner questions (D3).
 
@@ -31,8 +31,8 @@ Open now:
 - **Event bus is its own crate** — settled as D6 (17:10): the bus core is a separate crate and component in a low
   layer; the gateway is its cross-machine connector. Where the bus runs (its own small daemon, or inside the gateway
   process) is open, next question.
-- **Machine daemon** — settled as D7 (process model) and D9 (names: binary `fgosd`, verb `fgos daemon`). Open:
-  which process holds the bus's cross-machine connector.
+- **Machine daemon** — settled: D7 (child process per part), D9 (binary `fgosd`, verb `fgos daemon`), D10 (three
+  children: gateway, bus, connector).
 - **Timers per job** — shaper 17:36: keep one unit per job (different periods, switches, failure isolation, doctor
   rows); the door is what D8 unifies, not the timer; check whether account-probe should be per machine. Asked in chat,
   not answered yet.
@@ -131,6 +131,7 @@ coordination.
 | D7 | One long-lived **machine daemon** per machine (working name `fgosd`), kept alive by the OS as a user service. Each part runs as a **child process the daemon supervises**: the **gateway**, which now means only the REST + MCP door, and the **event bus** (D6); a failed child is restarted alone, the others keep running. The daemon itself is the supervisor. Refines D1's wording: "gateway" no longer names the whole per-machine process | 2026-11-27 | owner 17:22 and 17:38, shaper 17:25 |
 | D8 | Timers and the daemon service go through one door: the `managed timer` door (`packages/distribution/rust/src/timer.rs`) becomes a managed-unit door with two kinds, timer and service; no systemd or launchd unit is written anywhere else (L10). Timers stay as the floor and run independently of the daemon, so a dead daemon only slows (D5); their periods may grow once the bus pushes, never to zero. Doctor checks "installed but not running" for the service as it does for timers. Which machine runs the watcher of which project is stated in one place, tied to the plan `host` rule (where that place is, is open) | 2026-11-27 | shaper 17:32, owner agreed 17:40 |
 | D9 | Names: the machine daemon's binary is **`fgosd`**; its lifecycle verb is **`fgos daemon start|stop|status`**, which replaces `fgos gateway start|stop|status` (callers moved and the old verb deleted in the same change, L10). "Gateway" names only the REST + MCP child (D7). Neither name is used elsewhere in the repo (checked 17:40) | 2026-11-27 | shaper 17:25 and 17:36, owner chose 17:37 |
+| D10 | `fgosd` supervises three child processes: the **gateway** (REST + MCP), the **bus** (the core of D6, machine-local only: local publishers and subscribers over a local socket) and the **connector** (the cross-machine link to the other machines' `fgosd`, over Tailscale or the LAN, trusted by Identity machine pins). The connector joins its own machine's bus as an ordinary client: it takes the events to send and publishes the copies it receives. The network-facing parts (gateway, connector) are isolated from the local bus, so a network fault never stops local fast wakes | 2026-11-27 | shaper 17:40, owner chose (b) 17:45 |
 
 ## 5. Q&A log
 
@@ -203,19 +204,22 @@ coordination.
 - 2026-11-27 17:36 — Owner: one timer for the three jobs, or still three? Shaper: still one per job; the door is
   unified, not the timer; account-probe may belong per machine (§3 row "Timers per job").
 - 2026-11-27 17:37 — Owner: "1. fgosd và daemon". Minted D9 (binary `fgosd`, verb `fgos daemon`).
+- 2026-11-27 17:40 — Shaper: connector inside the bus process (a) or its own child (b); recommended (b).
+- 2026-11-27 17:45 — Owner: "(b)". Minted D10; §6 updated.
 
 ## 6. Thiết kế đã chốt {#design}
 
-Each machine runs one long-lived **machine daemon**, `fgosd`, managed by `fgos daemon start|stop|status` (D9), kept alive by the OS as a user service
-written through the one managed-unit door (D7, D8). The daemon is only a supervisor: each part runs as a child process
-it starts, watches and restarts alone, and every start, stop, panic and restart is recorded with its reason. The
-parts are:
+Each machine runs one long-lived **machine daemon**, `fgosd`, managed by `fgos daemon start|stop|status` (D9) and
+kept alive by the OS as a user service written through the one managed-unit door (D7, D8). The daemon is only a
+supervisor: each part runs as a child process it starts, watches and restarts alone, and every start, stop, panic and
+restart is recorded with its reason. The three children (D10):
 
 - the **gateway** — only the REST + MCP door: requests from outside (including the web dashboard it hosts) are
   relayed to the fgOS verbs of the project they name, by Identity project id (D1, D7; project key provisional);
-- the **event bus** — its own crate and component in a low layer just above the Event Store (D6): publish, subscribe,
-  wake coalescing, plus the cross-machine connector that links the buses of the owner's machines over Tailscale or the
-  local network, trusted by Identity machine pins.
+- the **bus** — the event bus core, its own crate and component in a low layer just above the Event Store (D6):
+  publish, subscribe and wake coalescing for this machine only, over a local socket;
+- the **connector** — the cross-machine link to the other machines' `fgosd` over Tailscale or the local network,
+  trusted by Identity machine pins; it joins its own machine's bus as an ordinary client.
 
 The bus is transient; the **Event Store** and git stay the durable truth (D5). An event is appended and acked in the
 Event Store first; the Event Store then publishes it on the bus, and the subscribers (watcher, attention queue,
@@ -227,7 +231,7 @@ watcher, which then runs the keeper through `supervisor wake`. The OS timers sta
 daemon (D8), so a dead daemon or a lost bus item only falls back to timer speed. There is no leader and no lease.
 Names: Event Store stays; the supervision queue becomes the attention queue (D4).
 
-Not settled yet: where the bus connector process sits; one timer per job (proposed); the component split C, D,
+Not settled yet: one timer per job (proposed); the component split C, D,
 E, F1 (owner answers before any `authority declare`); push inside one machine (append notify vs open-log watch); wake
 coalescing per subscriber; whether letters of local mail must survive a restart; who watches which project; plan and
 backlog beyond the provisional signal.
@@ -237,18 +241,20 @@ flowchart LR
   X[outside: REST, MCP, dashboard] --> GW1
   OS1[OS user service, managed-unit door] --> D1
   subgraph M1[machine A]
-    D1[machine daemon: supervisor only] --> GW1[child: gateway REST + MCP]
-    D1 --> BUS1[child: event bus + connector]
+    D1[fgosd: supervisor only] --> GW1[child: gateway REST + MCP]
+    D1 --> BUS1[child: bus, local only]
+    D1 --> CN1[child: connector]
     GW1 --> V1[fgos verbs of project P]
     ES1[Event Store of P: append, fsync, ack] --> BUS1
     BUS1 --> S1[subscribers: watcher, attention queue, mailbox, questions]
+    CN1 <--> BUS1
     T1[OS timers: the floor] --> S1
   end
   subgraph M2[machine B]
-    BUS2[child: event bus + connector] --> R2[Event Store read-side buffer, volatile]
-    R2 --> S2[subscribers]
+    CN2[child: connector] --> R2[Event Store read-side buffer, volatile]
+    R2 --> BUS2[child: bus] --> S2[subscribers]
   end
-  BUS1 <-->|Tailscale / LAN, Identity pins| BUS2
+  CN1 <-->|Tailscale / LAN, Identity pins| CN2
   ES1 -. git: seal, push, fetch - durable truth, slower .-> R2
 ```
 
