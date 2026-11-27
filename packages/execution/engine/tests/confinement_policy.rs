@@ -738,6 +738,8 @@ fn resolve_input(fixture: &Fixture, input: &Value, lock_template: &str) -> Resol
             .map(|dir| lock_template.replace("<fgosDir>", dir.trim_end_matches('/')))
             .unwrap_or_default(),
         uid: fixture.uid(),
+        cargo_home: opt(input, "cargoHome"),
+        rustup_home: opt(input, "rustupHome"),
     }
 }
 
@@ -773,4 +775,79 @@ fn resolver_turns_each_grant_into_the_resources_node_resolved_and_refuses_the_sa
         }
     }
     report.finish("resource resolver");
+}
+
+/// No existing test proves this: the `toolchain-cache` resource is new, and the recorded vectors use homes without a
+/// cargo or rustup directory, so they never reach it.
+#[test]
+fn a_confined_launch_reads_the_owners_cargo_and_rustup_caches_read_only_and_runs_cargo_offline() {
+    let template = mailbox_lock_template();
+    let toolchain = |fixture: &Fixture, extra: Value| {
+        let mut input = json!({
+            "dispatchId": "d1",
+            "context": {},
+            "grants": [],
+            "homeDir": format!("{}/home", fixture.root),
+            "claudeSocketBase": format!("{}/sock", fixture.root),
+        });
+        for (key, value) in extra.as_object().unwrap() {
+            input[key] = value.clone();
+        }
+        let resolved = resolve_confinement_resources(&resolve_input(fixture, &input, &template))
+            .expect("the toolchain cache never refuses a launch");
+        resolved
+            .into_iter()
+            .filter(|r| r.resource == "toolchain-cache")
+            .collect::<Vec<_>>()
+    };
+    let env_of = |r: &ResolvedResource| serde_json::to_value(&r.env).unwrap();
+
+    // Both directories under the home: two read-only mounts on their real paths, with the four variables.
+    let fixture = Fixture::new(&json!({ "dirs": ["home/.cargo", "home/.rustup"] }));
+    let home = format!("{}/home", fixture.root);
+    let found = toolchain(&fixture, json!({}));
+    assert_eq!(found.len(), 2, "{found:?}");
+    assert_eq!(found[0].host_target.as_deref(), Some(&*format!("{home}/.cargo")));
+    assert_eq!(found[1].host_target.as_deref(), Some(&*format!("{home}/.rustup")));
+    assert!(found.iter().all(|r| r.delivery == "mount" && r.access == "read"));
+    assert_eq!(
+        env_of(&found[0]),
+        json!({
+            "CARGO_HOME": format!("{home}/.cargo"),
+            "CARGO_NET_OFFLINE": "true",
+            "GIT_TERMINAL_PROMPT": "0",
+        })
+    );
+    assert_eq!(env_of(&found[1]), json!({ "RUSTUP_HOME": format!("{home}/.rustup") }));
+
+    // An absolute CARGO_HOME wins over <home>/.cargo; a relative one is ignored.
+    let fixture = Fixture::new(&json!({ "dirs": ["home/.cargo", "elsewhere/cargo"] }));
+    let elsewhere = format!("{}/elsewhere/cargo", fixture.root);
+    let found = toolchain(&fixture, json!({ "cargoHome": elsewhere }));
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].host_target.as_deref(), Some(&*elsewhere));
+    assert_eq!(env_of(&found[0])["CARGO_HOME"], json!(elsewhere));
+    let found = toolchain(&fixture, json!({ "cargoHome": "relative/cargo" }));
+    assert_eq!(
+        found[0].host_target.as_deref(),
+        Some(&*format!("{}/home/.cargo", fixture.root))
+    );
+
+    // A missing directory, or one that is a file, gives no resource and no variable.
+    let fixture = Fixture::new(&json!({ "dirs": ["home"], "files": { "home/.rustup": "x" } }));
+    assert!(toolchain(&fixture, json!({})).is_empty());
+
+    // A cache inside a machine-private root or a confinement root is never bound.
+    let fixture = Fixture::new(&json!({
+        "dirs": ["home/.fgos/private/cargo", "conf/rustup"],
+    }));
+    let found = toolchain(
+        &fixture,
+        json!({
+            "cargoHome": format!("{}/home/.fgos/private/cargo", fixture.root),
+            "rustupHome": format!("{}/conf/rustup", fixture.root),
+            "confinementRoots": [format!("{}/conf", fixture.root)],
+        }),
+    );
+    assert!(found.is_empty(), "{found:?}");
 }

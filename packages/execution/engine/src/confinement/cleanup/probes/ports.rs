@@ -101,6 +101,8 @@ impl ResourceResolver for PolicyResolver {
                 .map(|path| path.to_string_lossy().into_owned())
                 .unwrap_or_default(),
             uid: current_uid(),
+            cargo_home: text(&["cargoHome"]),
+            rustup_home: text(&["rustupHome"]),
         };
         let resolved = resolve_confinement_resources(&resolve_input)
             .map_err(|error| DriverError::new(ErrorKind::Port, error.to_string()))?;

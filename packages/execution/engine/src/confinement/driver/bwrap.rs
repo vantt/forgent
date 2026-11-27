@@ -523,6 +523,8 @@ impl BwrapDriver {
         }
         json!({
             "dispatchId": request.get("dispatchId").cloned().unwrap_or(Value::Null),
+            "cargoHome": (self.env)("CARGO_HOME"),
+            "rustupHome": (self.env)("RUSTUP_HOME"),
             "context": Value::Object(context),
             "grants": grants,
             "resourceNeeds": request.get("resourceNeeds").cloned().unwrap_or(Value::Null),
