@@ -72,7 +72,7 @@ fn real_merge_evidence_and_same_id_replay() {
         serde_json::to_value(replay.receipt().unwrap()).unwrap(),
         encoded
     );
-    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), f.request.target);
+    assert_eq!(git(&f.main, &["rev-parse", "HEAD"]), request.target);
 }
 #[test]
 fn mismatch_and_candidate_edits_never_publish() {

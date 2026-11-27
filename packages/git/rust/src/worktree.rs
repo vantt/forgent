@@ -986,9 +986,6 @@ impl GitDriver {
         let path = repo
             .work_tree()
             .ok_or_else(|| failure("worktree-identity-refused"))?;
-        if path == repo.trusted_main_root() || repo.git_dir() == repo.common_dir() {
-            return Err(failure("worktree-identity-refused"));
-        }
         let target = match self.resolve_repo(path, repo.trusted_main_root())? {
             ResolveRepo::Repository(r) => r,
             _ => return Err(recovery("worktree-registration-missing")),
@@ -1001,11 +998,17 @@ impl GitDriver {
         {
             return Err(failure("worktree-identity-refused"));
         }
-        let scope = self.worktree_scope(repo, held)?;
+        let scope = if held.is_empty() {
+            self.worktree_scope(repo, held)?
+        } else {
+            let scope = LockScope::seeded(held).map_err(failure)?;
+            scope.validate().map_err(failure)?;
+            scope
+        };
         let h = scope
             .handle("worktree-admin")
             .or_else(|| scope.handle("merge-slot"))
-            .or_else(|| scope.handle("land-slot"))
+            .or_else(|| scope.handle("main-checkout"))
             .ok_or_else(|| failure("worktree-admin-required"))?;
         let candidate_repo = self.checkout_repository(&target)?;
         let state = self.checkout_call_borrowed(
@@ -1050,15 +1053,6 @@ impl GitDriver {
             }
         }
         Ok(())
-    }
-    /// Alias for [`Self::materialize_committed_state`].
-    pub fn materialize_worktree_committed_state(
-        &self,
-        repo: &RepoHandle,
-        held: Vec<BorrowedHandle<'_>>,
-        commit: &str,
-    ) -> Result<()> {
-        self.materialize_committed_state(repo, held, commit)
     }
     /// Remove a delivered linked worktree. With `IgnoredBytes::Discard` its
     /// ignored bytes are deleted after every other check passed, and the

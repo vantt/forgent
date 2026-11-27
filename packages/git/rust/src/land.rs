@@ -582,7 +582,7 @@ impl GitDriver {
                     if e.cause == "worktree-state-paths-unreadable" {
                         e.cause = "land-state-paths-unreadable".into();
                     } else if e.cause == "worktree-command-failed" {
-                        e.cause = "land-command-failed".into();
+                        e.cause = "land-git-failed".into();
                     }
                     e
                 })?;
