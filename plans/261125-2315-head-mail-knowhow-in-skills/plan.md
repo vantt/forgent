@@ -1,10 +1,10 @@
 ---
 contract: plan-v1
 title: "Heads learn mail from one shared file: send once with --wake, read the answer; session-host spec and the pane lookup follow the mail door"
-status: ready
+status: running
 priority: P2
 blockedBy: []
-base: 49f851828f014b235e911e89e9737e5e88bde7d7
+base: a09103f46836e72c39a65e3c0c06b0d37e4a13b1
 footprint:
   - plans/261125-2315-head-mail-knowhow-in-skills/**
   - core/skills/_shared/head-mail.md
@@ -23,6 +23,8 @@ source:
   - plans/261125-2313-head-communication-agent-to-agent/plan.md
   - p-nnaksnxtwu
 created: 2026-11-25
+lead: head:lead-forgent-261125-2315-head-m-1cde4
+host: fg-server2-jdp2bv
 ---
 
 # Heads learn mail from one shared file
