@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Component authority declares four layerings as data, with fixed rule kinds in code"
 description: "Step A of CAS-D5: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; layering values sit on component rows under the layering id; the architecture checks run per fixed rule kind (order-downward, isolation, port-wiring) read from the model; no hardcoded layer or tier list remains."
-status: draft
+status: ready
 priority: P2
 blockedBy: []
 base: 25f849e9d001553a9ade2883704fa1b51cea8b43
@@ -105,13 +105,13 @@ rendered into `architecture-map.md` §3 from the model.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Spec first](phase-01-spec-first.md) | - | docs/platform/component-authority/spec.md | 1 | draft |
-| 2 | [Layerings in the model, fields renamed](phase-02-layerings-in-the-model.md) | 1 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, test/architecture.test.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | draft |
-| 3 | [Rule kinds in code](phase-03-rule-kinds-in-code.md) | 2 | test/architecture.test.mjs | 3 | draft |
-| 4 | [Hexagon by CAS-D4 and ports](phase-04-hexagon-and-ports.md) | 2, 3 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | draft |
-| 5 | [Orchestration ring and folded guards](phase-05-orchestration-ring.md) | 3, 4 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, test/architecture.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 5 | draft |
-| 6 | [Rendered definitions and prose](phase-06-rendered-definitions-and-prose.md) | 5 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md | 6 | draft |
-| 7 | [Integrate](phase-07-integrate.md) | 6 | CHANGELOG.md, plans/261127-1247-component-authority-layerings/reports/ | 7 | draft |
+| 1 | [Spec first](phase-01-spec-first.md) | - | docs/platform/component-authority/spec.md | 1 | ready |
+| 2 | [Layerings in the model, fields renamed](phase-02-layerings-in-the-model.md) | 1 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, test/architecture.test.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | ready |
+| 3 | [Rule kinds in code](phase-03-rule-kinds-in-code.md) | 2 | test/architecture.test.mjs | 3 | ready |
+| 4 | [Hexagon by CAS-D4 and ports](phase-04-hexagon-and-ports.md) | 2, 3 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | ready |
+| 5 | [Orchestration ring and folded guards](phase-05-orchestration-ring.md) | 3, 4 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, test/architecture.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 5 | ready |
+| 6 | [Rendered definitions and prose](phase-06-rendered-definitions-and-prose.md) | 5 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md | 6 | ready |
+| 7 | [Integrate](phase-07-integrate.md) | 6 | CHANGELOG.md, plans/261127-1247-component-authority-layerings/reports/ | 7 | ready |
 
 The waves are serial because `components.yaml`, `layers.yaml`, `test/architecture.test.mjs`
 and the rendered docs are hot files that four phases must write in turn; each phase leaves
