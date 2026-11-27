@@ -45,7 +45,7 @@ A spec is never made atomic. Thirty sections about one area are normal: the whol
         ─► 6 write, with links to owners ─► 7 check, regenerate, log, commit
 ```
 
-The order is the write door's ([6.1](../subcomponents/write-door/spec.md#61-a-write-step-by-step)). Steps 3 and 4 run once per write, not once per section.
+The order is the write door's ([6.1](../subcomponents/write-door/spec.md#61-a-write-step-by-step)). Steps 3 and 4 run once per write, not once per section. The commands for one claim (draft in English, `fgos doc locate`, reading every mention, the grow, ask, create and no-place records) are the shared procedure `core/skills/_shared/write-door.md`; this guide holds the worked examples and does not restate those steps.
 
 ## 3. Step 1: Draft The Narrative
 
@@ -215,7 +215,7 @@ Both are `create`, and both go through admission. Part 1 becomes a guide in `doc
 | Piece | Today | Target |
 |---|---|---|
 | Locate | pkm `v0.2.1` outside fgOS; recall on this corpus 91.7% at top 3, 95.8% at top 10 | `fgos doc locate` through a locate port, pkm linked into the host (build step 3) |
-| Interim locate for the retrospective writer | `rg` over `docs/knowledge`, `docs/explanation`, `docs/how-to` and the registry listing | replaced by `fgos doc locate` |
+| Locate for the retrospective writer | `fgos doc locate`, with exact `mentions` and `--exact`, through the shared procedure `core/skills/_shared/write-door.md` | unchanged |
 | Region of user notes | none: 505 of 691 documents are `unplaced` | `area` filled when a note is next edited, checked by doc-checks |
 | Platform paths | written by the writer from the placement rules; `fgos convention classify` and the pre-commit hook check them; `fgos convention path` generates names only for reports, plans and journals | unchanged unless the door needs generation |
 | User-note paths | `docs/knowledge/<topic>/<slug>.md`; `fgos doc reserve` records the path the writer passes | the (area, sub-area, question) slot |
