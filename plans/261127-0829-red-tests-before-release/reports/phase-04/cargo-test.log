@@ -1,0 +1,826 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+   Compiling rustix v1.1.6
+   Compiling linux-raw-sys v0.12.1
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling ahash v0.8.12
+   Compiling darling_core v0.20.11
+   Compiling monostate-impl v0.1.18
+   Compiling rustls v0.23.46
+   Compiling pkm-lang v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fastrand v2.5.0
+   Compiling fgctl v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/apps/fgctl)
+   Compiling fgos-graph v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/graph/rust)
+   Compiling fgos-secrets v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/secrets/rust)
+   Compiling fgos-resource-referee v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/resource-referee/rust)
+   Compiling napi v2.16.17
+   Compiling fgos-mailbox-core v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/mailbox/rust/core)
+   Compiling referencing v0.60.0
+   Compiling jsonschema-value v0.60.0
+   Compiling monostate v0.1.18
+   Compiling fgos-seat-binding v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/seat-binding/rust)
+   Compiling jsonschema v0.60.0
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/holder-lock/rust)
+   Compiling fgos-convention v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/convention/rust)
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/host-runtime/rust)
+   Compiling fgos-durable-file v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/durable-file/rust)
+   Compiling xattr v1.6.1
+   Compiling tempfile v3.27.0
+   Compiling tar v0.4.46
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/yaml-doc/rust)
+   Compiling darling_macro v0.20.11
+   Compiling fgos-git v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/git/rust)
+   Compiling fgos-terminal-control v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/terminal-control/rust)
+   Compiling fgos-agent-protocol v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/agent-protocol/rust)
+   Compiling darling v0.20.11
+   Compiling derive_builder_core v0.20.2
+   Compiling fgos-component-authority v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/component-authority/rust)
+   Compiling ureq v3.5.2
+   Compiling derive_builder_macro v0.20.2
+   Compiling derive_builder v0.20.2
+   Compiling tokenizers v0.22.2
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/canonical-json/rust)
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/process/rust)
+   Compiling fgos-write-scope v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/write-scope)
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/identity/rust)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/config/rust)
+   Compiling fgos-observe v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/observe/rust)
+   Compiling fgos-event-store v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/event-store/rust)
+   Compiling fgos-mailbox v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/mailbox/rust/store)
+   Compiling fgos-distribution v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/distribution/rust)
+   Compiling fgos-checkout v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/execution/checkout)
+   Compiling herdr-fgos-common v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/herdr-fgos-common/rust)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/agent-context-engine/rust)
+   Compiling pkm-lifecycle v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-cli v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-start-context v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/agent-start-context/rust)
+   Compiling fgos-session-host v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/session-host/rust)
+   Compiling fgos-run-result v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/run-result/rust)
+   Compiling fgos-supervision v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/supervision/rust)
+   Compiling fgos-questions v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/questions/rust)
+   Compiling fgos-documentation v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/documentation/rust)
+   Compiling fgos-work-state v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/work-state/rust)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/run-supervisor/rust)
+   Compiling fgos-execution v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/execution/rust)
+   Compiling fgos-execution-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/execution/engine)
+   Compiling fgos-node-addon v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/packages/git/node-addon)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p04/apps/fgos)
+warning: constant `OPERATION_ID` is never used
+  --> apps/fgos/tests/../src/wiring/migrate.rs:39:11
+   |
+39 | pub const OPERATION_ID: &str = "migrate.portfolio";
+   |           ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `AVAILABLE_SUBCOMMANDS` is never used
+  --> apps/fgos/tests/../src/wiring/migrate.rs:42:11
+   |
+42 | pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["portfolio"];
+   |           ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `DESCRIPTOR` is never used
+  --> apps/fgos/tests/../src/wiring/migrate.rs:44:11
+   |
+44 | pub const DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
+   |           ^^^^^^^^^^
+
+warning: function `project_migrate_request` is never used
+   --> apps/fgos/tests/../src/wiring/migrate.rs:112:8
+    |
+112 | pub fn project_migrate_request(
+    |        ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `MigrateProvider` is never constructed
+    --> apps/fgos/tests/../src/wiring/migrate.rs:1300:12
+     |
+1300 | pub struct MigrateProvider {
+     |            ^^^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+    --> apps/fgos/tests/../src/wiring/migrate.rs:1305:12
+     |
+1304 | impl MigrateProvider {
+     | -------------------- associated function in this implementation
+1305 |     pub fn new() -> Self {
+     |            ^^^
+
+warning: `fgos` (test "migrate_portfolio") generated 6 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 01s
+     Running unittests src/main.rs (target/debug/deps/fgctl-2b60439024fa7174)
+
+running 1 test
+test help::tests::every_verb_help_carries_the_required_sections ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_surface.rs (target/debug/deps/cli_surface-45ec296e2e50b3d8)
+
+running 10 tests
+test no_arguments_print_task_ordered_get_started_and_exit_zero ... ok
+test version_flag_prints_one_identifying_line_and_exits_zero ... ok
+test help_names_the_exit_codes_the_table_gives_to_not_ready_and_an_unreadable_pin ... ok
+test version_json_is_a_bare_object_with_name_and_version ... ok
+test unknown_verb_exits_two_and_suggests_the_closest_verb ... ok
+test unknown_flag_and_missing_value_exit_two_and_name_the_verb_help ... ok
+test every_verb_answers_help_on_stdout_with_exit_zero ... ok
+test init_refuses_a_committed_pin_it_cannot_read_instead_of_treating_it_as_unpinned ... ok
+test status_names_the_drift_between_the_active_release_and_the_pin_before_its_result_line ... ok
+test a_digest_only_pin_with_nothing_staged_names_three_ways_out ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/git_wal_activation_gate.rs (target/debug/deps/git_wal_activation_gate-9c86c93b07218d90)
+
+running 3 tests
+test the_shell_that_launched_the_upgrade_does_not_block_it ... ok
+test addon_admission_names_missing_payload_or_capability_and_preserves_activation ... ok
+test controller_publication_and_idempotent_paths_enforce_wal_and_keep_the_fence ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.87s
+
+     Running tests/uninstall_surface.rs (target/debug/deps/uninstall_surface-e8ee58639d11e15a)
+
+running 7 tests
+test uninstall_help_carries_the_required_sections ... ok
+test a_project_whose_shim_is_gone_cannot_be_applied_but_can_be_planned ... ok
+test purge_refuses_a_state_root_that_is_the_home_directory ... ok
+test a_failed_reversal_leaves_the_activation_and_the_store_in_place ... ok
+test yes_reverses_the_wiring_then_removes_the_activation_and_keeps_config_data_and_the_store ... ok
+test without_yes_and_without_a_terminal_it_prints_the_plan_and_changes_nothing ... ok
+test purge_removes_the_release_store_entries_and_nothing_else_of_the_state_root ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/windows_holder_lock_gate.rs (target/debug/deps/windows_holder_lock_gate-65d397a0d91f4cb9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/main.rs (target/debug/deps/fgos-d5ffd99fcb46828f)
+
+running 598 tests
+test cli_presenter::tests::test_format_iso8601 ... ok
+test cli_presenter::tests::a_categorised_refusal_exits_with_its_category_and_names_its_text_to_the_doors ... ok
+test cli_presenter::tests::a_projection_error_exits_with_its_category_or_as_unexpected ... ok
+test cli_presenter::tests::test_serialization_corpus_floating_exponent_formatting ... ok
+test cli_presenter::tests::test_serialization_corpus_integer_limits ... ok
+test cli_presenter::tests::test_serialization_corpus_negative_zero ... ok
+test cli_presenter::tests::test_serialization_corpus_object_insertion_order ... ok
+test cli_presenter::tests::test_serialization_corpus_null_booleans ... ok
+test cli_presenter::tests::test_envelope_list_vector ... ok
+test cli_presenter::tests::test_serialization_corpus_unicode_control_characters ... ok
+test cli_presenter::tests::test_envelope_version_vector ... ok
+test cli_presenter::tests::test_serialization_corpus_nested_arrays_maps ... ok
+test cli_projector::tests::a_flag_given_the_wrong_shape_is_a_validation_refusal ... ok
+test cli_projector::tests::a_flag_that_takes_no_value_refuses_the_word_the_parser_handed_it ... ok
+test cli_projector::tests::convention_check_requires_exactly_one_input_mode ... ok
+test cli_projector::tests::convention_check_keeps_dash_prefixed_paths_after_separator ... ok
+test cli_projector::tests::config_read_verbs_map_their_arguments_and_run_as_a_read ... ok
+test cli_projector::tests::identity_arguments_pick_the_operation_that_matches_their_effect ... ok
+test cli_projector::tests::identity_directory_flags_belong_to_their_verbs_only ... ok
+test cli_projector::tests::identity_request_ignores_the_shell_appended_dir_flag ... ok
+test cli_projector::tests::projects_convention_name_into_a_typed_request ... ok
+test cli_projector::tests::config_write_verbs_map_their_arguments_and_refuse_incompatible_flags ... ok
+test cli_projector::tests::test_project_cli_invocation_for_gate_bypass ... ok
+test cli_projector::tests::identity_mint_takes_a_kind_and_an_optional_release_number ... ok
+test cli_projector::tests::test_project_cli_invocation_for_metrics ... ok
+test cli_projector::tests::test_project_cli_invocation_for_version_needs_no_project ... ok
+test help::tests::effect_labels_cover_the_four_cases ... ok
+test help::tests::deprecation_is_a_string_or_structured_metadata ... ok
+test help::tests::flag_lines_skip_positionals_and_name_a_default_unless_the_description_does ... ok
+test help::tests::parameters_render_positional_only_and_mixed_required_in_their_own_idiom ... ok
+test invocation_doors::tests::a_dispatched_invocation_that_opens_the_store_runs_both_triggers_where_the_store_runs ... ok
+test invocation_doors::tests::a_read_of_a_missing_store_from_a_linked_worktree_passes_with_a_warning_and_no_record ... ok
+test invocation_doors::tests::a_read_that_found_no_store_runs_no_trigger_and_records_no_refusal_in_the_main_store ... ok
+test invocation_doors::tests::a_root_the_door_refuses_stops_a_verb_with_a_store_and_only_reaches_a_project_reader_otherwise ... ok
+test invocation_doors::tests::a_failed_event_store_child_is_recorded_with_the_failure_text_and_a_successful_or_silent_one_is_not ... ok
+test invocation_doors::tests::a_trigger_error_is_recorded_under_its_class_and_never_fails_the_invocation ... ok
+test invocation_doors::tests::an_unrecorded_refusal_names_no_record_and_prints_no_record_line ... ok
+test invocation_doors::tests::an_invocation_that_needs_no_store_and_a_publish_child_run_no_trigger ... ok
+test invocation_doors::tests::a_verb_that_needs_a_store_is_refused_and_recorded_when_dir_names_a_project_without_one ... ok
+test invocation_doors::tests::the_dispatch_depth_is_a_non_negative_finite_number_else_zero ... ok
+test invocation_doors::tests::an_unknown_flag_is_recorded_in_the_store_of_the_callers_directory_never_the_one_dir_names ... ok
+test cli_projector::tests::events_arguments_map_to_their_verb_and_pick_the_operation_that_matches_their_effect ... ok
+test invocation_doors::tests::a_write_from_a_worktree_with_a_frozen_store_is_refused_by_its_class_and_recorded_there ... ok
+test invocation_doors::tests::the_publish_child_is_started_without_the_recursion_guard_and_with_its_own_arguments ... ok
+test invocation_doors::tests::the_real_trigger_outside_a_repository_answers_an_error_code_and_does_not_panic ... ok
+test invocation_doors::tests::the_project_is_the_dir_as_named_else_the_found_root_and_never_the_global_directory ... ok
+test invocation_doors::tests::only_the_listed_native_verbs_take_the_lenient_root_arm ... ok
+test legacy_exec::tests::the_payload_root_is_the_entry_less_its_manifest_components ... ok
+test routing::confined_tests::a_confined_caller_cannot_choose_the_footprint_a_land_is_held_to ... ok
+test legacy_exec::tests::the_payload_command_runs_the_script_with_a_fresh_guard_this_host_and_the_state_root ... ok
+test invocation_doors::tests::a_verb_off_the_pre_door_list_reads_its_dir_from_the_shared_parser_and_a_bare_dir_is_refused ... ok
+test routing::confined_tests::a_heads_mail_goes_through_the_window_and_a_confined_worker_keeps_its_local_route ... ok
+test routing::confined_tests::a_confined_questions_list_is_one_window_frame_and_the_other_sub_commands_are_left_alone ... ok
+test routing::confined_tests::a_land_call_builds_the_contract_args_from_its_flags ... ok
+test routing::confined_tests::a_verb_the_contract_does_not_name_takes_its_own_route ... ok
+test routing::confined_tests::can_i_sends_the_words_after_it_as_one_frame_from_a_head_that_has_a_socket ... ok
+test routing::confined_tests::release_is_a_registered_route_that_a_call_outside_a_head_refuses_by_name ... ok
+test invocation_doors::tests::wire_agents_acts_on_the_main_checkout_of_the_callers_directory_whatever_dir_names ... ok
+test routing::confined_tests::release_run_is_a_frame_of_its_own_only_from_a_head_with_a_socket_and_takes_only_rollback ... ok
+test routing::confined_tests::run_goes_to_the_request_socket_only_from_a_head_that_has_one ... ok
+test routing::tests::a_call_is_read_over_the_tokens_after_the_verb ... ok
+test routing::tests::a_call_hands_a_verb_its_words_flags_and_the_arguments_after_a_bare_separator ... ok
+test routing::confined_tests::friction_record_detail_stdin_reads_stdin_and_drops_the_flag ... ok
+test routing::confined_tests::the_hosts_own_dir_of_this_project_leaves_a_window_argv_and_any_other_dir_stays ... ok
+test routing::tests::a_call_reads_its_sub_command_and_flags_only_through_the_shared_parser ... ok
+test routing::tests::a_flag_with_an_equals_value_is_refused_whole_and_a_bare_separator_ends_the_flags ... ok
+test routing::tests::a_dir_spelled_with_an_equals_sign_is_an_unknown_flag_for_every_verb ... ok
+test routing::tests::a_native_verb_serves_exactly_the_sub_commands_its_route_lists ... ok
+test routing::tests::agents_words_a_missing_or_unknown_sub_verb_as_the_node_arm_did ... ok
+test routing::confined_tests::the_other_contract_verbs_map_their_words_and_flags ... ok
+test routing::tests::a_missing_or_unknown_sub_command_is_an_arg_parse_fault_naming_what_is_available ... ok
+test routing::tests::config_refuses_an_unknown_flag_in_the_node_cli_text ... ok
+test routing::tests::every_first_positional_a_selector_serves_natively_has_a_server ... ok
+test routing::tests::git_refuses_an_unknown_flag_in_the_node_cli_text ... ok
+test routing::tests::lock_status_refuses_an_unknown_flag_in_the_node_cli_text_and_accepts_a_positional ... ok
+test routing::tests::every_native_route_names_its_operation_and_its_sub_commands_and_none_lands_work ... ok
+test routing::tests::of_several_unknown_flags_the_first_in_javascript_key_order_is_named ... ok
+test routing::tests::the_table_has_a_route_for_every_verb_and_none_for_an_option_token ... ok
+test routing::tests::the_lane_follows_the_route_kind_and_the_first_token_of_a_hook ... ok
+test routing::tests::the_project_a_call_names_is_its_dir_flag_and_a_bare_dir_is_the_empty_path ... ok
+test tests::the_production_composition_carries_no_test_fixture_provider ... ok
+test routing::tests::the_valid_flags_of_a_verb_print_in_registry_order ... ok
+test wiring::agents::tests::a_worktree_flag_names_the_project_root_as_node_resolves_a_path ... ok
+test wiring::agents::tests::a_definition_that_cannot_be_read_beneath_its_folder_is_listed_unreadable ... ok
+test wiring::agents::tests::a_tier_folder_lists_its_definitions_in_bytewise_order_and_names_the_yml_it_ignores ... ok
+test wiring::authority::tests::locate_projects_the_sentence_and_a_default_limit ... ok
+test routing::tests::every_shared_store_declaration_row_resolves_as_the_registry_resolves_it ... ok
+test wiring::authority::tests::declare_projects_the_kind_the_row_the_approval_and_the_move_and_update_switches ... ok
+test wiring::agents::tests::a_project_core_folder_hides_the_shipped_personas_it_lacks_and_a_domains_folder_hides_nothing ... ok
+test wiring::authority::tests::model_projects_with_no_arguments_and_refuses_any_option ... ok
+test wiring::authority::tests::locate_takes_a_limit_and_refuses_a_bad_one ... ok
+test wiring::authority::tests::the_fgos_repository_keeps_its_model_in_the_tree_and_every_other_project_under_dot_fgos ... ok
+test wiring::authority::tests::declare_refuses_a_missing_or_unknown_kind_a_missing_or_bad_row_and_an_argument ... ok
+test wiring::authority::tests::locate_refuses_a_missing_sentence_an_unknown_subcommand_and_an_unknown_option ... ok
+test wiring::authority::tests::render_refuses_a_bare_preview_flag_a_combination_an_argument_and_an_unknown_option ... ok
+test wiring::context_engine::values::tests::an_unparseable_domain_registry_is_refused_with_its_path ... ok
+test wiring::dispatch_decide::tests::a_decide_call_reads_its_selectors_and_the_flags_by_presence ... ok
+test wiring::dispatch_decide::tests::a_dir_names_the_cwd_when_no_cwd_is_given_and_a_bare_selector_flag_says_nothing ... ok
+test wiring::context_engine::values::tests::an_unparseable_workflow_file_is_refused_with_its_path ... ok
+test wiring::dispatch_decide::tests::a_missing_project_directory_blocks_an_agent_call_in_the_standard_protocol ... ok
+test wiring::dispatch_decide::tests::a_path_is_resolved_like_node_resolves_it ... ok
+test wiring::dispatch_decide::tests::a_payload_that_is_empty_or_names_no_agent_tool_allows_in_the_format_of_its_flag ... ok
+test wiring::dispatch_decide::tests::the_format_flag_is_read_in_its_equals_form_only ... ok
+test wiring::dispatch_decide::tests::an_assignment_id_is_one_plain_path_segment ... ok
+test wiring::context_engine::values::tests::every_live_key_answers_the_values_of_the_project_and_a_key_without_a_list_answers_none ... ok
+test wiring::authority::tests::render_projects_a_write_a_check_and_a_holder_preview ... ok
+test help::tests::a_verb_with_sub_verbs_lists_each_under_its_guide_options ... ok
+test help::tests::the_verbs_of_the_usage_line_are_the_route_table_verbs_in_registry_order ... ok
+test help::tests::a_deprecated_verb_keeps_its_full_entry_when_asked_for_alone ... ok
+test help::tests::top_level_refusals_name_the_request_and_the_usage ... ok
+test help::tests::every_route_selector_is_a_manifest_verb_and_back ... ok
+test help::tests::hook_help_keeps_the_raw_argv_and_reads_only_an_exact_json_token ... ok
+test help::tests::every_deprecated_verb_prints_a_plain_notice_alone_and_compound_is_listed_under_compatibility ... ok
+test help::tests::top_level_text_lists_live_verbs_then_one_compatibility_section ... ok
+test help::tests::help_words_may_follow_json_and_dir_and_a_repeated_help_token ... ok
+test help::tests::a_guided_verb_names_every_flag_example_and_exit_code_of_its_entry ... ok
+test wiring::dispatch_subs::tests::recover_reads_its_action_and_expectations_and_refuses_an_epoch_that_is_no_number ... ok
+test wiring::authority::tests::source_tree_returns_the_worktree_when_root_is_main_and_returns_root_otherwise ... ok
+test help::tests::the_shipped_manifest_renders_positional_only_and_mixed_arguments_in_their_own_idiom ... ok
+test help::tests::verb_help_reads_its_words_the_way_the_verbs_read_a_call ... ok
+test help::tests::the_whole_list_names_every_live_verb_with_its_effect_label ... ok
+test help::tests::the_manifest_file_is_the_serializer_output_so_the_whole_json_form_prints_the_file ... ok
+test wiring::dispatch_subs::tests::the_attention_definitions_reader_reports_a_definition_the_host_cannot_measure_beside_the_others ... ok
+test wiring::dispatch_subs::tests::the_attention_definitions_reader_measures_a_definition_file_added_after_an_earlier_read ... ok
+test wiring::doc_locate::tests::a_locate_call_reads_repeated_drafts_draft_files_and_the_guessed_region ... ok
+test wiring::doc_locate::tests::an_unreadable_draft_file_and_a_bare_index_are_the_callers_errors ... ok
+test wiring::doc_locate::tests::the_record_keeps_draft_digests_never_the_draft_text ... ok
+test wiring::doctor::bridge::contract_tests::every_vector_line_reads_back_as_the_body_it_was_written_from ... ok
+test wiring::doctor::bridge::contract_tests::the_prefix_and_module_are_the_contracts ... ok
+test help::tests::a_guided_verb_prints_its_sections_in_order_and_only_when_shown_alone ... ok
+test wiring::doctor::bridge::tests::a_crash_keeps_the_results_already_produced_and_fails_only_the_rest_with_the_cause ... ok
+test help::tests::one_verbs_help_prints_only_that_verbs_block_and_narrowing_drops_the_other_sub_verbs ... ok
+test wiring::doctor::bridge::tests::a_launcher_that_cannot_find_the_payload_fails_the_call_without_starting_anything ... ok
+test wiring::doctor::bridge::tests::a_missing_node_fails_every_row_with_the_install_hint_and_one_next_entry ... ok
+test wiring::doctor::bridge::tests::a_fix_that_never_answered_reports_the_cause_and_changed_false ... ok
+test wiring::doctor::bridge::tests::a_node_that_starts_and_never_ends_the_call_is_a_failed_fact_and_a_later_version_replaces_it ... ok
+test help::tests::every_manifest_entry_renders_as_text_and_json_and_every_sub_verb_narrows ... ok
+test wiring::doctor::bridge::tests::a_refusal_fails_every_row_with_its_message ... ok
+test wiring::doctor::bridge::tests::a_refused_work_store_step_carries_the_error_text_and_its_category ... ok
+test wiring::doctor::bridge::tests::a_work_store_step_that_stops_without_an_end_line_or_cannot_start_is_a_fault ... ok
+test wiring::doctor::bridge::tests::an_item_the_work_store_does_not_hold_is_no_hint_and_a_refused_lookup_is_the_fault ... ok
+test wiring::doctor::bridge::tests::each_row_is_judged_from_its_own_prefixed_line_and_stray_output_is_never_a_result ... ok
+test wiring::doctor::bridge::tests::the_request_reaches_the_child_on_stdin_with_the_phase_ids_and_directory ... ok
+test wiring::doctor::bridge::tests::the_work_dispatch_hint_request_names_the_item_and_the_stage_and_reads_one_hint_line ... ok
+test wiring::doctor::bridge::tests::the_child_runs_in_its_own_process_group_so_a_signal_to_the_host_group_cannot_leave_it_orphaned ... ok
+test wiring::doctor::bridge::tests::the_work_store_step_sends_its_phase_with_no_ids_and_succeeds_on_an_end_line ... ok
+test wiring::doctor::config::tests::a_confined_session_repairs_nothing_and_says_why ... ok
+test wiring::doctor::config::tests::a_refused_read_fails_every_row_with_its_reason ... ok
+test wiring::context_engine::owners::tests::the_real_model_names_a_component_and_a_domain_as_owners_and_refuses_an_unknown_one ... ok
+test wiring::doctor::config::tests::a_warning_finding_passes_with_a_warning_prefix_and_a_failing_one_fails_naming_file_position_and_row ... ok
+test wiring::doctor::config::tests::no_row_message_carries_a_value_of_a_config_file ... ok
+test wiring::doctor::config::tests::the_adapter_has_exactly_the_rows_and_fixes_of_the_contract_under_the_ids_the_registry_gives ... ok
+test wiring::doctor::config::tests::the_permission_fix_repairs_a_loose_global_directory_once_and_a_second_run_changes_nothing ... ok
+test wiring::doctor::confinement::tests::a_capability_naming_an_unknown_policy_fails_and_declared_or_builtin_policies_pass ... ok
+test wiring::doctor::bridge::tests::a_work_store_step_that_hangs_is_ended_at_its_own_deadline ... ok
+test wiring::doctor::confinement::tests::a_malformed_custom_policy_names_its_id ... ok
+test wiring::doctor::confinement::tests::a_policy_the_machine_declares_is_known_and_an_unreadable_config_fails_policies_and_readiness ... ok
+test wiring::doctor::confinement::tests::blind_read_is_backend_unsupported_without_a_usable_backend_and_pass_or_fail_by_the_probe ... ok
+test wiring::doctor::confinement::tests::copies::a_clean_machine_passes ... ok
+test wiring::doctor::confinement::tests::copies::a_half_written_copy_is_reported_for_hand_recovery_at_any_age ... ok
+test wiring::doctor::confinement::tests::a_home_owned_by_a_dead_process_is_named_by_the_row_and_removed_only_by_the_fix ... ok
+test wiring::doctor::confinement::tests::copies::a_held_home_fails_with_its_hand_recovery_a_retried_one_is_only_noted_and_the_marker_is_never_repeated ... ok
+test wiring::doctor::confinement::tests::copies::a_home_reached_through_two_spellings_of_one_root_is_counted_once ... ok
+test wiring::doctor::confinement::tests::copies::a_kept_home_under_a_root_nothing_retries_is_held_at_once ... ok
+test wiring::doctor::confinement::tests::copies::a_link_of_one_root_is_counted_once_and_still_retried ... ok
+test wiring::doctor::confinement::tests::copies::a_pending_copy_a_day_old_is_reported_by_provider_account_and_age_and_a_young_one_is_not ... ok
+test wiring::doctor::confinement::tests::copies::a_scratch_home_or_a_half_written_copy_in_a_stranded_directory_names_that_directory ... ok
+test wiring::doctor::confinement::tests::copies::an_account_over_the_pending_limit_is_reported_even_when_its_copies_are_young ... ok
+test wiring::doctor::confinement::tests::copies::an_agent_copy_set_aside_after_empty_renewals_has_its_own_wording ... ok
+test wiring::doctor::confinement::tests::copies::an_attempt_home_whose_run_has_neither_envelope_nor_intent_fails_naming_the_attempt ... ok
+test wiring::doctor::confinement::tests::copies::an_id_that_names_an_object_built_in_is_not_found_in_the_inventory ... ok
+test wiring::doctor::confinement::tests::copies::a_staging_in_a_stranded_store_is_reported_once_for_hand_recovery_and_the_fix_leaves_it ... ok
+test wiring::doctor::confinement::tests::copies::an_interrupted_staging_row_offers_no_source_judgement_without_an_inventory ... ok
+test wiring::doctor::confinement::tests::copies::an_over_limit_store_is_named_by_its_cli_and_a_stranded_one_promises_no_re_check ... ok
+test wiring::doctor::confinement::tests::copies::copies_in_a_store_the_inventory_still_reads_keep_the_waiting_wording ... ok
+test wiring::doctor::confinement::tests::copies::an_interrupted_staging_is_reported_and_the_fix_removes_only_one_provably_not_needed ... ok
+test wiring::doctor::confinement::tests::copies::copies_in_a_store_the_layout_no_longer_reads_are_named_for_hand_recovery_at_any_age ... ok
+test wiring::doctor::confinement::tests::copies::the_fix_leaves_a_stranded_copy_in_place ... ok
+test wiring::doctor::confinement::tests::copies::the_fix_judges_a_staging_against_the_source_login_of_its_store_through_the_inventory ... ok
+test wiring::doctor::config::tests::every_runner_key_a_past_release_retired_is_an_unknown_key_whichever_file_carries_it ... ok
+test wiring::doctor::confinement::tests::copies::the_inventory_the_machine_config_gives_names_accounts_by_state_key_and_keeps_declared_stores_waiting ... ok
+test wiring::doctor::confinement::tests::copies::the_orphan_count_skips_a_held_home_of_a_dead_process_but_counts_one_only_being_retried ... ok
+test wiring::doctor::confinement::tests::copies::without_a_readable_inventory_the_row_fails_lists_every_copy_and_promises_nothing_of_a_dispatch ... ok
+test wiring::doctor::confinement::tests::herdr_maturity_names_bypass_executors_without_full_confinement ... ok
+test wiring::doctor::confinement::tests::probe_freshness_skips_off_linux_and_reports_a_failing_probe ... ok
+test wiring::doctor::confinement::tests::strict_readiness_warns_unless_the_config_is_strict ... ok
+test wiring::doctor::confinement::tests::the_backend_registry_row_tells_missing_invalid_malformed_and_valid_apart ... ok
+test wiring::doctor::confinement::tests::the_bwrap_rows_follow_the_registry_the_platform_and_the_smoke_test ... ok
+test wiring::doctor::confinement::tests::the_group_lists_the_rows_and_fixes_the_registry_names ... ok
+test wiring::doctor::confinement::tests::the_login_copy_row_passes_when_nothing_is_kept_and_fails_on_a_stranded_copy ... ok
+test wiring::doctor::confinement::tests::the_orphans_row_counts_what_confinement_left_and_the_fix_removes_empty_shells ... ok
+test wiring::doctor::confinement::tests::the_registry_fix_skips_a_registry_it_cannot_parse_and_leaves_it_in_place ... ok
+test wiring::doctor::documentation::tests::a_model_file_with_wrong_bytes_warns_and_is_listed_as_corrupt ... ok
+test wiring::doctor::documentation::tests::a_project_without_a_corpus_or_an_index_passes_the_index_row_without_a_warning ... ok
+test wiring::doctor::documentation::tests::an_empty_model_folder_warns_and_lists_every_missing_file ... ok
+test wiring::doctor::confinement::tests::copies::the_fix_never_sweeps_a_stores_constructor_staging_the_row_calls_stranded ... ok
+test wiring::doctor::event_store::tests::a_machine_ref_another_clone_wrote_warns_and_names_the_fix ... ok
+test wiring::doctor::confinement::tests::copies::the_fix_settles_a_held_home_from_its_host_record_and_never_one_without_a_record_or_through_a_link ... ok
+test wiring::doctor::bridge::tests::the_work_questions_request_has_no_ids_and_reads_one_data_line_or_the_fault ... ok
+test wiring::dispatch_subs::tests::a_plan_naming_a_run_without_a_repair_action_is_refused_before_anything_is_read ... ok
+test wiring::doctor::event_store::tests::a_row_is_judged_only_when_it_is_an_event_store_row ... ok
+test wiring::dispatch_subs::tests::reconcile_selects_its_mode_from_the_positionals ... ok
+test wiring::dispatch_subs::tests::watch_stops_on_a_settled_run_and_spends_its_tick_budget_on_a_live_one ... ok
+test wiring::doctor::event_store::tests::an_unreadable_open_root_reads_as_node_read_it ... ok
+test wiring::dispatch_subs::tests::the_probes_refuse_a_malformed_call_before_any_config_is_read_or_seat_started ... ok
+test wiring::doctor::event_store::tests::incidents_counts_a_skipped_peer_mirror_and_the_sync_warning_kept_for_it_but_not_the_shared_machine_ref_warning ... ok
+test wiring::doctor::event_store::tests::incidents_counts_orphan_branch_streams_and_integrity_problems_and_fails_closed_only_on_integrity ... ok
+test wiring::doctor::event_store::tests::incidents_warns_for_real_unpublished_project_events_and_not_for_a_private_local_stream ... ok
+test wiring::doctor::event_store::tests::incidents_warns_past_twice_the_seal_interval_and_never_fails_on_unsealed_age ... ok
+test wiring::doctor::event_store::tests::javascript_truthiness_is_kept_for_the_counts_a_status_carries ... ok
+test wiring::doctor::event_store::tests::with_no_repository_every_row_fails_on_the_one_remembered_error_and_the_pointer_only_warns ... ok
+test wiring::doctor::execution::row_tests::a_project_template_with_a_forbidden_variable_fails_and_a_broken_packaged_one_is_not_read ... ok
+test wiring::doctor::execution::row_tests::the_seat_binding_route_answers_ladder_at_its_protocol ... ok
+test wiring::doctor::git::tests::a_git_below_the_feature_floor_fails_the_compatibility_row ... ok
+test wiring::doctor::git::tests::a_git_error_reads_as_its_cause_plus_the_decoded_stderr_text ... ok
+test wiring::authority::tests::render_check_fails_naming_the_view_whose_generated_block_was_hand_edited ... ok
+test wiring::doctor::git::tests::a_row_or_fix_is_handled_only_when_it_is_a_git_one ... ok
+test wiring::dispatch_subs::tests::an_adopt_that_leaves_the_attempt_open_or_held_writes_nothing ... ok
+test wiring::dispatch_subs::tests::an_apply_whose_expectations_no_longer_hold_is_stale_and_writes_nothing ... ok
+test wiring::doctor::git::tests::an_untrusted_credential_helper_names_its_remedy_and_other_failures_do_not ... ok
+test wiring::doctor::git::tests::pending_git_operations_make_the_incidents_pointer_warn_and_name_the_recover_command ... ok
+test wiring::dispatch_subs::tests::an_apply_missing_an_expectation_or_naming_a_gone_run_refuses_with_the_node_wording ... ok
+test wiring::dispatch_subs::tests::an_adopt_of_a_run_a_coordination_session_owns_is_refused_before_any_lock ... ok
+test wiring::dispatch_subs::tests::the_replays_follow_the_recorded_probe_answer_not_the_host_they_run_on ... ok
+test wiring::doctor::git::tests::the_contract_versions_must_equal_the_ones_the_row_requires ... ok
+test wiring::dispatch_subs::tests::a_consumed_action_key_returns_the_recorded_outcome_without_acting_again ... ok
+test wiring::dispatch_subs::tests::an_apply_while_another_holds_the_run_recovery_lock_is_refused_as_busy ... ok
+test wiring::doctor::git::tests::the_driver_directories_fix_is_current_after_the_first_call ... ok
+test wiring::doctor::git::tests::the_incidents_pointer_never_fails_even_when_its_facts_cannot_be_read ... ok
+test wiring::dispatch_subs::tests::the_attention_view_reads_the_corpus_project_with_attempt_views_as_node_did ... ok
+test wiring::dispatch_subs::tests::a_reconcile_plan_applies_once_under_the_repo_mutex_and_a_replay_is_stale ... ok
+test wiring::dispatch_subs::tests::reconcile_plans_every_corpus_run_as_the_node_planner_did ... ok
+test wiring::dispatch_subs::tests::an_adopt_that_settles_the_attempt_writes_one_recovery_line_with_the_node_fields ... ok
+test wiring::dispatch_subs::tests::show_run_reads_every_corpus_run_as_the_node_use_case_did ... ok
+test wiring::dispatch_subs::tests::recover_recommends_for_every_corpus_run_as_the_node_use_case_did ... ok
+test wiring::doctor::event_store::tests::a_missing_open_root_fails_with_the_path ... ok
+test wiring::dispatch_subs::tests::inspect_reads_every_corpus_run_and_assignment_with_its_attempt_view_as_node_did ... ok
+test wiring::doctor::git::tests::the_retention_sentence_warns_when_finished_operations_keep_piling_up_and_only_informs_below_the_line ... ok
+test wiring::doctor::event_store::tests::a_persisted_integrity_record_fails_the_incidents_row ... ok
+test wiring::doctor::bridge::tests::a_child_that_hangs_is_ended_with_its_whole_tree_at_the_deadline ... ok
+test wiring::doctor::holder_lock::tests::a_guarantee_of_unsupported_fails_by_name_a_network_filesystem_too_and_a_kernel_one_passes ... ok
+test wiring::doctor::holder_lock::tests::lock_dirs_creates_both_directories_private_once_and_tightens_a_directory_made_too_open ... ok
+test wiring::doctor::holder_lock::tests::lock_dirs_names_a_directory_it_could_not_make_and_still_makes_the_other ... ok
+test wiring::doctor::holder_lock::tests::lock_holders_is_a_read_only_pointer_to_the_lock_status_verb ... ok
+test wiring::doctor::holder_lock::tests::lock_kernel_semantics_warns_for_a_missing_directory_then_passes_on_the_real_mount_once_it_exists ... ok
+test wiring::doctor::holder_lock::tests::the_borrow_vectors_answer_is_worded_for_a_pass_a_leak_and_an_unavailable_driver ... ok
+test wiring::doctor::event_store::tests::a_run_remembers_a_failed_setup_context_for_every_row_and_a_new_run_observes_the_repaired_file ... ok
+test wiring::doctor::holder_lock::tests::the_group_names_exactly_the_rows_and_the_fix_the_registry_gives_to_the_holder_lock ... ok
+test wiring::doctor::identity::tests::a_machine_id_that_is_not_a_valid_id_fails_with_the_hosts_own_words ... ok
+test wiring::doctor::identity::tests::an_activation_pointing_at_a_binary_that_does_not_answer_is_a_host_error_never_a_pass ... ok
+test wiring::doctor::identity::tests::an_activation_that_names_no_usable_host_fails_the_row_naming_every_place_looked_at ... ok
+test wiring::doctor::identity::tests::minting_beneath_symlinked_ancestors_lands_in_the_canonical_directory ... ok
+test wiring::doctor::identity::tests::the_key_row_warns_without_an_id_or_a_key_mints_once_on_fix_then_shows_the_fingerprint ... ok
+test wiring::doctor::identity::tests::the_machine_id_row_warns_while_none_exists_mints_once_on_fix_then_passes_without_replacing_it ... ok
+test wiring::doctor::identity::tests::the_project_row_outside_a_repository_fails_naming_the_host_and_the_refusal ... ok
+test wiring::doctor::identity::tests::the_shared_directory_row_says_there_is_none_when_the_clone_has_no_project_id ... ok
+test wiring::doctor::identity::tests::the_ssh_keygen_row_shows_the_version_or_why_the_machine_cannot_sign ... ok
+test wiring::doctor::identity::tests::the_writer_row_names_the_running_host_and_says_a_project_without_an_activation_cannot_resolve_at_home ... ok
+test wiring::doctor::mailbox::tests::a_project_the_mailbox_cannot_find_a_record_directory_for_is_not_checked_and_still_passes ... ok
+test wiring::doctor::mailbox::tests::a_record_that_cannot_be_read_fails_the_row_and_names_the_verb ... ok
+test wiring::doctor::mailbox::tests::a_record_with_no_hook_yet_passes_and_a_good_one_counts_heads_pending_and_the_last_outcome ... ok
+test wiring::doctor::mailbox::tests::an_answer_with_no_record_says_the_record_was_not_checked_and_why ... ok
+test wiring::doctor::mailbox::tests::cross_machine_mail_is_worded_with_counts_and_names_every_unconfirmed_key ... ok
+test wiring::doctor::mailbox::tests::the_group_names_exactly_the_rows_and_fixes_the_registry_gives_to_the_mailbox_and_its_timers ... ok
+test wiring::doctor::mailbox::tests::the_row_says_why_it_cannot_tell_when_the_config_is_refused_and_reads_no_record_when_the_project_opted_out ... ok
+test wiring::doctor::observe::tests::a_doctor_run_in_a_repository_with_no_setup_writes_nothing_under_the_observe_directory ... ok
+test wiring::doctor::observe::tests::a_friction_store_the_host_refuses_fails_the_row_with_the_cause ... ok
+test wiring::doctor::git::tests::a_group_writable_driver_directory_fails_the_compatibility_row_naming_the_fix_and_the_fix_repairs_it ... ok
+test wiring::doctor::observe::tests::every_observe_row_has_its_own_judge ... ok
+test wiring::doctor::observe::tests::an_existing_observe_directory_is_proven_writable_and_left_as_it_was ... ok
+test wiring::doctor::observe::tests::write_health_points_at_the_health_query_while_recent_writes_were_refused_and_never_fails ... ok
+test wiring::doctor::git::tests::the_git_half_of_the_floor_row_passes_where_git_is_available_and_starts_no_node ... ok
+test wiring::doctor::git::tests::the_compatibility_row_keeps_its_facts_under_detail_so_its_message_stays_one_sentence ... ok
+test wiring::doctor::observe::tests::friction_migration_warns_while_old_shard_lines_are_missing_from_the_records_store_and_clears_after_migrate ... ok
+test wiring::doctor::packaging::tests::the_cache_fix_words_each_of_its_four_outcomes ... ok
+test wiring::doctor::packaging::tests::a_missing_tool_is_the_os_error_name_and_a_failing_one_the_command_line ... ok
+test wiring::doctor::packaging::tests::the_version_row_names_the_version_and_the_commit_of_a_checkout_or_says_there_is_none ... ok
+test wiring::doctor::run_supervisor::tests::a_codex_home_that_does_not_trust_the_project_fails_with_the_lines_to_add_and_is_never_written ... ok
+test wiring::doctor::packaging::tests::the_group_names_exactly_the_rows_and_fixes_the_registry_gives_to_packaging_in_run_order ... ok
+test wiring::doctor::run_supervisor::tests::a_missing_socket_dir_warns_the_fix_creates_it_0700_and_a_loose_mode_fails_until_the_fix_tightens_it ... ok
+test wiring::doctor::run_supervisor::tests::a_readable_claude_trust_store_passes_and_a_broken_one_fails_by_name ... ok
+test wiring::doctor::run_supervisor::tests::a_root_that_is_not_a_git_repository_or_a_config_that_does_not_load_is_not_applicable ... ok
+test wiring::doctor::run_supervisor::tests::a_socket_dir_that_is_not_a_directory_fails_and_the_fix_leaves_it_alone ... ok
+test wiring::doctor::run_supervisor::tests::a_socket_dir_too_long_for_a_socket_name_fails_and_is_not_called_fixable ... ok
+test wiring::doctor::run_supervisor::tests::an_agy_sub_home_must_list_the_project_and_a_cli_that_is_not_installed_skips ... ok
+test wiring::doctor::run_supervisor::tests::an_open_attempt_from_before_the_supervisor_is_nothing_to_adopt_and_never_a_failure ... ok
+test wiring::doctor::run_supervisor::tests::an_unclosed_attempt_with_a_free_lock_warns_naming_the_doors_and_writes_nothing ... ok
+test wiring::doctor::run_supervisor::tests::an_unreadable_codex_or_agy_store_fails_and_a_declared_readable_one_passes ... ok
+test wiring::doctor::run_supervisor::tests::containment_kernel_passes_best_effort_warns_on_linux_informs_elsewhere_and_no_driver_fails ... ok
+test wiring::doctor::run_supervisor::tests::nothing_open_passes_and_a_closed_attempt_is_not_listed ... ok
+test wiring::doctor::run_supervisor::tests::an_attempt_whose_release_was_removed_is_named_with_what_to_restore ... ok
+test wiring::doctor::git::tests::without_the_activation_fence_the_missing_wal_row_names_fgctl_and_not_a_fix_that_cannot_run ... ok
+test wiring::doctor::run_supervisor::tests::two_codex_homes_are_each_checked_and_only_the_untrusted_one_is_named ... ok
+test wiring::doctor::git::tests::the_journal_row_fails_and_names_the_fix_while_no_git_wal_exists ... ok
+test wiring::doctor::terminal::tests::herdr_executor_kinds_does_not_judge_when_herdr_cannot_be_asked ... ok
+test wiring::doctor::terminal::tests::herdr_executor_kinds_fails_a_kind_herdr_cannot_start_and_derives_the_kind_from_the_command ... ok
+test wiring::doctor::terminal::tests::herdr_executor_kinds_fails_an_outdated_hook_and_only_notes_a_missing_one ... ok
+test wiring::doctor::terminal::tests::herdr_executor_kinds_passes_without_a_herdr_executor_and_never_asks_herdr ... ok
+test wiring::doctor::terminal::tests::route_config_carries_only_explicitly_set_values_and_never_the_retain_time ... ok
+test wiring::doctor::terminal::tests::terminal_allocations_passes_when_nothing_is_stuck_and_counts_findings_without_listing_them ... ok
+test wiring::doctor::terminal::tests::terminal_allocations_says_it_did_not_scan_instead_of_failing ... ok
+test wiring::doctor::terminal::tests::terminal_control_fails_a_grace_below_the_ready_timeout_plus_30_s_and_passes_the_exact_bound ... ok
+test wiring::doctor::terminal::tests::terminal_control_fails_a_retain_time_that_is_neither_null_nor_a_positive_integer ... ok
+test wiring::doctor::terminal::tests::terminal_control_fails_by_name_on_a_config_that_cannot_be_read ... ok
+test wiring::doctor::terminal::tests::terminal_control_gives_an_info_line_when_herdr_cannot_report_pane_geometry ... ok
+test wiring::doctor::terminal::tests::terminal_control_judges_the_anchor_pane_empty_and_unresolvable_fail_a_resolved_pane_is_verified ... ok
+test wiring::doctor::terminal::tests::terminal_control_names_the_core_refusal_of_a_layout_and_retries_with_the_core_defaults ... ok
+test wiring::doctor::terminal::tests::terminal_control_names_the_source_of_an_override_and_hands_the_route_only_set_values ... ok
+test wiring::doctor::terminal::tests::terminal_control_passes_on_defaults_and_prints_every_value_with_its_source ... ok
+test wiring::doctor::terminal::tests::terminal_control_warns_when_herdr_is_not_on_the_machine_and_says_why_on_windows ... ok
+test wiring::doctor::terminal::tests::terminal_control_warns_without_failing_when_the_route_does_not_answer ... ok
+test wiring::doctor::tests::a_call_with_no_project_is_the_projection_error ... ok
+test wiring::doctor::tests::a_row_or_fix_belongs_to_exactly_one_group ... ok
+test wiring::doctor::tests::every_bridged_entry_names_the_step_that_removes_it ... ok
+test wiring::doctor::tests::the_answer_carries_the_strict_exit_the_report_and_the_pretty_text_only_when_asked ... ok
+test wiring::doctor::tests::the_flags_read_as_the_node_cli_read_them ... ok
+test wiring::doctor::tests::the_node_row_names_the_version_the_bridge_reported_and_fails_where_node_is_old_or_missing ... ok
+test wiring::doctor::session_host::tests::the_pointer_counts_only_proven_dead_executors_warns_never_repairs_and_never_fails ... ok
+test wiring::doctor::tests::the_registry_splits_the_rows_and_fixes_between_rust_and_the_bridge_as_measured ... ok
+test wiring::doctor::tests::the_registry_the_host_embeds_parses_and_lists_exactly_the_adapters_the_host_has ... ok
+test wiring::events::tests::a_detached_child_whose_state_root_is_gone_skips_and_leaves_the_root_gone ... ok
+test wiring::events::tests::a_foreground_call_in_no_repository_names_the_missing_repository ... ok
+test wiring::events::tests::a_relative_path_is_resolved_against_the_project_and_dots_are_folded ... ok
+test wiring::events::tests::a_detached_child_that_raced_a_config_write_skips_and_a_foreground_call_still_fails ... ok
+test wiring::events::tests::a_seal_without_a_valid_stream_is_a_validation_refusal_before_any_store_is_read ... ok
+test wiring::events::tests::an_export_without_a_destination_fails_as_the_node_cli_does ... ok
+test wiring::doctor::packaging::tests::a_tool_that_runs_passes_and_one_that_exits_non_zero_names_what_it_ran ... ok
+test wiring::events::tests::the_stream_name_is_the_one_the_seal_verb_accepts ... ok
+test wiring::execution_routes::caller_line_tests::end_of_input_after_the_request_line_means_the_caller_is_gone_and_before_it_does_not ... ok
+test wiring::gateway_control::tests::a_build_that_reports_success_without_a_binary_is_refused ... ok
+test wiring::gateway_control::tests::a_build_that_succeeds_a_build_that_fails_and_a_missing_cargo_are_told_apart ... ok
+test wiring::gateway_control::tests::a_call_outside_any_project_creates_nothing ... ok
+test wiring::gateway_control::tests::a_dead_process_is_cleared_and_reported_already_stopped_with_its_pid ... ok
+test wiring::doctor::run_supervisor::tests::the_standard_dispatch_values_pass_and_name_their_source ... ok
+test wiring::doctor::run_supervisor::tests::a_host_that_serves_every_route_names_its_driver_and_one_that_does_not_fails_by_route ... ok
+test wiring::doctor::git::tests::the_fetch_mapping_fix_has_nothing_to_repair_and_says_so_without_a_failure_while_there_is_no_remote ... ok
+test wiring::doctor::git::tests::the_incidents_row_never_fails_it_counts_native_locks_and_a_merge_in_progress_and_points_to_fgos_git_status ... ok
+test wiring::doctor::git::tests::the_hook_row_applies_only_to_a_project_whose_pre_commit_is_the_fgos_guard ... ok
+test wiring::gateway_control::tests::a_live_process_whose_port_serves_the_contract_is_running_and_reachable ... ok
+test wiring::gateway_control::tests::a_live_process_with_nothing_listening_or_a_failing_answer_is_running_but_not_reachable ... ok
+test wiring::doctor::git::tests::the_repository_config_row_skips_naming_the_command_that_adds_a_remote_while_there_is_no_remote ... ok
+test wiring::doctor::holder_lock::tests::the_borrow_vectors_row_passes_with_the_real_driver_and_real_git ... ok
+test wiring::gateway_control::tests::a_project_with_no_gateway_crate_is_refused_by_name ... ok
+test wiring::events::tests::a_seal_history_outside_the_cache_is_refused_naming_the_cache ... ok
+test wiring::gateway_control::tests::a_registry_that_does_not_parse_fails_closed_and_is_kept ... ok
+test wiring::gateway_control::tests::a_registry_that_holds_a_falsy_value_means_nothing_is_running ... ok
+test wiring::gateway_control::tests::a_recorded_process_that_is_gone_is_a_stale_registry ... ok
+test wiring::gateway_control::tests::a_recorded_identity_whose_start_time_is_not_the_live_pids_is_cleared_and_nothing_is_signalled ... ok
+test wiring::gateway_control::tests::a_start_with_a_live_registry_refuses_before_touching_the_crate ... ok
+test wiring::gateway_control::tests::an_entry_with_no_verifiable_identity_is_never_signalled_and_every_call_refuses_by_name ... ok
+test wiring::gateway_control::tests::status_with_no_registry_is_not_running ... ok
+test wiring::gateway_control::tests::stop_with_no_registry_is_already_stopped_and_seals_what_is_open ... ok
+test wiring::gateway_control::tests::the_gateway_is_spawned_without_the_recursion_guard ... ok
+test wiring::gateway_control::tests::the_release_build_runs_cargo_in_the_crate_with_a_locked_release_build_of_the_gateway ... ok
+test wiring::gateway_control::tests::the_lock_path_is_the_one_the_lock_registry_names ... ok
+test wiring::gateway_control::tests::the_sub_verb_is_the_first_positional_of_the_shared_parser ... ok
+test wiring::gateway_control::tests::the_shutdown_seal_also_runs_when_the_stop_failed_and_never_where_the_store_does_not_run ... ok
+test wiring::git_incidents::tests::a_call_names_its_operation_and_the_project_dir_flag_names ... ok
+test wiring::git_incidents::tests::a_checkout_the_git_door_refuses_is_the_callers_usage_error_with_no_data ... ok
+test wiring::init::tests::a_git_wal_that_cannot_be_created_is_a_warning_and_the_recovery_still_runs ... ok
+test wiring::init::tests::a_missing_node_is_a_missing_precondition_and_a_failed_payload_an_unexpected_failure ... ok
+test wiring::init::tests::a_signal_during_the_work_step_ends_the_call_as_a_signalled_process_does ... ok
+test wiring::init::tests::a_work_store_refusal_keeps_the_category_the_payload_named ... ok
+test wiring::init::tests::only_the_machine_id_the_legacy_settle_and_the_work_steps_refuse_and_nothing_after_them_runs ... ok
+test wiring::init::tests::the_answer_keeps_the_key_order_and_leaves_out_what_did_not_happen ... ok
+test wiring::gateway_control::tests::two_concurrent_starts_build_and_spawn_exactly_once ... ok
+test wiring::init::tests::the_request_is_the_root_the_doors_resolved ... ok
+test wiring::init::tests::the_steps_run_in_the_order_of_the_module_and_the_work_store_after_the_lock_directories ... ok
+test wiring::init::tests::without_an_event_store_the_work_steps_are_left_out_and_the_answer_says_so ... ok
+test wiring::lock_status::tests::a_call_names_the_project_dir_flag_names_and_ignores_positionals ... ok
+test wiring::init::tests::the_later_steps_never_refuse_their_trouble_is_in_the_answer ... ok
+test wiring::mailbox_body::tests::a_body_is_kept_while_the_message_naming_it_is_younger_than_the_lifetime_and_a_nameless_one_only_until_the_grace_ends ... ok
+test wiring::lock_status::tests::a_checkout_the_git_door_refuses_is_the_callers_usage_error_with_no_report ... ok
+test wiring::mailbox_body::tests::a_body_is_taken_only_when_its_digest_length_and_text_match_the_signed_header ... ok
+test wiring::gateway_control::tests::a_live_process_is_sent_term_and_the_registry_is_cleared ... ok
+test wiring::doctor::git::tests::the_repository_rows_report_information_not_a_failure_outside_a_git_repository ... ok
+test wiring::doctor::event_store::tests::a_stream_for_a_branch_with_no_live_worktree_is_an_orphan_and_a_live_worktree_branch_key_is_not ... ok
+test wiring::mailbox_config::tests::the_cross_machine_settings_are_read_from_the_snapshot_and_a_missing_or_mistyped_key_is_refused ... ok
+test wiring::mailbox_hook::tests::a_confined_head_backs_off_only_after_its_own_recent_failed_bind_and_retries_when_another_heads_entry_overwrote_it ... ok
+test wiring::mailbox_identity::tests::a_head_registers_its_cli_session_and_mailbox_name_and_a_refresh_writes_only_what_changed ... ok
+test wiring::mailbox_identity::tests::a_head_whose_start_time_no_longer_matches_its_pid_is_refused_head_not_live_and_nothing_is_registered ... ok
+test wiring::gateway_control::tests::a_gateway_that_exits_at_once_is_reported_within_one_poll_with_its_log ... ok
+test wiring::mailbox_identity::tests::a_mailbox_name_in_an_identity_record_names_a_head_only_in_that_records_own_project ... ok
+test wiring::mailbox_identity::tests::an_identifier_identity_finds_ambiguous_is_refused_even_when_one_of_its_sessions_is_a_head_here ... ok
+test wiring::mailbox_identity::tests::an_omp_head_renders_and_is_addressed_by_the_handle_identity_registered_from_its_ancestry_among_two_heads ... ok
+test wiring::mailbox_identity::tests::text_with_an_at_sign_a_slash_or_a_lead_prefix_is_an_alias_and_every_other_text_a_mailbox_name ... ok
+test wiring::mailbox_ingest::tests::a_baseline_less_record_reads_only_events_inside_the_age_window ... ok
+test wiring::mailbox_identity::tests::inside_a_confined_head_the_head_is_bound_through_its_request_socket_and_identity_is_not_written ... ok
+test wiring::mailbox_config::tests::the_bundled_standard_holds_the_limits_contract_value_of_every_key_a_reader_takes ... ok
+test wiring::doctor::git::tests::the_journal_row_fails_with_git_fence_missing_when_a_git_wal_has_lost_the_controller_activation_fence ... ok
+test wiring::doctor::git::tests::the_wal_fix_initializes_once_and_reports_nothing_changed_the_second_time ... ok
+test wiring::mailbox_ingest::tests::the_shortest_body_lifetime_is_the_longest_age_at_which_a_header_is_still_taken ... ok
+test wiring::events::tests::status_of_a_fresh_repository_adds_the_remote_and_the_facts_to_the_crate_status ... ok
+test wiring::mailbox_remote::tests::a_listed_send_keeps_to_one_row_with_no_terminal_control_characters ... ok
+test wiring::mailbox_remote::tests::the_wire_cap_and_signing_domain_equal_the_remote_contract ... ok
+test wiring::mailbox_sync::tests::only_a_dir_and_a_remote_flag_with_values_name_the_project ... ok
+test wiring::mailbox_verbs::projection_tests::a_flag_of_another_sub_command_or_spelled_with_an_equals_sign_is_unknown ... ok
+test wiring::mailbox_verbs::projection_tests::a_reply_by_without_a_duration_is_a_usage_error ... ok
+test wiring::mailbox_verbs::projection_tests::a_switch_before_the_body_leaves_the_body_a_word_of_the_call ... ok
+test wiring::observe_declarations::tests::embedded_list_merges_with_the_shared_names ... ok
+test wiring::observe_query::tests::a_config_value_is_read_as_a_number_and_anything_else_is_named ... ok
+test wiring::observe_query::tests::a_source_stating_an_undeclared_kind_is_refused_by_name ... ok
+test wiring::mailbox_ingest::tests::a_body_reference_header_goes_stale_by_the_same_age_rule_which_ends_any_hold ... ok
+test wiring::observe_query::tests::the_host_environment_embeds_the_same_declarations_the_registry_merges ... ok
+test wiring::observe_query::tests::the_payload_tree_is_the_resolved_release_root_and_absent_when_none_resolves ... ok
+test wiring::observe_sources::plan_text::tests::a_board_log_line_gives_its_stamp_lane_and_text_and_prose_gives_none ... ok
+test wiring::observe_sources::plan_text::tests::front_matter_status_and_priority_are_read_and_the_body_is_ignored ... ok
+test wiring::observe_sources::plan_text::tests::plan_directories_are_found_whole_and_once_in_free_text ... ok
+test wiring::observe_query::tests::every_kind_a_host_record_source_states_is_declared_by_the_embedded_list ... ok
+test wiring::observe_sources::tests::a_gone_pane_reads_gone_regardless_of_supervisor ... ok
+test wiring::observe_sources::tests::a_head_whose_attempt_closed_without_a_stop_is_ended_at_the_close_instant ... ok
+test wiring::observe_sources::tests::a_live_pane_with_a_dead_supervisor_reads_supervisor_gone_with_the_placement_instant ... ok
+test wiring::observe_sources::tests::a_live_pane_with_a_live_supervisor_reads_live ... ok
+test wiring::observe_sources::tests::a_placement_whose_host_reports_gone_gives_gone_with_the_identity_view_alongside ... ok
+test wiring::observe_sources::tests::a_placement_with_retired_at_is_retired_at_that_instant_and_an_invalid_one_is_no_signal ... ok
+test wiring::doctor::git::tests::an_obsolete_mapping_on_only_the_configured_remote_is_repaired_there_and_never_on_an_origin_that_does_not_exist ... ok
+test wiring::doctor::git::tests::reserved_legacy_mirror_refs_are_named_by_the_repository_config_row ... ok
+test wiring::observe_sources::tests::a_project_that_never_started_a_head_has_no_head_records ... ok
+test wiring::observe_sources::tests::a_rotated_head_with_a_new_run_dir_and_no_closed_file_is_not_ended ... ok
+test wiring::observe_sources::tests::a_retired_at_beats_a_closed_attempt ... ok
+test wiring::observe_sources::tests::an_unknown_host_answer_stays_unknown_and_a_live_one_is_live ... ok
+test wiring::observe_sources::tests::an_unreadable_or_invalid_closed_file_is_no_signal ... ok
+test wiring::observe_sources::tests::host_head_facts_supervisor_alive_checks_process_identity_and_completion_markers ... ok
+test wiring::gateway_control::tests::a_start_records_the_gateway_once_it_says_it_is_listening ... ok
+test wiring::doctor::run_supervisor::tests::project_overrides_global_overrides_standard_and_a_refused_value_or_a_wait_shorter_than_the_grace_fails ... ok
+test wiring::mailbox_body::tests::a_body_is_read_from_the_senders_mirror_and_a_missing_ref_or_blob_is_expired ... ok
+test wiring::questions::tests::a_busy_reply_is_retried_three_times_and_any_other_refusal_is_not ... ok
+test wiring::questions::tests::a_long_work_question_is_cut_in_the_list_and_whole_in_the_data ... ok
+test wiring::questions::tests::a_plan_priority_is_read_from_the_plan_front_matter_under_the_root ... ok
+test wiring::questions::tests::a_refusal_exits_with_the_category_its_code_has_in_the_contract ... ok
+test wiring::questions::tests::an_age_is_the_largest_whole_unit ... ok
+test wiring::questions::tests::an_unreadable_case_is_listed_but_not_counted_as_waiting_for_the_owner ... ok
+test wiring::questions::tests::list_rows_and_lines_expose_pending_recipient_delivery ... ok
+test wiring::questions::tests::questions_list_by_plan_priority_then_oldest_first_and_unprioritised_last ... ok
+test wiring::questions::tests::the_host_catalog_declares_the_operations_the_providers_serve ... ok
+test wiring::questions_hook::tests::a_question_is_ours_when_the_session_or_one_of_its_head_roles_asked_and_only_while_answered ... ok
+test wiring::questions_hook::tests::a_stop_blocks_once_for_notices_not_yet_in_the_transcript_and_passes_when_active_or_shown ... ok
+test wiring::questions_hook::tests::a_transcript_is_searched_from_its_end_and_only_a_view_with_an_answer_needs_a_caller ... ok
+test wiring::questions_hook::tests::the_flags_accept_claude_by_default_codex_only_on_a_stop_and_nothing_else ... ok
+test wiring::questions_hook::tests::the_notice_line_names_the_answer_the_ref_the_asker_and_the_ack_door ... ok
+test wiring::resource_check::tests::a_bad_plan_is_rejected_naming_the_pairs_the_shared_paths_and_the_finding_codes ... ok
+test wiring::resource_check::tests::a_bare_file_name_in_the_current_directory_works ... ok
+test wiring::resource_check::tests::a_control_character_in_an_id_is_refused_without_quoting_it ... ok
+test wiring::resource_check::tests::a_control_character_is_written_out_and_a_long_value_is_cut ... ok
+test wiring::observe_sources::tests::a_gone_head_keeps_the_instant_of_its_placement_on_every_tick_so_its_event_id_holds ... ok
+test wiring::resource_check::tests::a_good_plan_is_accepted_with_its_layers_and_critical_path ... ok
+test wiring::resource_check::tests::a_hostile_entry_in_the_output_is_escaped_in_json_and_in_human_text ... ok
+test wiring::resource_check::tests::a_missing_file_is_refused_by_name_and_so_is_a_missing_plan ... ok
+test wiring::resource_check::tests::a_missing_policy_file_is_a_refusal_and_never_falls_back_to_the_default ... ok
+test wiring::resource_check::tests::a_plan_with_no_phases_is_a_blocking_finding_never_accept ... ok
+test wiring::resource_check::tests::a_policy_cannot_remove_the_floor ... ok
+test wiring::resource_check::tests::a_ready_plan_without_a_phase_table_is_refused_by_the_reader_code ... ok
+test wiring::resource_check::tests::a_symlinked_leaf_a_fifo_and_an_oversize_file_are_refused_by_name ... ok
+test wiring::resource_check::tests::a_symlinked_parent_of_units_and_policy_is_refused_in_every_spelling ... ok
+test wiring::resource_check::tests::a_symlinked_plan_root_is_refused_with_and_without_a_trailing_slash ... ok
+test wiring::resource_check::tests::an_unknown_claim_space_is_refused_naming_the_unit_and_the_entry ... ok
+test wiring::resource_check::tests::live_claim_admission_uses_the_units_evaluation_and_never_accepts_incomplete_claims ... ok
+test wiring::resource_check::tests::resource_slots_collide_only_by_exact_equality_within_their_space ... ok
+test wiring::resource_check::tests::the_shipped_policy_is_the_floor_plus_declared_layers_valid ... ok
+test wiring::resource_check::tests::units_and_plan_together_or_neither_are_a_usage_error ... ok
+test wiring::run_dirs::tests::each_of_the_three_listers_yields_what_the_shared_fixture_says_for_every_tree ... ok
+test wiring::run_dirs::tests::the_three_rows_get_the_parameters_their_templates_name ... ok
+test wiring::seat_binding::tests::a_program_is_found_on_the_given_path_or_by_its_executable_bit ... ok
+test wiring::seat_binding::tests::a_request_that_is_not_the_contract_is_invalid_not_a_decision ... ok
+test wiring::seat_binding::tests::a_scan_target_of_dot_is_the_root_and_a_dot_prefixed_path_is_beneath_it ... ok
+test wiring::seat_binding::tests::digest_is_the_seat_config_digest_of_the_runner ... ok
+test wiring::seat_binding::tests::herdr_presence_is_what_the_request_states_else_what_the_environment_shows ... ok
+test wiring::seat_binding::tests::ladder_answers_with_the_tier_vocabulary_and_the_host_version ... ok
+test wiring::seat_binding::tests::preflight_names_the_agent_clis_looked_for_when_none_is_on_the_given_path ... ok
+test wiring::seat_binding::tests::the_plan_answer_carries_the_binding_of_a_purpose_with_a_prefer_pool ... ok
+test wiring::seat_binding::tests::the_protocol_is_checked_before_the_operation ... ok
+test wiring::seat_binding::tests::usage_faults_exit_two_once_the_protocol_is_right ... ok
+test wiring::mailbox_ingest::tests::a_wake_is_signed_as_version_two_under_its_own_domain_and_only_a_confirmed_machine_ever_wakes ... ok
+test wiring::session_rotation_hook::tests::a_running_background_task_holds_the_rotation_and_a_refused_request_is_the_error_not_a_panic ... ok
+test wiring::session_rotation_hook::tests::a_head_that_stays_above_soft_across_many_stops_asks_at_every_stop ... ok
+test wiring::session_rotation_hook::tests::a_stop_at_or_above_soft_asks_for_a_rotation_with_the_stop_facts_and_below_soft_asks_for_a_record_only ... ok
+test wiring::session_rotation_hook::tests::a_stop_hook_that_fails_before_the_node_route_runs_leaves_one_incident_line_in_the_lineage ... ok
+test wiring::session_rotation_hook::tests::a_successor_answers_with_the_rotation_id_of_its_handoff_and_its_own_session_and_does_not_measure ... ok
+test wiring::session_rotation_hook::tests::a_successor_with_no_rotation_id_in_its_handoff_sends_nothing_and_says_why ... ok
+test wiring::session_rotation_hook::tests::one_record_is_written_for_a_head_payload_and_nothing_is_written_outside_a_head ... ok
+test wiring::session_rotation_hook::tests::only_the_event_flag_with_a_known_value_is_accepted ... ok
+test wiring::session_rotation_hook::tests::run_writes_nothing_outside_a_head ... ok
+test wiring::session_rotation_hook::tests::text_sent_to_a_verb_is_cut_at_the_stated_unit_bound ... ok
+test wiring::session_rotation_hook::tests::the_hook_does_nothing_without_a_head_role_and_takes_persona_and_name_from_their_own_variables ... ok
+test wiring::session_rotation_hook::tests::the_lineage_root_is_the_project_directory_the_head_started_in_not_the_main_checkout ... ok
+test wiring::session_rotation_hook::tests::the_session_start_prints_only_the_answer_instruction_while_a_rotation_awaits_it_and_never_the_handoff ... ok
+test wiring::gateway_control::tests::a_held_lock_blocks_a_contender_until_its_timeout_and_names_the_holder ... ok
+test wiring::supervision::tests::a_definition_answer_maps_to_one_row_per_group_with_the_readme_precedence ... ok
+test wiring::supervision::tests::a_gone_pane_or_an_unrecognised_agent_status_is_unknown ... ok
+test wiring::supervision::tests::a_missing_placement_is_unknown_never_idle ... ok
+test wiring::supervision::tests::a_running_request_ticket_makes_the_head_busy_whatever_its_pane_says ... ok
+test wiring::supervision::tests::a_short_role_lead_is_stopped_by_role_and_a_head_lead_by_persona_and_name ... ok
+test wiring::supervision::tests::a_short_role_nobody_holds_is_unknown_never_idle ... ok
+test wiring::supervision::tests::an_idle_pane_with_no_running_ticket_is_idle ... ok
+test wiring::supervision::tests::an_unreadable_ticket_directory_is_unknown_never_idle ... ok
+test wiring::supervision::tests::keeper_detached_run_fixture ... ignored, detached subprocess fixture
+test wiring::observe_sources::tests::the_board_log_lines_naming_an_existing_plan_dir_are_activity ... ok
+test wiring::supervision::tests::review_source_inputs_cover_open_plan_open_question_new_event_and_refused_plan ... ok
+test wiring::supervision::tests::the_plans_answer_names_only_the_first_unreadable_plans ... ok
+test wiring::supervision::tests::the_review_action_calls_an_independent_read_only_run_and_records_its_settled_unit_id ... ok
+test wiring::supervision::tests::worktree_removal_refusal_code_maps_refusals_to_short_machine_codes ... ok
+test wiring::observe_sources::tests::a_walk_stopped_by_its_bound_marks_its_records_truncated ... ok
+test wiring::doctor::event_store::tests::a_malformed_seal_coalescing_window_fails_every_row ... ok
+test wiring::mailbox_ingest::tests::a_body_reference_message_is_signed_under_its_own_domain_with_an_optional_signed_wake ... ok
+test wiring::session_rotation_hook::tests::the_shipped_standard_rotates_the_secretary_and_supervisor_at_a_lower_soft_than_every_other_persona ... ok
+test wiring::supervision::tests::keeper_source_facts_reach_the_host_doors_without_restarting_a_pending_head ... ok
+test wiring::mailbox_remote::tests::a_flagged_send_signs_ack_within_sec_under_its_versions_domain_and_an_unflagged_send_is_unchanged ... ok
+test wiring::observe_sources::tests::the_same_transition_rebased_onto_two_branches_is_one_record ... ok
+test wiring::observe_sources::tests::only_plans_under_the_contract_with_contract_values_record_status ... ok
+test wiring::uninstall::tests::a_project_without_a_repository_unwires_nothing_and_asks_no_driver ... ok
+test wiring::uninstall::tests::a_plan_never_creates_a_state_root_that_is_gone ... ok
+test wiring::uninstall::tests::a_root_that_is_the_filesystem_root_home_or_a_directory_holding_home_is_refused_before_anything_runs ... ok
+test wiring::uninstall::tests::a_shell_profile_is_only_named_and_global_agent_wiring_is_left_with_how_to_undo_it ... ok
+test wiring::uninstall::tests::a_timer_fgos_wrote_is_removed_by_its_marker_and_a_missing_home_is_a_failed_step ... ok
+test wiring::uninstall::tests::a_skill_whose_version_is_newer_than_the_releases_is_kept_and_an_unreadable_version_is_named ... ok
+test wiring::doctor::event_store::tests::the_lock_dirs_fix_repairs_modes_below_fgos_and_creates_a_missing_tree_private ... ok
+test wiring::observe_sources::tests::a_plan_going_draft_ready_running_done_with_one_priority_change_gives_four_transitions_after_its_creation ... ok
+test wiring::uninstall::tests::an_emptied_skills_root_is_removed_and_the_source_checkout_keeps_its_surfaces ... ok
+test wiring::session_rotation_hook::tests::a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context ... FAILED
+test wiring::uninstall::tests::links_are_refused_never_followed_and_a_root_behind_a_link_stays ... ok
+test wiring::uninstall::tests::only_a_bare_yes_applies_and_a_bare_dry_run_cancels_it ... ok
+test wiring::uninstall::tests::versions_compare_as_dotted_numbers_and_a_frontmatter_block_is_cut_as_the_render_cuts_it ... ok
+test wiring::unit_run_host::host::refusal_class::a_pane_preparation_refusal_reaches_the_caller_as_the_dispatch_error_it_was ... ok
+test wiring::unit_run_host::persona::section_tests::a_persona_file_is_read_with_the_yaml_parser_block_scalars_in_full_comments_stripped_lists_rendered ... ok
+test wiring::unit_run_host::persona::section_tests::a_persona_file_that_is_not_valid_yaml_renders_one_could_not_parse_line_and_no_half_read_fields ... ok
+test wiring::unit_run_host::persona::section_tests::a_persona_found_in_no_tier_keeps_the_bare_persona_section ... ok
+test wiring::unit_run_host::persona::section_tests::a_persona_that_declares_skills_renders_one_skills_line_and_none_without ... ok
+test wiring::unit_run_host::persona::section_tests::a_persona_that_names_a_model_taste_renders_one_failure_line ... ok
+test wiring::unit_run_host::persona::section_tests::an_unpinned_persona_that_lives_only_in_the_workspace_tier_renders_its_text ... ok
+test wiring::unit_run_host::persona::section_tests::pinned_text_that_is_a_mapping_where_text_belongs_renders_one_visible_line ... ok
+test wiring::unit_run_host::tests::a_declared_operation_stamps_its_fields_and_an_undeclared_one_is_refused ... ok
+test wiring::unit_run_host::tests::a_direct_attempt_shows_no_pane_screen ... ok
+test wiring::unit_run_host::tests::a_leased_login_far_from_expiry_is_left_fresh_by_the_hosts_renewal_and_the_lease_carries_the_write_back ... ok
+test wiring::uninstall::tests::a_tracked_skill_file_with_uncommitted_edits_is_kept_and_a_clean_one_goes ... ok
+test wiring::unit_run_host::tests::a_persona_is_pinned_from_the_first_layer_that_defines_it ... ok
+test wiring::unit_run_host::tests::a_record_from_before_the_seat_fence_decodes_to_its_pattern_and_runner_view ... ok
+test wiring::mailbox_ingest::tests::only_a_message_that_passes_every_check_in_order_is_taken_and_each_failure_has_its_own_counted_reason ... ok
+test wiring::unit_run_host::tests::a_unit_file_carrying_a_seat_or_unit_tier_is_refused_by_name ... ok
+test wiring::unit_run_host::tests::a_unit_files_plan_names_a_plan_directory_that_exists ... ok
+test wiring::unit_run_host::tests::a_unit_is_validated_and_a_unit_missing_its_capability_is_refused_by_name ... ok
+test wiring::unit_run_host::tests::a_seat_binds_to_the_executor_the_machine_can_start ... ok
+test wiring::unit_run_host::tests::a_unit_source_is_data_as_given_or_a_file_read_as_json_then_yaml ... ok
+test wiring::unit_run_host::tests::a_mutating_run_in_the_main_checkout_is_seen_and_a_linked_worktree_is_not ... ok
+test wiring::unit_run_host::tests::a_write_scope_gains_the_render_targets_of_the_generated_sources_it_touches ... ok
+test wiring::uninstall::tests::a_hook_of_the_persons_that_only_mentions_the_shim_stays_and_is_named ... ok
+test wiring::unit_run_host::tests::an_attempt_without_private_homes_finalizes_clean ... ok
+test wiring::unit_run_host::tests::an_override_run_timeout_is_held_to_the_floor_and_ceiling ... ok
+test wiring::unit_run_host::tests::door_choices_refuse_what_the_calling_door_has_no_authority_for_before_a_run_exists ... ok
+test wiring::uninstall::tests::a_failed_backup_runs_nothing_and_the_answer_has_the_short_shape ... ok
+test wiring::unit_run_host::tests::inputs_resolve_to_the_report_a_seat_left_and_a_blind_unit_gets_digested_copies ... ok
+test wiring::unit_run_host::tests::one_controller_holds_a_unit_run_until_it_releases_it ... ok
+test wiring::unit_run_host::tests::a_unit_run_with_an_attempt_still_open_publishes_no_summary ... ok
+test wiring::unit_run_host::tests::run_unit::a_cancelled_controller_starts_no_unit_run ... ok
+test wiring::uninstall::tests::a_payload_that_cannot_be_found_fails_the_skills_step_and_nothing_else ... ok
+test wiring::unit_run_host::tests::git_roots_name_the_worktree_and_its_main_checkout_and_refuse_outside_a_repository ... ok
+test wiring::uninstall::tests::a_hooks_path_the_person_set_is_left_alone_and_named_and_an_unset_one_is_a_no_op ... ok
+test wiring::unit_run_host::tests::the_adopt_door_judges_a_closed_attempt_and_a_pre_supervisor_one ... ok
+test wiring::uninstall::tests::a_plan_lists_changes_and_keeps_and_changes_nothing ... ok
+test wiring::unit_run_host::tests::the_attempt_sweep_closes_nothing_it_cannot_judge_and_never_fails ... ok
+test wiring::unit_run_host::tests::terminal::a_terminal_attempts_pane_opens_in_its_worker_session_is_named_by_the_intent_first_and_is_given_back_on_abandon ... ok
+test wiring::unit_run_host::tests::account_reads_over_an_empty_store_find_nothing_to_rotate_or_audit ... ok
+test wiring::uninstall::tests::a_hooks_directory_reached_through_a_link_loses_its_setting_but_nothing_inside_it ... ok
+test wiring::unit_run_host::tests::the_process_facts_are_the_environments_and_the_identitys ... ok
+test wiring::unit_run_host::tests::the_project_fgos_dir_sits_under_the_main_checkout ... ok
+test wiring::unit_run_host::tests::the_report_digest_of_an_attempt_names_its_bytes_or_is_null ... ok
+test wiring::unit_run_host::tests::the_git_door_opens_a_worktree_under_its_main_checkout ... ok
+test wiring::wire_agents::tests::a_backup_never_overwrites_a_copy_that_is_there ... ok
+test wiring::unit_run_host::tests::the_collaboration_of_a_plain_unit_is_one_solo_producer_and_an_unknown_pattern_is_refused ... ok
+test wiring::unit_run_host::tests::the_current_attempt_and_the_summary_of_a_node_settled_unit_run_read_back_byte_for_byte ... ok
+test wiring::wire_agents::tests::a_missing_home_is_refused_as_a_missing_precondition_with_exit_2 ... ok
+test wiring::uninstall::tests::an_apply_removes_every_fgos_hook_and_generated_skill_and_keeps_what_is_the_persons ... ok
+test wiring::unit_run_host::tests::the_shipped_catalog_is_the_bundled_standards_patterns_and_loops ... ok
+test wiring::wire_agents::tests::the_request_reads_yes_and_json_as_the_node_cli_read_them ... ok
+test wiring::uninstall::tests::a_tracked_pre_commit_survives_the_unwiring_byte_for_byte ... ok
+test wiring::wire_agents::tests::the_text_is_the_default_and_json_replaces_it ... ok
+test wiring::uninstall::tests::a_hooks_path_fgos_wired_is_unset_and_its_untracked_hook_and_empty_directory_go ... ok
+test wiring::uninstall::tests::every_file_a_run_rewrites_or_deletes_is_copied_beside_itself_first ... ok
+test wiring::wire_agents::tests::the_plan_holds_only_agents_present_and_writes_nothing_without_yes ... ok
+test wiring::wire_agents::tests::a_failing_claude_step_stops_its_change_is_reported_and_ends_with_exit_1 ... ok
+To /tmp/fgos-body-rotate-2812213/remote
+ + 4d5aece...e083c85 e083c8560a16e14c63a9c964c99d858c588ad172 -> refs/fgos/mail-bodies/alpha-abcdef (forced update)
+test wiring::gateway_control::tests::a_gateway_that_never_says_it_is_listening_is_stopped_by_identity_and_not_recorded ... ok
+test wiring::wire_agents::tests::a_backup_that_cannot_be_written_runs_nothing_and_leaves_the_files_as_they_were ... ok
+test wiring::mailbox_body::tests::a_rotation_built_before_the_remote_moved_is_refused_and_the_remote_keeps_its_tip ... ok
+test wiring::doctor::git::tests::the_repository_config_row_names_an_untrusted_transport_setting_without_echoing_its_value ... ok
+test wiring::wire_agents::tests::yes_backs_up_each_existing_file_with_its_mode_before_claude_changes_anything_and_never_writes_a_permission ... ok
+test wiring::doctor::event_store::tests::a_fresh_repository_passes_the_open_root_machine_id_and_incidents_rows_and_the_legacy_layout_row ... ok
+test wiring::wire_agents::tests::the_answer_serialises_the_plan_first_then_applied_then_the_result ... ok
+test wiring::unit_run_host::tests::a_verify_command_passes_or_finds_and_runs_under_the_custody_it_is_given ... ok
+test wiring::unit_run_host::tests::the_committed_runner_config_loads_checked_and_a_project_value_the_door_refuses_keeps_its_code ... ok
+test wiring::doctor::git::tests::the_repository_config_row_allows_ordinary_pushes_and_protective_negative_fetches_but_refuses_event_store_pushes ... ok
+test wiring::resource_check::tests::a_dense_valid_units_file_is_not_refused_for_the_size_of_its_generated_graph ... ok
+test wiring::doctor::git::tests::the_repository_config_row_fails_a_missing_fetch_mapping_an_unsafe_refspec_and_a_remote_that_moved_since_setup ... ok
+test wiring::mailbox_body::tests::a_seal_is_waited_for_up_to_the_bound_and_refused_past_it ... ok
+test wiring::doctor::git::tests::an_obsolete_legacy_mapping_on_the_origin_or_the_configured_remote_fails_the_row_and_the_fix_repairs_each ... ok
+test wiring::gateway_control::tests::a_hung_gateway_makes_status_return_within_the_probe_timeout ... ok
+test wiring::gateway_control::tests::a_process_that_ignores_term_is_killed_after_its_window_and_the_registry_is_cleared ... ok
+test wiring::unit_run_host::tests::session_attempt::a_head_session_is_launched_confined_in_its_pane_and_handed_to_a_supervisor_that_binds_it ... ok
+test wiring::unit_run_host::tests::run_unit::a_read_only_unit_runs_end_to_end_through_the_composed_host ... ok
+test wiring::unit_run_host::tests::run_unit::a_writing_unit_runs_under_its_custody_and_commits_its_declared_write ... ok
+
+failures:
+
+---- wiring::session_rotation_hook::tests::a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context stdout ----
+
+thread 'wiring::session_rotation_hook::tests::a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context' (2821102) panicked at apps/fgos/src/wiring/session_rotation_hook.rs:1357:64:
+called `Result::unwrap()` on an `Err` value: "the project has no name"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    wiring::session_rotation_hook::tests::a_session_opened_by_hand_gets_the_rules_scoped_to_hand_opened_sessions_as_its_one_additional_context
+
+test result: FAILED. 596 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out; finished in 7.28s
+
+error: test failed, to rerun pass `-p fgos --bin fgos`
+exit=101

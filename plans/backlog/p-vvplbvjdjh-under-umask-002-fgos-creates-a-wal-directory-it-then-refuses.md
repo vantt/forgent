@@ -39,3 +39,7 @@ from the test fixture. `test/rust-host/fgctl-init-fixture.mjs` snapshots and res
 The fixture now copies each directory's mode after the files. All four `fgctl` init and upgrade test files pass under
 umask 002 (36 tests). No production change was needed.
 
+
+# Notes
+
+Row added in 041ac635b4 without this section; the section was added so the backlog index builds.

@@ -56,6 +56,8 @@ session start: resolve the publication refusal before retrying admission in prio
 
 ## Running plans
 
+You may widen any `ready` or `running` plan with `fgos supervisor widen <plan-dir> --phase <id> --path <p> [--path <p> ...] --criterion <n>` for an approved acceptance criterion (supervision spec §4.2); the lead uses the same verb for its own plan only, and overlap is advice, not a hold.
+
 A `running` plan with `leadUnnamed: true` names no lead: do not start a lead for it (one may already run), report it to the
 owner, and leave it held. Restart only a `running` plan whose `leadLive` is `false` (its named `lead` role has no live
 holder in this project). Handle `leadLive: false`, or an event `head-gone` or `plan-no-progress`: read the phase table and the

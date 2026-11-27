@@ -1722,6 +1722,7 @@ mod tests {
                     text.contains("<key>AbandonProcessGroup</key><true/>"),
                     "{text}"
                 );
+                assert!(!text.contains("KillMode"), "{text}");
                 assert!(text.contains("<integer>45</integer>"), "{text}");
             }
         }

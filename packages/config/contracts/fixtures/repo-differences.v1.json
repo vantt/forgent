@@ -488,15 +488,15 @@
    "personas"
   ],
   [
+   "runner",
+   "supervisorScope"
+  ],
+  [
    "docRegistry",
    "topicMaxDocs"
   ],
   [
    "secretary"
-  ],
-  [
-   "runner",
-   "supervisorScope"
   ],
   [
    "startContext"

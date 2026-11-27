@@ -689,6 +689,60 @@ fn the_remote_moving_once_between_prepare_and_push_lands_on_the_second_try() {
 }
 
 #[test]
+fn a_land_command_builds_into_the_shared_cargo_target_unless_the_caller_names_one() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let seen = f.temp.join("target-seen");
+    f.land(
+        &branch("topic"),
+        &config(vec![gate(&format!(
+            "printf %s \"$CARGO_TARGET_DIR\" > {}",
+            seen.display()
+        ))]),
+    )
+    .unwrap();
+    let expected = match std::env::var("CARGO_TARGET_DIR") {
+        Ok(own) if !own.is_empty() => own,
+        _ => fs::canonicalize(&f.main)
+            .unwrap()
+            .join(fgos_supervision::land::LAND_CARGO_TARGET)
+            .to_string_lossy()
+            .into_owned(),
+    };
+    assert_eq!(fs::read_to_string(&seen).unwrap(), expected);
+}
+
+#[test]
+fn a_retry_whose_trunk_moved_only_outside_every_gate_reuses_the_gates_it_passed_and_lands() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    // The gate moves the trunk every time it runs, by a path outside its own `when`: only a retry that reuses the
+    // passed gate, instead of running it again, can land.
+    let out = f
+        .land(
+            &branch("topic"),
+            &config(vec![gate_when(&mover(&f, false), &["a"])]),
+        )
+        .unwrap();
+    assert_eq!(out.retries, 1);
+    assert_eq!(out.main_sha, f.remote_tip());
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "incoming\n");
+}
+
+#[test]
+fn a_retry_whose_trunk_moved_a_path_a_gate_names_runs_that_gate_again() {
+    let f = Fixture::new();
+    f.topic("topic", &[("a", "incoming\n")]);
+    let refusal = f
+        .land(
+            &branch("topic"),
+            &config(vec![gate_when(&mover(&f, false), &["a", "moved-*"])]),
+        )
+        .unwrap_err();
+    assert_eq!(refusal.code, "land-retries-exhausted");
+}
+
+#[test]
 fn the_remote_moving_every_time_ends_retries_exhausted_with_no_local_land() {
     let f = Fixture::new();
     f.topic("topic", &[("a", "incoming\n")]);
@@ -1297,6 +1351,120 @@ fn a_paths_land_whose_push_is_rejected_every_time_leaves_local_main_not_ahead_an
     assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
     assert_eq!(git(&f.main, &["status", "--porcelain", "--", "a"]), "M a");
     f.catch_up().unwrap();
+}
+
+#[test]
+fn a_paths_land_whose_push_is_refused_before_sending_undoes_its_commit_and_restores_the_bytes() {
+    let f = Fixture::new();
+    f.topic("topic", &[("c", "incoming\n")]);
+    // A land that stopped after prepare leaves a dead pending chain on the target ref: the commit
+    // of the checkout is admitted, the push to that ref is refused before anything is sent.
+    let main = git(&f.main, &["rev-parse", "refs/heads/trunk"]);
+    let source = git(&f.main, &["rev-parse", "refs/heads/topic"]);
+    let request = fgos_git::LandRequest {
+        source,
+        target: main,
+        destination: "refs/heads/trunk".into(),
+        message: "interrupted".into(),
+        squash: false,
+        footprint: None,
+        subtree: None,
+        files: vec![],
+    };
+    drop(
+        f.env
+            .driver
+            .prepare_land(
+                &f.env.repo,
+                vec![],
+                &request,
+                "fixture",
+                "interrupted",
+                &fgos_git::wal::OsFileSystem,
+                0,
+            )
+            .unwrap(),
+    );
+    let remote_before = f.remote_tip();
+    let local_before = f.local_tip();
+    fs::write(f.main.join("a"), "landed\n").unwrap();
+    let refusal = f
+        .land(&paths(&["a"]), &config(vec![gate("true")]))
+        .unwrap_err();
+    assert_eq!(refusal.code, "resource-recovery-required", "{refusal:?}");
+    assert_eq!(f.remote_tip(), remote_before);
+    assert_eq!(
+        f.local_tip(),
+        local_before,
+        "the refused push leaves local main where it was"
+    );
+    assert_eq!(
+        f.local_tip(),
+        f.remote_tip(),
+        "the refused push leaves local main equal to origin"
+    );
+    assert_eq!(fs::read_to_string(f.main.join("a")).unwrap(), "landed\n");
+}
+
+/// Why a land-door commit was once refused as foreign: the journal of a finished commit is compacted
+/// as soon as the next commit of the checkout is admitted, leaving only a ledger receipt that holds
+/// a digest of the checkout it was taken for. Recognition read only the retained journals, so every
+/// compacted commit counted as "not ours" and the catch-up refused `land-target-ahead`. Recognition
+/// now also matches the ledger receipt against this checkout's resource set and lock identity.
+#[test]
+fn a_paths_land_finishes_a_land_door_commit_whose_journal_was_compacted_by_a_later_scoped_commit() {
+    let f = Fixture::new();
+    let slot = f
+        .env
+        .driver
+        .acquire_merge_slot(
+            &f.env.repo,
+            &fgos_git::RefName::parse("refs/heads/trunk").unwrap(),
+            30_000,
+        )
+        .unwrap();
+    let commit = |name: &str, id: &str| {
+        let baseline = f
+            .env
+            .driver
+            .preflight_commit(&f.env.repo, slot.lend().unwrap(), None)
+            .unwrap();
+        fs::write(f.main.join(name), format!("{name}\n")).unwrap();
+        f.env
+            .driver
+            .scoped_commit(
+                &f.env.repo,
+                slot.lend().unwrap(),
+                &baseline,
+                &fgos_git::CommitRequest {
+                    writes: vec![name.into()],
+                    message: format!("unpushed {name}"),
+                },
+                "writer-1",
+                id,
+                &fgos_git::wal::OsFileSystem,
+            )
+            .unwrap()
+            .oid
+            .unwrap()
+    };
+    let first = commit("a", "land-orphan-1");
+    let second = commit("b", "land-orphan-2");
+    drop(slot);
+    assert_eq!(f.local_tip(), second.as_str());
+    assert_ne!(f.remote_tip(), first.as_str());
+    fs::write(f.main.join("c"), "third\n").unwrap();
+    let cmd = LandCommand {
+        message: "third landed".into(),
+        ..paths(&["c"])
+    };
+    let out = f.land(&cmd, &config(vec![gate("true")])).unwrap();
+    assert_eq!(out.main_sha, f.remote_tip());
+    let log = git(&f.remote, &["log", "--oneline", "refs/heads/trunk"]);
+    assert!(
+        log.contains("unpushed a") && log.contains("unpushed b"),
+        "{log}"
+    );
 }
 
 #[test]

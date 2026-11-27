@@ -1,0 +1,462 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.04s
+fgos: dispatch unit=unit-run-1795749313180-f4e16e1a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> awaiting-approval, branch kept, worktree gone, runner is the only .fgos writer and stamps role "runner" on every move it writes (3625.25796ms)
+fgos: dispatch unit=unit-run-1795749316622-5beeccb6 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce logs the "<executorId> — <provider> — <model>" announce line and appends a matching executor.dispatch audit event (3220.500797ms)
+fgos: dispatch unit=unit-run-1795749319865-1bd56103 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce's executor.dispatch audit event records the REAL spawned command even when a executor declares a different provider label (tsk-33w D9: the audit must not lie when the two diverge) (3242.584248ms)
+fgos: dispatch unit=unit-run-1795749323679-ca87b631 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: work "item-clarify" has unrecognized domain "bogus-domain" — folding to "coding" for its step transition.
+✔ runOnce: an item already advanced to planning (via an explicit prior discover call, the only live path left post-tsk-5mj) still gets swept to executing and dispatched in the SAME runOnce pass; the clarify-pass settlement recorded at that prior call reads role "session" (3796.436697ms)
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: work "item-clarify" has unrecognized domain "bogus-domain" — folding to "coding" for its step transition.
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: dispatch unit=unit-run-1795749327537-6c235016 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+fgos: unrecognized domain "bogus-domain" — folding to "coding".
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce decompose sweep folds an unrecognized item.domain to "coding" (fail-safe), logging a warning instead of throwing (3898.201142ms)
+fgos: dispatch unit=unit-run-1795749330788-10c10518 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce clarify+decompose sweeps never touch a synthetic-domain item with no Clarify/Divide-mapped stage — it dispatches straight through instead of being wrongly swept (3256.280265ms)
+fgos: dispatch unit=unit-run-1795749334784-116bf5f8 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runOnce decompose sweep still fires normally for a coding-domain item advanced to planning (no behavior change for coding) (4197.049129ms)
+fgos: dispatch unit=unit-run-1795749338756-6762380b executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749338719-3b685238 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ real concurrency: two independent ready items dispatched in ONE runOnce run at the same moment (each worker sees the other one running) and both reach proposed with a consistent event log (4871.18547ms)
+fgos: dispatch unit=unit-run-1795749343877-fc6667ee executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749343885-a4b0825a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749348039-e81f348b executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ bounded drain-run: three independent ready items under maxRoots=2 dispatch across two waves (refill) — all reach proposed, then the run terminates (8264.18212ms)
+fgos: dispatch unit=unit-run-1795749352048-bf947920 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749352050-c91b4f12 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749355879-5213ad8f executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ two-tier cap: a root with three ready leaves dispatches maxLeavesPerRoot per wave, refills the rest, all leaves reach proposed under one shared root owner (7803.849505ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ an idle run with nothing on the frontier reports frontier-empty (232.041712ms)
+fgos: dispatch unit=unit-run-1795749360230-c946ff37 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ cell fan-out-parallel-9: a leaf whose root branch already carries a planted commit forks its own worktree from that root tip, not from main (4034.516949ms)
+fgos: dispatch unit=unit-run-1795749363481-5facaba3 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ cell fan-out-parallel-9: a root-less item is unaffected (byte-for-byte regression) — its worktree still forks fresh from main, exactly as before this cell (3226.182196ms)
+fgos: dispatch unit=unit-run-1795749367247-022984a3 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ cell fan-out-parallel-9: a root whose own branch already carries a planted commit (simulating an earlier merged leaf) reuses it via the existing branch-reuse path — proves the mechanism, not a real leaf-to-root merge (4245.68707ms)
+fgos: dispatch unit=unit-run-1795749371244-1942285a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749374735-b62add36 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ verify-miss: worker commits the wrong thing -> retry once, then park to blocked (never proposed) (7725.157351ms)
+fgos: dispatch unit=unit-run-1795749378684-a65281f8 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749382360-710a00d2 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ P1 fix: retry resets to this item's own dispatch baseline, not HEAD — a differently-committing retry never carries the first (failed) attempt's commit forward (7317.359584ms)
+fgos: dispatch unit=unit-run-1795749386603-609ec238 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749389525-50dd547e executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ P1 fix (defect-class sweep): a retry on a root item whose branch already carries a planted commit preserves that pre-existing content while still discarding only its own failed first-attempt commit (7257.96351ms)
+fgos: dispatch unit=unit-run-1795749393295-70b302a2 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749396615-379dfe0a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ verify passes but the worker changed nothing -> no commit, classified verify-miss, parked after retries (6912.105359ms)
+fgos: dispatch unit=unit-run-1795749400316-ed5d03cb executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749402959-853c2d6f executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ worker-spawn-fail: an executor the operating system cannot start -> retry per matrix, then park to blocked (5993.823454ms)
+fgos: dispatch unit=unit-run-1795749406151-00c9719a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ live log: the item log names the Unit run and its stdout log before the worker settles, and the terminal block carries the full stdout (3136.564535ms)
+fgos: dispatch unit=unit-run-1795749409515-2b8777b6 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749409533-6225c352 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ live log: two items dispatched in the same parallel wave never interleave into each other's log file (4569.56398ms)
+fgos: dispatch unit=unit-run-1795749413859-50f0ec7d executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ live log: .fgos/logs is never committed (the item log did not change the committed surface) (3385.284835ms)
+fgos: dispatch unit=unit-run-1795749418073-2addeb18 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ anti-loop: an item at MAX_VISITS is parked todo -> blocked and truly leaves the frontier — the next item runs in the same pass (4101.944876ms)
+fgos: dispatch unit=unit-run-1795749422143-2fe337ea executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ anti-loop: a human reject (with reason) resets the runner gate — visits BEFORE it no longer count toward the cap (4101.660962ms)
+✔ anti-loop: a BARE resume (no reason, no human role) does NOT reset the gate — the machine-only loop still dies at the cap (1662.68401ms)
+fgos: dispatch unit=unit-run-1795749427178-c4f30f01 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ breaker trip: a goal-check miss at threshold parks the item and halts the run — worktree gone, branch kept (halt path teardown) (3241.203911ms)
+fgos: dispatch unit=unit-run-1795749430253-3808c2a8 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749433186-8de3b033 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ breaker inert under default config: same goal-check miss with no breakerThreshold override parks the item instead of tripping the breaker (phase2-p1-breaker-inert-fix) (6652.990383ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap: a crashed run's doing item with a committed, verify-passing branch is completed to proposed before the frontier runs (2219.760401ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap reclaims an orphaned checkout left behind by a genuine crash (worktree teardown never ran) instead of dying raw (1668.604583ms)
+✔ startup reap: a doing item with nothing on its branch is reclaimed to blocked (runner-crash-reclaim) (626.300735ms)
+✔ startup reap SKIPS a doing item claimed by a human (claimRole) — never reclaimed, even with no branch/commit at all (252.62901ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap SKIPS a doing item claimed by a session, but still reaps a plain runner claim in the SAME pass — selective, not a blanket disablement (724.726145ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap: empty fgw/ orphan branches are pruned, branches carrying commits are kept (1511.678228ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap: a zero-ahead root branch with an open (non-done/wontfix) leaf descendant is kept, not pruned (tsk-577) (795.626773ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap: a zero-ahead root branch whose only descendant is already done/wontfix is still pruned normally (tsk-577 regression guard) (983.080512ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ startup reap: a wontfix branch with real commits ahead and no open descendants is force-deleted (1012.968617ms)
+✔ startup reap: a wontfix branch with an open descendant is kept, not pruned (1139.904631ms)
+fgos: dispatch unit=unit-run-1795749447889-ecbcf7a2 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ state-conflict: a racing write under the runner's claim makes its own CAS fail -> cleanup, clean halt, exit 3 (3275.139395ms)
+fgos: dispatch unit=unit-run-1795749451229-84ba97c6 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ tsk-40m code-review finding (blocker): a claim reclaimed by a DIFFERENT actor mid-dispatch is never silently settled by the runner's own stale claimId -- CAS conflict, clean halt, exit 3 (3645.872104ms)
+✔ dry-run: prints the plan (tier -> model, branch) and writes no event, no branch, no worktree (282.451335ms)
+✔ bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on that repo (root from cwd, never __dirname) (4382.451796ms)
+✔ bin/fgos-runner.mjs rejects an unknown flag with the validation exit code (98.771909ms)
+fgos: dispatch unit=unit-run-1795749459874-aee4b58e executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ wgi-8: a worker fgos-discovered block makes the RUNNER create a new item stamped discoveredFrom = the dispatched item (the worker never writes) (4165.293498ms)
+fgos: dispatch unit=unit-run-1795749464016-85f9ac0f executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ a fgos-discovered block with no description takes its own title, and one with an out-of-vocabulary or absent kind or risk takes the derived one — each item created instead of dropped (3860.907586ms)
+fgos: dispatch unit=unit-run-1795749467657-7d8a9309 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ wgi-8: a malformed fgos-discovered block is skipped (fail-safe) — the dispatch still proposes and no item is created (3169.376839ms)
+fgos: dispatch unit=unit-run-1795749470741-6f54a0a0 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ S10: a worker output with more than DISCOVERY_CAP (20) fgos-discovered blocks creates exactly 20 items, surplus skipped, dispatch outcome unaffected (3594.054988ms)
+fgos: dispatch unit=unit-run-1795749474463-c42d3c98 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ a worker output repeating the identical fgos-discovered block twice creates exactly one item, while a genuinely distinct block in the same output still creates its own (idempotency check does not over-match) (3262.000433ms)
+fgos: dispatch unit=unit-run-1795749477553-4081871c executor=claude via=cli model=sonnet tier=advanced outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749479937-762f07ab executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ S10: a re-dispatched item re-emitting a block it already captured on a prior dispatch creates no additional item (5357.122737ms)
+fgos: dispatch unit=unit-run-1795749482959-f9e3a2ea executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ S11: a discovery block title with embedded newlines cannot forge extra log lines (sanitized in the idempotent-skip log), and a very long title is clamped in the log and bounded in the stored item (3306.55495ms)
+fgos: dispatch unit=unit-run-1795749486562-51fcde79 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749489640-4c0cb910 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgos-discovered report captured exactly once at the terminal outcome, no duplicate across the retry (7049.029048ms)
+✔ resolveRepoRoot: a git repo with zero commits throws category "validation" naming the cause and the fix (37.3553ms)
+✔ resolveRepoRoot: a git repo with at least one commit still returns the repo root string unchanged (68.934212ms)
+fgos: dispatch unit=unit-run-1795749493656-66993455 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runWatch: a cycle that committed is followed by an immediate next cycle; a cycle that committed nothing is followed by a next cycle only after roughly pollFallbackMs (7139.286704ms)
+✔ runWatch seals what is due on every poll without waiting for the stop, and seals everything when it stops (917.054247ms)
+✔ runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing (104.148866ms)
+fgos: dispatch unit=unit-run-1795749501668-ce70b855 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749504566-723d21ce executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749508220-b930c7bb executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ runWatch threads the SAME breaker instance into every cycle: misses accumulate ACROSS cycles past what one dispatch alone could reach (cross-cycle sharing) (9961.142884ms)
+✔ runWatch catches a runOnce throw, reports it via onCycle with outcome "error", and keeps looping instead of terminating (162.564027ms)
+fgos: dispatch unit=unit-run-1795749511761-cda80b76 executor=claude via=cli model=sonnet tier=advanced outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clear verdict, skipping exploring, carrying the worker's proposed verify onto the item (3780.233832ms)
+fgos: dispatch unit=unit-run-1795749515624-a159ae28 executor=claude via=cli model=sonnet tier=advanced outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path (4079.716822ms)
+fgos: dispatch unit=unit-run-1795749519718-278c2db1 executor=claude via=cli model=sonnet tier=advanced outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749522664-691ebe70 executor=claude via=cli model=sonnet tier=advanced outcome=execution-failure
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+Switched to a new branch 'fgw/stale-attest-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/retry-attest-item'
+Switched to branch 'main'
+✔ tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes — nor when the research worker crashes (5745.702879ms)
+✔ tsk-4v6: parseVerdictBlock is fail-safe on absent/malformed fences and picks the last well-formed block when more than one is emitted (0.388612ms)
+✔ tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, without changing the shape of a fence that omits them (0.133351ms)
+✔ tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear discovery outcome with a clear caller verdict, and only for fields actually reported (0.094169ms)
+✔ tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies them to the work item via editWork (146.939682ms)
+✔ tsk-34o5: startupReap parks a stale doing item with attestation-mismatch when baseCommit/headRef diverges (714.020008ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ tsk-34o5: startupReap does NOT halt a legitimate retry on a branch with previous commits if latest attestation baseCommit is ancestor (1365.57112ms)
+fgos: dispatch unit=unit-run-1795749529213-e47114cd executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ Step 06 executing-stage scout-blast-radius operation choice runs through runOnce loop safely without mutating Work (5109.908355ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+Switched to a new branch 'fgw/tsk-driver-review-reject'
+Switched to branch 'main'
+✔ driver loop runOnce: executing scout-blast-radius with failed or no-evidence result settles item to blocked and DOES NOT fall through to implement-item (Finding P2 fix) (2985.153695ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749538340-c57eb14e executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+Switched to a new branch 'fgw/tsk-driver-review-approve'
+Switched to branch 'main'
+✔ driver loop routes done review findings with REJECT to fix-verify-red instead of blocking (6108.996379ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+Switched to a new branch 'fgw/tsk-driver-review-fail-verify'
+Switched to branch 'main'
+✔ driver loop runOnce: executing review-item with APPROVED verdict and passing goal-check verify advances to awaiting-approval (Finding P1 & P2 fix) (2945.011328ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749547254-a689c61a executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+fgos: dispatch unit=unit-run-1795749550308-d6e00087 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ driver loop runOnce: executing review-item with APPROVED verdict but failing goal-check verify refuses awaiting-approval and routes to fix (Finding P1 & P2 fix) (9431.83149ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ driver loop runOnce: executing review-item on Work with NO candidate diff/verify refs fails evidence gate and stops driver execution (Finding P2 fix) (1750.247101ms)
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ Finding 5 regression test: scout-blast-radius/review-item assignment paths do not log duplicate cleanup failures (3133.089444ms)
+✔ Finding 1 regression test: planning Work item with status doing (live claim) is not swept, validated, or moved by runOnce (283.907886ms)
+✔ Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assignment in worktree root when plan.md exists only in worktree (2275.157068ms)
+✔ Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake executor and stores a done/reported RunResult (1745.486614ms)
+fgos: dispatch unit=unit-run-1795749565068-76e5aac4 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ Cell 6.1 happy path: driver consumes READY+reported and feeds the existing planning edge through engine verbs only (5177.589144ms)
+✔ Cell 6.1 happy path: run evidence is complete and the verdict artifact is a worker artifact, never a control-plane file (1602.769139ms)
+fgos: dispatch unit=unit-run-1795749572965-b513f8f9 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+fgos: dispatch unit=unit-run-1795749572990-8fec58f3 executor=fgos-coding-implement via=cli model=sonnet tier=standard outcome=pass
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+warning: worktree-cwd-unreadable pid=608089 comm="systemd"
+warning: worktree-cwd-unreadable pid=608106 comm="(sd-pam)"
+✔ Cell P01.2: reviewer READY on an item whose plan.md declares split children materializes children through resolvePlan and moves the root to executing (7237.269428ms)
+✔ Cell P01.2: a child spec without a cited D-ID in plan.md's own split JSON block is rejected on the Assignment/runner path too (same gate as the caller-verdict CLI path) (2359.533408ms)
+✔ Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pass — validate-plan re-dispatches and Work stays put (3208.019187ms)
+✔ Cell 6.2 staleness: an mtime-hidden plan.md edit is still caught by the recorded plan content hash (3207.530622ms)
+✔ Cell 6.2 red-team: string-only evidenceRefs without a companion report never classify reported nor advance Work (1605.113684ms)
+✔ Cell 6.2 read-back tamper: a schema-broken agentClaim in the stored result.json is never consumed cross-pass (2982.322863ms)
+✔ Cell 6.2 read-back tamper: a deleted report-1.md is never consumed cross-pass (2881.105099ms)
+✔ Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work untouched (1576.547614ms)
+✔ Cell 6.2 failed stop: malformed result-1.json fails closed and leaves Work untouched (1601.056687ms)
+✔ validate-plan NOT READY with done findings returns to planning without advancing or blocking Work (1521.563088ms)
+✔ F2d composed: a phantom future run dir with a recomputed plan hash is never consumed — validate-plan re-dispatches (2924.814201ms)
+✔ F2c composed: a schema-valid NOT READY -> READY flip in the stored result.json is never consumed cross-pass (2873.43278ms)
+✔ F5 anti-wedge: honest re-plan then re-dispatch then consume keeps the normal cycle healthy (2867.12341ms)
+✔ F2d(c) composed: a result.json-only tamper cannot relocate evidence to a planted report — validate-plan re-dispatches (3015.423245ms)
+✔ P4a composed: a planted pinned-dir report and result.json field edits cannot forge a READY verdict — Work stays untouched (1773.183591ms)
+✔ S3a composed: a single runtime.exitCode flip cannot erase a settle-classified failed run — Work stays untouched (1853.845808ms)
+✔ init ends on Ready and one runnable next step, exits 0 and completes the transaction when doctor is ok (2413.2539ms)
+✔ a clean doctor ends the tail after init and one doctor run, and a rerun of the active release says nothing to do (6822.796206ms)
+✔ a doctor that still names a fix runs doctor --fix (its fixes, then its rows) and a second doctor before the closing block (24965.787417ms)
+✔ init lists each failing check with its fix, exits 2 (precondition) and marks the transaction degraded when doctor is not ok (23895.497859ms)
+✔ verify prints one line naming the short digest of the verified release (32865.960795ms)
+✔ status ends with one line naming the active release, or the command to run when there is none (28183.489124ms)
+✔ repair keeps the release tag the committed pin already names (30901.925905ms)
+✔ an upgrade to the release that is already active names the active release digest in its up-to-date line (31601.693968ms)
+ℹ tests 102
+ℹ suites 0
+ℹ pass 102
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 374944.70016
+exit=0

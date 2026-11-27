@@ -707,6 +707,24 @@ function contextEngineRefusal(committingToplevel) {
   return `commit refused: the context engine refuses ${(result.refusals ?? []).length} rule-unit finding(s) (docs/platform/agent-context-engine/spec.md). Fix each as its message says; the check reads the working-tree files, not the staged blobs.`;
 }
 
+// The plan contract gate: a staged plan.md or phase file of a plan is checked by the same plan-contract-check the land
+// door runs as a gate, before the commit exists, so a plan that breaks the contract never reaches a land. Like the
+// config check, it reads the plan's files on disk. Its ERROR lines refuse the commit; WARN lines do not.
+function planContractRefusal(committingToplevel) {
+  // The check beside this hook, like the documentation gate's checker; the plans it reads are the committing tree's.
+  const script = path.resolve(__dirname, '..', 'scripts/plan-contract-check.mjs');
+  if (!fs.existsSync(script)) return null;
+  const staged = execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z'], { cwd: committingToplevel, encoding: 'utf8' })
+    .split('\0').filter(Boolean);
+  const dirs = [...new Set(staged.map((file) => /^(plans\/[^/]+)\/(?:plan|phase-[^/]*)\.md$/u.exec(file)?.[1]).filter(Boolean))]
+    .filter((dir) => fs.existsSync(path.join(committingToplevel, dir, 'plan.md')));
+  if (dirs.length === 0) return null;
+  const run = spawnSync(process.execPath, [script, ...dirs.flatMap((dir) => ['--plan', dir])], { cwd: committingToplevel, encoding: 'utf8' });
+  if (run.status === 0) return null;
+  const errors = `${run.stdout ?? ''}${run.stderr ?? ''}`.split('\n').filter((line) => line.startsWith('ERROR'));
+  return `commit refused: the plan contract check fails (${dirs.join(', ')}):\n${errors.join('\n') || (run.stderr ?? '').trim()}\nFix each as it says; "node scripts/plan-contract-check.mjs --plan <dir>" shows the same.`;
+}
+
 async function main() {
   const eventRefusal = addedEventPathRefusal(process.cwd());
   if (eventRefusal) { console.error(eventRefusal); process.exitCode = 1; return; }
@@ -752,6 +770,12 @@ async function main() {
   const configRefusal = configCheckRefusal(committingToplevel);
   if (configRefusal) {
     refuse(configRefusal);
+    return;
+  }
+
+  const planRefusal = planContractRefusal(committingToplevel);
+  if (planRefusal) {
+    refuse(planRefusal);
     return;
   }
 

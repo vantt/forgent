@@ -1,0 +1,137 @@
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.23s
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+✔ test addon descriptor uses the release capability producer (0.802462ms)
+✔ release staging carries a real combined addon resolved from its release manifest (2593.489365ms)
+✔ addon test builder respects Cargo target/home and defaults to the normal output directory (8979.824568ms)
+✔ the staged addon digest covers every workspace member, the host sources included, so a changed host is rebuilt (0.903574ms)
+✔ development host carries and loads the addon from its per-invocation manifest (3060.898949ms)
+✔ only registered Linux and Windows releases advertise C5 and fence-backed Git WAL capability (0.141526ms)
+✔ a script reuses a fresh staged addon without cargo and names a stale one it cannot rebuild (1522.533789ms)
+✔ dev door runs the real Node consumer from INIT_CWD with default Cargo output (7062.915402ms)
+✔ dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output (6703.62295ms)
+✔ dev door runs the real Node consumer from INIT_CWD with relative Cargo output (6686.858533ms)
+✔ dev door runs the real Node consumer from INIT_CWD with absolute Cargo output (6683.054797ms)
+✔ dev door refuses symlink segment .fgos without modifying its target (426.109305ms)
+✔ dev door refuses symlink segment .fgos/runtime without modifying its target (409.763042ms)
+✔ dev door refuses symlink segment .fgos/runtime/dev-host without modifying its target (403.076461ms)
+✔ dev door refuses symlink segment bin/fgos.mjs without modifying its target (393.135238ms)
+✔ dev door propagates Cargo failure without materializing or executing a host (328.176622ms)
+✔ concurrent dev consumers with distinct Cargo targets keep independent verified artifacts (4938.905613ms)
+✔ fgos --help --json through the host is the whole manifest, byte-identical to the generated manifest file (2919.115057ms)
+✔ an unlisted leading option still fails closed in the host (R3), and refused help exits 4 with nothing on stdout (96.49582ms)
+✔ fgos <verb> --help --json through the host returns the manifest entry for every route selector, without running the verb (2792.488289ms)
+✔ help never runs the verb: write and spawn forms, and a help token after a value-taking flag, leave the directory untouched (139.546505ms)
+✔ help accepts the --dir the shell function appends, through the real shell function (310.462544ms)
+✔ a native verb with sub-verbs refuses an unknown sub-verb the same way with or without --help (27.597139ms)
+✔ the direct-node channel hands every help form to the host unchanged, and says where to look when there is none (900.389024ms)
+✔ a host that forwards help back to Node is refused on the second hop, not looped (156.209916ms)
+▶ a staged host a detached process runs from or names as its host is kept, and pruned once that process has ended
+  ✔ runs from it (1769.074463ms)
+  ✔ names it as its host (1609.626729ms)
+✔ a staged host a detached process runs from or names as its host is kept, and pruned once that process has ended (3379.721951ms)
+✔ an unused staged host is removed at once, and a young one is never pruned by another invocation (1047.354792ms)
+✔ a directory is judged against the scan the caller supplies, not a fresh one (18.928558ms)
+✔ with no process scan a run directory is kept, and a prune removes it only once it is stale (4.655422ms)
+✔ the dev door points FGOS_HOST_BIN at the staged host, replacing any inherited host (0.1518ms)
+✔ the launcher scans for processes inside a run directory that does not exist yet, with no host variables inherited, and restaging an unchanged door rewrites nothing (2251.545487ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 34896.611996
+exit=0
+total 12
+drwxrwxr-x 3 vantt vantt 4096 Nov 27 09:59 .
+drwxrwxr-x 5 vantt vantt 4096 Nov 27 10:14 ..
+drwxrwxr-x 2 vantt vantt 4096 Nov 27 09:14 run-planted

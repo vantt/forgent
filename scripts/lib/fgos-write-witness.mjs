@@ -113,6 +113,29 @@ function install(logFile, fgosDir) {
     }
   };
 
+  // mkdtemp names its directory only when it returns: record that directory as made by this process, so
+  // removing it later is seen as undoing this process's own directory, not as deleting one that was there.
+  const noteMadeTemp = (made) => {
+    try {
+      const rel = path.relative(fgosDir, path.resolve(made));
+      if (!rel || rel.startsWith('..') || path.isAbsolute(rel) || touched.has(rel)) return;
+      touched.add(rel);
+      append({ kind: 'write', path: rel, before: { exists: false } });
+    } catch { /* never throws */ }
+  };
+  const originalMkdtempSync = fs.mkdtempSync;
+  fs.mkdtempSync = function witnessedMkdtempSync(...args) {
+    const made = originalMkdtempSync.apply(this, args);
+    noteMadeTemp(made);
+    return made;
+  };
+  const originalMkdtemp = fs.promises.mkdtemp;
+  fs.promises.mkdtemp = async function witnessedMkdtemp(...args) {
+    const made = await originalMkdtemp.apply(this, args);
+    noteMadeTemp(made);
+    return made;
+  };
+
   for (const [name, positionsOf] of Object.entries(SPECS)) {
     wrap(fs, name, positionsOf);
     wrap(fs, `${name}Sync`, positionsOf);

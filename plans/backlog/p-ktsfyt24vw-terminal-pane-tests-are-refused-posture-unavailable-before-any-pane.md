@@ -62,3 +62,7 @@ The remaining cases were adapted, and `terminal-cutover` (10 of 10) and `termina
 - the never-started, limit-screen and trust-prompt cases assert the run door's documented exit codes (11, 10, 13);
 - an executor declared by `invocations[]` gives the harness its first invocation's fields.
 
+
+# Notes
+
+Row added in 2a513ab171 without this section; the section was added so the backlog index builds.

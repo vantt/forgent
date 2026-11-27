@@ -420,7 +420,9 @@ const NATIVE_SOURCES = {
     shared: () => {
       const src = RUST('apps/fgos/src/wiring/supervision.rs');
       const start = src.indexOf('Some("raise") =>');
-      return src.slice(start, src.indexOf('Some("wake") =>', start));
+      // `widen` reads its flags in a parser of its own.
+      const widen = src.indexOf('fn widen_command(');
+      return src.slice(start, src.indexOf('Some("wake") =>', start)) + src.slice(widen, src.indexOf('\nfn ', widen + 1));
     },
   },
   convention: {

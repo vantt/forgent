@@ -78,6 +78,9 @@ fn door_with(op: &str, extra: &[&str], env: &[(&str, &Path)], request: &Value) -
     let mut child = Command::new(env!("CARGO_BIN_EXE_fgos"))
         .args(["internal", "context-engine", op, "--protocol", "1"])
         .args(extra)
+        // A state root inherited from the caller (a release run sets one) outranks FGOS_STATE_HOME and would
+        // point the door at the machine's real model; the case's own env alone decides the state folder.
+        .env_remove("FGOS_STATE_ROOT")
         .envs(env.iter().copied())
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())

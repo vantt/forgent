@@ -314,6 +314,11 @@ land:
   # @fgos:doc Gates a landing runs, each a command and optional path globs; a gate with when runs only if a landed path matches one, and without when it always runs. Default: [].
   # @fgos:why [39631fb7-af40-41d5-8e8b-18afb8376e42] heads-stable phase 3: the land door runs the plan contract check on every landed plan (p-erwx4t7gl6); restored on release edf91f57, which carries the land-door addon fix p01c (deaedf06d)
   gates:
+    # The plan contract check is first: it takes seconds, so a malformed plan fails the land before any test runs.
+    - run: node scripts/plan-contract-check.mjs {plans}
+      when:
+        - plans/*/plan.md
+        - plans/*/phase-*.md
     - run: node scripts/run-tests.mjs test/architecture.test.mjs test/setup/git-mutation-census.test.mjs test/scripts/doc-health.test.mjs test/scripts/check-decision-citation-drift.test.mjs test/scripts/mailbox-behaviour-v7n.test.mjs test/rust-host/command-routes.test.mjs test/cli/fgos-manifest.test.mjs {tests}
       when:
         - src/**
@@ -327,13 +332,6 @@ land:
         - apps/**/*.rs
         - packages/**/*.rs
         - test/**/*.rs
-    - run: node scripts/git-one-door-scan.mjs --root . | tail -1 | grep -q '^0 undeclared'
-      when:
-        - src/**
-        - apps/**
-        - packages/**
-        - bin/**
-        - scripts/**
     - run: node scripts/export-command-selectors.mjs --check
       when:
         - src/**
@@ -341,22 +339,23 @@ land:
         - packages/**
         - bin/**
         - scripts/**
-    - run: node scripts/plan-contract-check.mjs {plans}
-      when:
-        - plans/*/plan.md
-        - plans/*/phase-*.md
   # @fgos:doc The command that regenerates derived files after a landing, with the files it rewrites; null runs none.
   # @fgos:why [74bda49f-655f-46ea-b76a-7a230bb878a6] restore land.regenerate for code paths only (when globs, 0414ccf9b); heads have cargo on PATH (timer re-rendered)
   regenerate:
     # @fgos:doc Shell command that regenerates the files.
-    run: node scripts/export-command-selectors.mjs && node scripts/git-one-door-scan.mjs --root . --write-census
-    # @fgos:doc Repo-relative files the command rewrites.
+    # @fgos:why [711df800-ada7-415e-b3e3-8bc371bf80db] D1 of ds-yf3vnbidi6: the land door rebuilds the generated skill surfaces (plan 261126-2324 phase 3)
+    run: npm run build:skills && node scripts/export-command-selectors.mjs && node scripts/git-one-door-scan.mjs --root . --write-census
+    # @fgos:doc Repo-relative files or globs the command rewrites; a glob covers every file it matches in the candidate before or after the run.
+    # @fgos:why [711df800-ada7-415e-b3e3-8bc371bf80db] D1 of ds-yf3vnbidi6: the land door rebuilds the generated skill surfaces (plan 261126-2324 phase 3)
     files:
       - packages/git/contracts/mutation-census.v1.json
       - packages/host-runtime/contracts/command-routes.json
       - packages/host-runtime/contracts/command-manifest.json
+      - .agents/skills/**
+      - .claude/skills/**
+      - plugins/fgOS/skills/**
     # @fgos:doc Path globs; the command runs only if a landed path matches one. Absent runs it on every landing.
-    # @fgos:why [f381c6d2-3f10-4128-aeac-d0f158513f83] heads-stable phase 7: land.regenerate runs for core/** too, so a skill-only land rebuilds the mutation census (owner q-y24ukwgfpo)
+    # @fgos:why [711df800-ada7-415e-b3e3-8bc371bf80db] D1 of ds-yf3vnbidi6: the land door rebuilds the generated skill surfaces (plan 261126-2324 phase 3)
     when:
       - src/**
       - apps/**
@@ -364,11 +363,12 @@ land:
       - bin/**
       - scripts/**
       - core/**
+      - domains/**
 # @fgos:doc The project watcher: a no-LLM timer tick that runs detection definitions and records each raised event once.
 watcher:
   # @fgos:doc The action per row kind.
   actions:
-    # @fgos:doc The action for this row kind. Values: wake-supervisor | notify | none.
+    # @fgos:doc The action for this row kind. Values: wake-supervisor | start-review | notify | none.
     # @fgos:why [3199073] watcher tune: actions.session-idle=none
     session-idle: none
 # @fgos:doc The project supervisor head and its lead pool.
@@ -387,3 +387,41 @@ sessionRotation:
       # @fgos:doc This persona's soft fraction; the global value when absent. Minimum: 0. Default: 0.15.
       # @fgos:why [2f2aff97-7ef0-4ca6-9496-8e89b501e067] owner 2026-11-24: raise supervisor soft rotation to 0.30 like the secretary
       soft: 0.3
+# @fgos:doc The project's release recipe that `fgos release run` follows: checks, the rollout command, its probe and its rollback.
+release:
+  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root. Default: [].
+  # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner decision q-dhhezn67em: release checks are the full test suite
+  checks:
+    - - env
+      - -u
+      - FGOS_STATE_ROOT
+      - TMPDIR=/var/tmp/r
+      - npm
+      - test
+      - --
+      - --test-concurrency=6
+    - - env
+      - -u
+      - FGOS_STATE_ROOT
+      - TMPDIR=/var/tmp/r
+      - cargo
+      - test
+      - --workspace
+  # @fgos:doc The rollout command, a list of words run with no shell from the project root; null means the project declares no release.
+  # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner order: forgent release recipe per heads-operate phase 6 (apply fgctl upgrade, probe head-grant-probe, rollback fgctl repair, reversible)
+  apply:
+    - fgctl
+    - upgrade
+  # @fgos:doc The command that proves the new release works after apply, a list of words; a non-zero exit runs the rollback.
+  # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner order: forgent release recipe per heads-operate phase 6 (apply fgctl upgrade, probe head-grant-probe, rollback fgctl repair, reversible)
+  probe:
+    - node
+    - test/live/head-grant-probe.live.mjs
+  # @fgos:doc The command that returns to the previous release, a list of words; required when reversible is true.
+  # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner order: forgent release recipe per heads-operate phase 6 (apply fgctl upgrade, probe head-grant-probe, rollback fgctl repair, reversible)
+  rollback:
+    - fgctl
+    - repair
+  # @fgos:doc Whether the release can be undone by the rollback command; an irreversible release never applies by itself. Default: false.
+  # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner order: forgent release recipe per heads-operate phase 6 (apply fgctl upgrade, probe head-grant-probe, rollback fgctl repair, reversible)
+  reversible: true

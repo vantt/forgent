@@ -1688,6 +1688,15 @@
         "dir",
         "json",
         "help"
+      ],
+      "widen": [
+        "dir",
+        "json",
+        "help",
+        "plan",
+        "phase",
+        "path",
+        "criterion"
       ]
     },
     "store": "open",

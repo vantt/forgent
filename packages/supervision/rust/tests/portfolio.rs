@@ -2,8 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use fgos_supervision::portfolio::{
-    admissible, admitted_text, collisions, footprint_problem, head_name, name_tag, order,
-    read_plan, running_overlaps, supervisor_name, Plan,
+    active_overlaps, admissible, admitted_text, collisions, footprint_problem, head_name, name_tag,
+    order, read_plan, running_overlaps, supervisor_name, widened_text, Plan,
 };
 
 fn plan(
@@ -488,4 +488,205 @@ fn admission_adds_missing_lead_and_base_through_the_frontmatter_editor() {
     );
     assert!(edited.contains("base: abc123"));
     assert!(edited.ends_with(&body));
+}
+
+#[test]
+fn widened_text_writes_both_copies_when_path_is_new_to_both() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Criterion one.\n2. Criterion two.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let widened =
+        widened_text(&original, "1", &["packages/supervision/rust/src/lib.rs"], 2).unwrap();
+    assert!(widened.text.is_some());
+    assert_eq!(widened.added, ["packages/supervision/rust/src/lib.rs"]);
+    assert!(widened.unchanged.is_empty());
+    assert_eq!(widened.criterion_text, "Criterion two.");
+
+    let edited = widened.text.unwrap();
+    let read = read_plan("p", &edited).unwrap();
+    assert!(read
+        .footprint
+        .contains(&"packages/supervision/rust/src/lib.rs".to_string()));
+    assert!(read.phases[0]
+        .footprint
+        .contains(&"packages/supervision/rust/src/lib.rs".to_string()));
+}
+
+#[test]
+fn widened_text_keeps_every_other_byte_of_plan_md() {
+    let body = format!(
+        "# Title\n\nSome introductory notes.\n\n## Acceptance criteria\n\n1. First criterion.\n2. Second criterion.\n\n## Phases\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n| 2 | b | 1 | `tests/**` | 2 | ready |\n\nSome trailing notes.\n"
+    );
+    let original = text_with("# Frontmatter comment\nfootprint:\n  - src/**\n", &body);
+    let widened = widened_text(&original, "1", &["lib/new_module.rs"], 1).unwrap();
+    let edited = widened.text.unwrap();
+
+    let expected = format!(
+        "---\ntitle: t\nstatus: ready\npriority: P1\ncreated: 2026-11-01\n# Frontmatter comment\nfootprint:\n  - src/**\n  - lib/new_module.rs\n---\n\n# Title\n\nSome introductory notes.\n\n## Acceptance criteria\n\n1. First criterion.\n2. Second criterion.\n\n## Phases\n\n{HEAD}| 1 | a | - | `src/**`, `lib/new_module.rs` | 1 | ready |\n| 2 | b | 1 | `tests/**` | 2 | ready |\n\nSome trailing notes.\n"
+    );
+    assert_eq!(edited, expected);
+}
+
+#[test]
+fn widened_text_canonicalizes_phase_cell_entries_before_comparing() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `./src/existing.rs` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let widened = widened_text(&original, "1", &["src/existing.rs"], 1).unwrap();
+    assert!(widened.text.is_none());
+    assert!(widened.added.is_empty());
+    assert_eq!(widened.unchanged, ["src/existing.rs"]);
+}
+
+#[test]
+fn widened_text_refuses_when_comment_inside_footprint_list() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  # comment inside list\n  - src/**\n", &body);
+    let err = widened_text(&original, "1", &["tests/new.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "comment-would-be-lost");
+}
+
+#[test]
+fn widened_text_treats_covered_path_as_frontmatter_noop_and_adds_to_phase_cell() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/existing.rs` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let widened = widened_text(&original, "1", &["src/new.rs"], 1).unwrap();
+    assert!(widened.text.is_some());
+    assert_eq!(widened.added, ["src/new.rs"]);
+    assert!(widened.unchanged.is_empty());
+
+    let edited = widened.text.unwrap();
+    let read = read_plan("p", &edited).unwrap();
+    // Frontmatter was NOT modified because src/** already covers src/new.rs
+    assert_eq!(read.footprint, ["src/**"]);
+    // Phase 1 footprint cell added src/new.rs
+    assert_eq!(read.phases[0].footprint, ["src/existing.rs", "src/new.rs"]);
+}
+
+#[test]
+fn widened_text_returns_none_and_reports_unchanged_when_neither_copy_changes() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let widened = widened_text(&original, "1", &["src/**"], 1).unwrap();
+    assert!(widened.text.is_none());
+    assert!(widened.added.is_empty());
+    assert_eq!(widened.unchanged, ["src/**"]);
+    assert_eq!(widened.criterion_text, "Item one.");
+}
+
+#[test]
+fn widened_text_refuses_when_plan_is_not_widenable() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    for status in ["draft", "done", "withdrawn"] {
+        let text = format!("---\ntitle: t\nstatus: {status}\npriority: P1\ncreated: 2026-11-01\nfootprint:\n  - src/**\n---\n\n{body}");
+        let err = widened_text(&text, "1", &["src/foo.rs"], 1).unwrap_err();
+        assert_eq!(err.code(), "plan-not-widenable", "{status}");
+    }
+}
+
+#[test]
+fn widened_text_refuses_when_criterion_is_not_found() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+    let err = widened_text(&original, "1", &["src/foo.rs"], 2).unwrap_err();
+    assert_eq!(err.code(), "criterion-not-found");
+
+    let no_criteria_body = format!("{HEAD}| 1 | a | - | `src/**` | 1 | ready |\n");
+    let original_no_criteria = text_with("footprint:\n  - src/**\n", &no_criteria_body);
+    let err = widened_text(&original_no_criteria, "1", &["src/foo.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "criterion-not-found");
+}
+
+#[test]
+fn widened_text_refuses_when_phase_is_not_found_or_ended() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | src/** | 1 | ready |\n| 2 | b | 1 | tests/** | 2 | done |\n| 3 | c | 2 | docs/** | 3 | withdrawn |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+
+    // Missing phase id
+    let err = widened_text(&original, "99", &["src/foo.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "phase-not-found");
+
+    // Phase 2 is done
+    let err = widened_text(&original, "2", &["src/foo.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "phase-not-found");
+
+    // Phase 3 is withdrawn
+    let err = widened_text(&original, "3", &["src/foo.rs"], 1).unwrap_err();
+    assert_eq!(err.code(), "phase-not-found");
+}
+
+#[test]
+fn widened_text_refuses_invalid_footprint_entries() {
+    let body = format!(
+        "## Acceptance criteria\n\n1. Item one.\n\n{HEAD}| 1 | a | - | src/** | 1 | ready |\n"
+    );
+    let original = text_with("footprint:\n  - src/**\n", &body);
+
+    for bad in [
+        "-leading-dash",
+        "./-leading-dash",
+        "",
+        "/abs/path",
+        "../escape",
+    ] {
+        let err = widened_text(&original, "1", &[bad], 1).unwrap_err();
+        assert_eq!(err.code(), "footprint-entry-invalid", "{bad}");
+    }
+}
+
+#[test]
+fn active_overlaps_compares_ready_and_running_plans_and_skips_self() {
+    let plans = vec![
+        plan(
+            "mine",
+            "running",
+            "P1",
+            "2026-11-01",
+            &[],
+            &["src/shared/**"],
+        ),
+        plan(
+            "peer_running",
+            "running",
+            "P1",
+            "2026-11-02",
+            &[],
+            &["src/shared/a.rs"],
+        ),
+        plan(
+            "peer_ready",
+            "ready",
+            "P1",
+            "2026-11-03",
+            &[],
+            &["src/shared/b.rs"],
+        ),
+        plan(
+            "peer_done",
+            "done",
+            "P1",
+            "2026-11-04",
+            &[],
+            &["src/shared/c.rs"],
+        ),
+    ];
+    let overlaps = active_overlaps(&plans[0], &plans);
+    let dirs: Vec<&str> = overlaps.iter().map(|(d, _)| d.as_str()).collect();
+    assert_eq!(dirs, ["peer_running", "peer_ready"]);
+    assert_eq!(overlaps[0].1, ["src/shared/**"]);
+    assert_eq!(overlaps[1].1, ["src/shared/**"]);
 }

@@ -139,6 +139,27 @@ fn repository_files(root: &Path) -> Result<Option<HashSet<String>>, SourcePayloa
         .map_err(|_| {
             SourcePayloadError::Git("the checkout is not inside its own work tree".into())
         })?;
+    // A paged read whose index moves underneath it (a land, or any `git status` refreshing the index) is
+    // refused `inspect-cursor-stale`; the whole read restarts so the set always comes from one index.
+    let mut attempt = 1;
+    loop {
+        match read_pages(&driver, &repo, &prefix) {
+            Ok(files) => return Ok(Some(files)),
+            Err(e) if e.cause == "inspect-cursor-stale" && attempt < STALE_CURSOR_ATTEMPTS => {
+                attempt += 1
+            }
+            Err(e) => return Err(git(e)),
+        }
+    }
+}
+
+const STALE_CURSOR_ATTEMPTS: u32 = 5;
+
+fn read_pages(
+    driver: &GitDriver,
+    repo: &fgos_git::RepoHandle,
+    prefix: &str,
+) -> Result<HashSet<String>, fgos_git::OperationError> {
     let mut files = HashSet::new();
     let mut add = |bytes: &[u8]| {
         let rel = String::from_utf8_lossy(bytes).into_owned();
@@ -150,7 +171,7 @@ fn repository_files(root: &Path) -> Result<Option<HashSet<String>>, SourcePayloa
     };
     let mut cursor: Option<InspectCursor> = None;
     loop {
-        let page = driver.tracked_paths(&repo, cursor, 4096).map_err(git)?;
+        let page = driver.tracked_paths(repo, cursor, 4096)?;
         page.entries.iter().for_each(|p| add(p));
         cursor = page.next_cursor;
         if cursor.is_none() {
@@ -158,16 +179,14 @@ fn repository_files(root: &Path) -> Result<Option<HashSet<String>>, SourcePayloa
         }
     }
     loop {
-        let page = driver
-            .status(
-                &repo,
-                Untracked::All,
-                Submodules::Configured,
-                Ignored::Excluded,
-                cursor,
-                4096,
-            )
-            .map_err(git)?;
+        let page = driver.status(
+            repo,
+            Untracked::All,
+            Submodules::Configured,
+            Ignored::Excluded,
+            cursor,
+            4096,
+        )?;
         page.entries
             .iter()
             .filter(|e| e.untracked)
@@ -177,7 +196,7 @@ fn repository_files(root: &Path) -> Result<Option<HashSet<String>>, SourcePayloa
             break;
         }
     }
-    Ok(Some(files))
+    Ok(files)
 }
 
 /// The source payload of the checkout at `repo_root`: forward-slash paths relative to it, sorted, each once.

@@ -149,6 +149,30 @@ race under load. No failure is introduced by these plans. The suites are therefo
 predate the plans and lie outside their footprints. Each phase's own rule was to fix nothing outside its footprint,
 so they are left to their owners.
 
+Gate rerun (2026-11-27 08:40, fg-server, main at `6c14b0fdc`), after the earlier failures were fixed at their cause:
+- `fgctl`: the init fixture now keeps directory modes;
+- credential provisioning under bwrap: a production fix;
+- `guide-schema`: a stale test;
+- the herdr terminal cases: the harness now runs confined;
+- the head-request mail case: it now binds its own Identity state.
+
+Result:
+- `cargo test --workspace` is green (exit 0).
+- `npm test`: 6,543 pass and 1 fail of 6,571. The failing test, "the orphan sweep kills a run the harness did not
+  finish..." (`test/scripts/mailbox-live-confined.test.mjs`), passes 19 of 19 when run alone, three times out of
+  three: a timing race under full-suite load, not a defect.
+
+Final gate (2026-11-27 13:00, fg-server, main at `22a23e5d7`), green to the letter: `npm test` exits 0, with 6,545
+pass and 0 fail of 6,572; `cargo test --workspace` exits 0. The last failures were fixed at their cause:
+- `case-close`: the concurrent prune races in `src/workflow/case-close.mjs`;
+- the `.fgos` write witness: it now sees directories that `mkdtemp` makes;
+- the supervisor flag-drift test: it now reads the `widen` parser;
+- the config fixture: a duplicate entry removed;
+- the head-request host exec: it now waits out ETXTBSY.
+
+The owner chose to activate only on a green gate. Release `b6eb617b59e0` was built from this main and activated on
+fg-server. Its four red doctor rows (hook wiring, a missing tool, `tsk-5db`, provider quarantine) predate both plans.
+
 ### Waits on other plans
 
 | phase | waits for | shared files or data |

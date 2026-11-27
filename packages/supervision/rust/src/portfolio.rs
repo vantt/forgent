@@ -4,7 +4,7 @@
 
 use std::sync::OnceLock;
 
-use fgos_yaml_doc::{parse, Profile, Value};
+use fgos_yaml_doc::{parse, CommentLoss, Profile, Refusal, Segment, Value};
 
 const VOCABULARY_JSON: &str = include_str!("../../contracts/plan-vocabulary.v1.json");
 
@@ -94,6 +94,53 @@ impl PlanRefusal {
             PlanRefusal::IdDuplicate(_) => "phase-id-duplicate",
         }
     }
+}
+
+/// Why widening a plan's footprint was refused.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+pub enum WidenRefusal {
+    #[error("plan-frontmatter-missing: {0}")]
+    FrontmatterMissing(String),
+    #[error("plan-not-widenable: status is {0}")]
+    NotWidenable(String),
+    #[error("criterion-not-found: criterion {0} not found under Acceptance criteria")]
+    CriterionNotFound(u32),
+    #[error("phase-not-found: phase {0}")]
+    PhaseNotFound(String),
+    #[error("footprint-entry-invalid: {0}")]
+    FootprintEntryInvalid(String),
+    #[error("plan-reread-failed: {0}")]
+    RereadFailed(String),
+    #[error("{0}")]
+    DocRefusal(Refusal),
+}
+
+impl WidenRefusal {
+    /// The stable refusal code.
+    pub fn code(&self) -> &'static str {
+        match self {
+            WidenRefusal::FrontmatterMissing(_) => "plan-frontmatter-missing",
+            WidenRefusal::NotWidenable(_) => "plan-not-widenable",
+            WidenRefusal::CriterionNotFound(_) => "criterion-not-found",
+            WidenRefusal::PhaseNotFound(_) => "phase-not-found",
+            WidenRefusal::FootprintEntryInvalid(_) => "footprint-entry-invalid",
+            WidenRefusal::RereadFailed(_) => "plan-reread-failed",
+            WidenRefusal::DocRefusal(r) => r.rule,
+        }
+    }
+}
+
+/// The outcome of widening a plan text.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Widened {
+    /// The edited text of `plan.md`, or `None` when neither copy changed.
+    pub text: Option<String>,
+    /// The paths added to either the frontmatter or the phase cell.
+    pub added: Vec<String>,
+    /// The paths that were already covered in frontmatter and listed in the phase cell.
+    pub unchanged: Vec<String>,
+    /// The first line of the acceptance criterion item.
+    pub criterion_text: String,
 }
 
 /// One row of a plan's phase table.
@@ -272,9 +319,30 @@ pub fn running_overlaps(plan: &Plan, plans: &[Plan]) -> Vec<(String, Vec<String>
     if plan.status != "ready" || footprint_problem(plan).is_some() {
         return Vec::new();
     }
+    plan_overlaps(plan, plans, |r| r.status == "running")
+}
+
+/// An active (ready or running) plan's overlaps with every other active plan,
+/// naming the shared entries.
+pub fn active_overlaps(plan: &Plan, plans: &[Plan]) -> Vec<(String, Vec<String>)> {
+    if (!is_active(&plan.status)) || footprint_problem(plan).is_some() {
+        return Vec::new();
+    }
+    plan_overlaps(plan, plans, |r| is_active(&r.status))
+}
+
+fn is_active(status: &str) -> bool {
+    status == "ready" || status == "running"
+}
+
+fn plan_overlaps(
+    plan: &Plan,
+    plans: &[Plan],
+    filter: impl Fn(&Plan) -> bool,
+) -> Vec<(String, Vec<String>)> {
     plans
         .iter()
-        .filter(|r| r.status == "running" && footprint_problem(r).is_none())
+        .filter(|r| r.dir != plan.dir && filter(r) && footprint_problem(r).is_none())
         .filter_map(|r| {
             let items = [plan, r].map(|p| fgos_write_scope::Item {
                 id: p.dir.clone(),
@@ -315,9 +383,9 @@ pub fn admitted_text(text: &str, role: &str, base: &str) -> Result<String, Strin
     let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md").map_err(|e| e.to_string())?;
     for (key, value) in [("status", "running"), ("lead", role), ("base", base)] {
         doc.set(
-            &[fgos_yaml_doc::Segment::Key(key.to_owned())],
+            &[Segment::Key(key.to_owned())],
             Value::Str(value.to_owned()),
-            fgos_yaml_doc::CommentLoss::Refuse,
+            CommentLoss::Refuse,
         )
         .map_err(|e| e.to_string())?;
     }
@@ -329,6 +397,341 @@ pub fn admitted_text(text: &str, role: &str, base: &str) -> Result<String, Strin
         edited,
         &text[start + front.len()..]
     ))
+}
+
+/// Widens a plan's footprint by one or more paths for a numbered acceptance criterion.
+/// Edits both the frontmatter footprint (through the YAML document door) and the phase
+/// row's footprint cell, keeping every other byte of `plan.md`.
+pub fn widened_text<S: AsRef<str>>(
+    text: &str,
+    phase_id: &str,
+    paths: &[S],
+    criterion: u32,
+) -> Result<Widened, WidenRefusal> {
+    let (front, body) = split_frontmatter(text)
+        .ok_or_else(|| WidenRefusal::FrontmatterMissing("no frontmatter block".to_owned()))?;
+    let mut doc = parse(front.as_bytes(), Profile::Tool, "plan.md")
+        .map_err(|e| WidenRefusal::FrontmatterMissing(format!("{e:?}")))?;
+    let Value::Map(entries) = doc.value() else {
+        return Err(WidenRefusal::FrontmatterMissing(
+            "frontmatter is not a mapping".to_owned(),
+        ));
+    };
+    let get = |key: &str| entries.iter().find(|(k, _)| k == key).map(|(_, v)| v);
+    let status = match get("status") {
+        Some(Value::Str(s)) => s.as_str(),
+        _ => "",
+    };
+    if status != "ready" && status != "running" {
+        return Err(WidenRefusal::NotWidenable(status.to_owned()));
+    }
+
+    let criterion_text = find_acceptance_criterion(body, criterion)?;
+
+    let phases = read_phase_table("plan.md", body)
+        .map_err(|e| WidenRefusal::RereadFailed(format!("{phase_id}: {e}")))?;
+    let phase = phases
+        .iter()
+        .find(|p| p.id == phase_id)
+        .ok_or_else(|| WidenRefusal::PhaseNotFound(phase_id.to_owned()))?;
+    if phase.status == "done" || phase.status == "withdrawn" {
+        return Err(WidenRefusal::PhaseNotFound(format!(
+            "{phase_id} is {}",
+            phase.status
+        )));
+    }
+
+    let mut canon_paths: Vec<String> = Vec::new();
+    for p_ref in paths {
+        let p = p_ref.as_ref();
+        if p.starts_with('-') || p.is_empty() {
+            return Err(WidenRefusal::FootprintEntryInvalid(p.to_owned()));
+        }
+        let canon = fgos_write_scope::canonicalize(p)
+            .map_err(|e| WidenRefusal::FootprintEntryInvalid(format!("{p}: {e}")))?;
+        if canon.starts_with('-') || canon.is_empty() {
+            return Err(WidenRefusal::FootprintEntryInvalid(canon));
+        }
+        canon_paths.push(canon);
+    }
+
+    let current_footprint: Vec<String> = match get("footprint") {
+        Some(Value::Seq(items)) => items
+            .iter()
+            .filter_map(|v| match v {
+                Value::Str(s) => Some(s.clone()),
+                _ => None,
+            })
+            .collect(),
+        _ => Vec::new(),
+    };
+
+    let mut updated_footprint = current_footprint.clone();
+    let mut frontmatter_added: Vec<String> = Vec::new();
+    for canon in &canon_paths {
+        let covered = fgos_write_scope::matches(canon.as_bytes(), &updated_footprint)
+            .map_err(|e| WidenRefusal::FootprintEntryInvalid(e.to_string()))?;
+        if !covered {
+            updated_footprint.push(canon.clone());
+            frontmatter_added.push(canon.clone());
+        }
+    }
+
+    let mut canon_phase_footprint: Vec<String> = Vec::new();
+    for existing in &phase.footprint {
+        let canon = fgos_write_scope::canonicalize(existing)
+            .map_err(|e| WidenRefusal::FootprintEntryInvalid(format!("{existing}: {e}")))?;
+        canon_phase_footprint.push(canon);
+    }
+
+    let mut phase_added: Vec<String> = Vec::new();
+    for canon in &canon_paths {
+        if !canon_phase_footprint
+            .iter()
+            .any(|existing| existing == canon)
+        {
+            if !phase_added.contains(canon) {
+                phase_added.push(canon.clone());
+            }
+        }
+    }
+
+    let mut added: Vec<String> = Vec::new();
+    let mut unchanged: Vec<String> = Vec::new();
+    for canon in &canon_paths {
+        if frontmatter_added.contains(canon) || phase_added.contains(canon) {
+            if !added.contains(canon) {
+                added.push(canon.clone());
+            }
+        } else if !unchanged.contains(canon) {
+            unchanged.push(canon.clone());
+        }
+    }
+
+    let frontmatter_changed = !frontmatter_added.is_empty();
+    let phase_cell_changed = !phase_added.is_empty();
+
+    if !frontmatter_changed && !phase_cell_changed {
+        return Ok(Widened {
+            text: None,
+            added,
+            unchanged,
+            criterion_text,
+        });
+    }
+
+    if frontmatter_changed {
+        let seq = Value::Seq(
+            updated_footprint
+                .iter()
+                .map(|s| Value::Str(s.clone()))
+                .collect(),
+        );
+        doc.set(
+            &[Segment::Key("footprint".to_owned())],
+            seq,
+            CommentLoss::Refuse,
+        )
+        .map_err(WidenRefusal::DocRefusal)?;
+    }
+
+    let (new_body, _) = if phase_cell_changed {
+        update_phase_cell(body, phase_id, &phase_added)?
+    } else {
+        (body.to_string(), false)
+    };
+
+    let new_front_text = if frontmatter_changed {
+        String::from_utf8(doc.to_bytes()).map_err(|e| WidenRefusal::RereadFailed(e.to_string()))?
+    } else {
+        front.to_string()
+    };
+
+    let start = text
+        .find('\n')
+        .ok_or_else(|| WidenRefusal::FrontmatterMissing("no newline".to_owned()))?
+        + 1;
+    let closing_line_len = text[start + front.len()..]
+        .find('\n')
+        .map(|idx| idx + 1)
+        .unwrap_or(3);
+    let closing = &text[start + front.len()..start + front.len() + closing_line_len];
+    let full_text = format!(
+        "{}{}{}{}",
+        &text[..start],
+        new_front_text,
+        closing,
+        new_body
+    );
+
+    read_phase_table("plan.md", &new_body)
+        .map_err(|e| WidenRefusal::RereadFailed(format!("{phase_id}: {e}")))?;
+    read_plan("plan.md", &full_text)
+        .map_err(|e| WidenRefusal::RereadFailed(format!("{phase_id}: {e}")))?;
+
+    Ok(Widened {
+        text: Some(full_text),
+        added,
+        unchanged,
+        criterion_text,
+    })
+}
+
+fn find_acceptance_criterion(body: &str, criterion: u32) -> Result<String, WidenRefusal> {
+    let mut in_criteria = false;
+    let mut criteria_heading_level = 0;
+    let mut found_item = false;
+    let marker_dot = format!("{criterion}.");
+    let marker_paren = format!("{criterion})");
+
+    for line in body.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with('#') {
+            let level = trimmed.chars().take_while(|c| *c == '#').count();
+            let heading_text = trimmed[level..].trim().to_lowercase();
+            if heading_text.starts_with("acceptance criteria") {
+                in_criteria = true;
+                criteria_heading_level = level;
+                continue;
+            } else if in_criteria && level <= criteria_heading_level {
+                break;
+            }
+        }
+        if in_criteria {
+            if found_item {
+                let content = trimmed;
+                if !content.is_empty() && !content.starts_with('#') {
+                    return Ok(content.to_string());
+                }
+            } else {
+                let item_line = line.trim_start();
+                if let Some(rest) = item_line
+                    .strip_prefix(&marker_dot)
+                    .or_else(|| item_line.strip_prefix(&marker_paren))
+                {
+                    let first_line = rest.trim();
+                    if !first_line.is_empty() {
+                        return Ok(first_line.to_string());
+                    }
+                    found_item = true;
+                }
+            }
+        }
+    }
+    Err(WidenRefusal::CriterionNotFound(criterion))
+}
+
+fn update_phase_cell(
+    body: &str,
+    phase_id: &str,
+    to_add: &[String],
+) -> Result<(String, bool), WidenRefusal> {
+    if to_add.is_empty() {
+        return Ok((body.to_string(), false));
+    }
+    let raw_lines: Vec<&str> = body.split_inclusive('\n').collect();
+
+    let mut tables: Vec<(usize, usize)> = Vec::new();
+    let mut i = 0;
+    while i < raw_lines.len() {
+        if !raw_lines[i].trim_start().starts_with('|') {
+            i += 1;
+            continue;
+        }
+        let mut j = i;
+        while j < raw_lines.len() && raw_lines[j].trim_start().starts_with('|') {
+            j += 1;
+        }
+        if header_of(raw_lines[i]).iter().any(|h| h == "footprint") {
+            tables.push((i, j));
+        }
+        i = j;
+    }
+    let (i, j) = match tables.as_slice() {
+        [one] => *one,
+        _ => {
+            return Err(WidenRefusal::RereadFailed(format!(
+                "{phase_id}: table missing or ambiguous"
+            )))
+        }
+    };
+    let header = header_of(raw_lines[i]);
+    let footprint_col = header
+        .iter()
+        .position(|h| h == "footprint")
+        .ok_or_else(|| WidenRefusal::RereadFailed("column footprint missing".to_owned()))?;
+    let id_col = header
+        .iter()
+        .position(|h| h == "id")
+        .ok_or_else(|| WidenRefusal::RereadFailed("column id missing".to_owned()))?;
+
+    let mut target_row_idx = None;
+    for row_idx in (i + 2)..j {
+        let row_cells = cells(raw_lines[row_idx]);
+        if let Some(id_cell) = row_cells.get(id_col) {
+            if plain(id_cell) == phase_id {
+                target_row_idx = Some(row_idx);
+                break;
+            }
+        }
+    }
+
+    let Some(row_idx) = target_row_idx else {
+        return Err(WidenRefusal::PhaseNotFound(phase_id.to_owned()));
+    };
+
+    let line = raw_lines[row_idx];
+    let mut pipes = Vec::new();
+    let mut chars = line.char_indices().peekable();
+    while let Some((idx, c)) = chars.next() {
+        if c == '\\'
+            && chars
+                .peek()
+                .map(|(_, next_c)| *next_c == '|')
+                .unwrap_or(false)
+        {
+            chars.next();
+        } else if c == '|' {
+            pipes.push(idx);
+        }
+    }
+
+    if pipes.len() <= footprint_col + 1 {
+        return Err(WidenRefusal::RereadFailed(format!(
+            "{phase_id}: invalid table row formatting"
+        )));
+    }
+
+    let cell_start = pipes[footprint_col] + 1;
+    let cell_end = pipes[footprint_col + 1];
+    let cell_raw = &line[cell_start..cell_end];
+    let cell_trimmed = cell_raw.trim();
+
+    let backticked_add: Vec<String> = to_add.iter().map(|p| format!("`{p}`")).collect();
+    let add_str = backticked_add.join(", ");
+
+    let new_cell = if cell_trimmed.is_empty()
+        || cell_trimmed == "-"
+        || cell_trimmed == "—"
+        || cell_trimmed.eq_ignore_ascii_case("none")
+        || cell_trimmed.eq_ignore_ascii_case("n/a")
+    {
+        format!(" {add_str} ")
+    } else {
+        let trimmed_end = cell_raw.trim_end();
+        format!("{trimmed_end}, {add_str} ")
+    };
+
+    let new_line = format!("{}{}{}", &line[..cell_start], new_cell, &line[cell_end..]);
+    let mut result = String::new();
+    for (idx, l) in raw_lines.iter().enumerate() {
+        if idx == row_idx {
+            result.push_str(&new_line);
+        } else {
+            result.push_str(l);
+        }
+    }
+    Ok((result, true))
 }
 
 fn cut(text: &str, max: usize) -> &str {

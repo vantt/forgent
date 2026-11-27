@@ -1,0 +1,294 @@
+### cargo test -p fgos --bin fgos observe_query
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/agent-context-engine/rust)
+   Compiling pkm-lifecycle v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-start-context v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/agent-start-context/rust)
+   Compiling fgos-session-host v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/session-host/rust)
+   Compiling fgos-run-supervisor v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/run-supervisor/rust)
+   Compiling fgos-documentation v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/documentation/rust)
+   Compiling fgos-execution v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/execution/rust)
+   Compiling fgos-execution-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/execution/engine)
+   Compiling fgos v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/apps/fgos)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.55s
+     Running unittests src/main.rs (target/debug/deps/fgos-ae1b3e3424bcf018)
+
+running 5 tests
+test wiring::observe_query::tests::the_host_environment_embeds_the_same_declarations_the_registry_merges ... ok
+test wiring::observe_query::tests::the_payload_tree_is_the_resolved_release_root_and_absent_when_none_resolves ... ok
+test wiring::observe_query::tests::a_config_value_is_read_as_a_number_and_anything_else_is_named ... ok
+test wiring::observe_query::tests::a_source_stating_an_undeclared_kind_is_refused_by_name ... ok
+test wiring::observe_query::tests::every_kind_a_host_record_source_states_is_declared_by_the_embedded_list ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 593 filtered out; finished in 0.00s
+
+### exit=0
+### cargo test -p fgos-component-authority --test model_checks
+   Compiling serde_core v1.0.229
+   Compiling serde_json v1.0.151
+   Compiling hashbrown v0.17.1
+   Compiling syn v3.0.5
+   Compiling serde v1.0.229
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling indexmap v2.14.2
+   Compiling thiserror-impl v2.0.20
+   Compiling serde_derive v1.0.229
+   Compiling thiserror v2.0.20
+   Compiling saphyr-parser v0.2.2 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/yaml-doc/third-party/saphyr-parser-0.2.2)
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/yaml-doc/rust)
+   Compiling fgos-component-authority v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/component-authority/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.58s
+     Running tests/model_checks.rs (target/debug/deps/model_checks-5af3b8dd0b71dfde)
+
+running 23 tests
+test contract_guards_outside_the_schema_shapes_are_refused ... ok
+test a_path_without_a_trailing_slash_covers_only_that_file_and_the_longest_path_wins ... ok
+test two_components_claiming_the_same_longest_path_are_an_error_naming_both ... ok
+test synthetic_coverage_provider_and_path_existence_checks_fail_with_the_named_file_or_row ... ok
+test the_loader_refuses_a_component_row_missing_a_required_field ... ok
+test the_enum_constants_and_the_typed_row_fields_equal_the_schema ... ok
+test first_row_of_components_is_component_authority ... ok
+test canonical_and_aliases_are_unique_across_components_and_decision_kinds_case_insensitively ... ok
+test every_component_exception_path_exists_on_disk_and_resolves_to_the_component_that_declares_it ... ok
+test live_and_designed_contract_rows_name_an_existing_path ... ok
+test every_top_level_package_contract_file_and_every_prose_contract_has_exactly_one_row ... ok
+test contracts_rows_obey_the_enums_and_non_empty_rules_of_the_schema ... ok
+test every_parent_component_reference_exists_in_components ... ok
+test every_spec_source_and_decision_kind_narrative_path_exists_on_disk ... ok
+test component_ids_are_unique ... ok
+test a_provider_differing_from_the_longest_prefix_path_owner_carries_a_reason ... ok
+test every_model_row_obeys_the_enums_ranges_and_non_empty_rules_of_the_schema ... ok
+test every_decision_kind_owner_exists_in_components ... ok
+test every_contract_row_has_exactly_one_provider_that_exists_in_components ... ok
+test every_component_paths_entry_exists_on_disk ... ok
+test contract_id_canonical_and_aliases_are_unique_case_insensitively ... ok
+test every_contract_consumer_exists_in_components ... ok
+test layers_declare_the_layer_names_the_rules_and_the_ten_tier_names_the_model_uses ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+### exit=0
+### cargo test -p fgos-config --test authoring_equivalence
+   Compiling serde_json v1.0.151
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling syn v2.0.119
+   Compiling ahash v0.8.12
+   Compiling fgos-process v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/process/rust)
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/yaml-doc/rust)
+   Compiling jsonschema-value v0.60.0
+   Compiling referencing v0.60.0
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/canonical-json/rust)
+   Compiling strum_macros v0.28.0
+   Compiling fgos-host-runtime v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/host-runtime/rust)
+   Compiling fgos-identity v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/identity/rust)
+   Compiling strum v0.28.0
+   Compiling jsonschema v0.60.0
+   Compiling fgos-holder-lock v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/holder-lock/rust)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/config/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.89s
+     Running tests/authoring_equivalence.rs (target/debug/deps/authoring_equivalence-3dae29bd415b9577)
+
+running 9 tests
+test the_scrub_needles_still_catch_what_is_not_exactly_allowed ... ok
+test the_pinned_source_is_the_file_the_fixture_names ... ok
+test no_machine_or_owner_specific_string_is_in_the_standard_files ... ok
+test the_tier_ladder_renders_one_doc_line_per_tier_from_the_seat_binding_contract ... ok
+test the_real_runner_keys_sit_in_the_files_scopes_and_sensitivities_the_spec_gives_them ... ok
+test standard_files_plus_the_recorded_differences_read_back_as_the_tuned_config ... ok
+test each_exclusion_is_explained_by_a_named_behaviour ... ok
+test impact_analysis_resolves_to_gitnexus_here_and_to_no_provider_in_a_fresh_project ... ok
+test a_tier_cell_in_a_higher_layer_replaces_the_lower_layers_whole_cell_in_any_form ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+### exit=0
+### cargo test -p fgos-config --test registry_defaults
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1291:17
+     |
+1291 |     pub fn iter(&self) -> Iter<T> {
+     |                 ^^^^^     ^^^^^^^ the same lifetime is hidden here
+     |                 |
+     |                 the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+     = note: `#[warn(mismatched_lifetime_syntaxes)]` on by default
+help: use `'_` for type paths
+     |
+1291 |     pub fn iter(&self) -> Iter<'_, T> {
+     |                                +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1317:21
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<T> {
+     |                     ^^^^^^^^^     ^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1317 |     pub fn iter_mut(&mut self) -> IterMut<'_, T> {
+     |                                           +++
+
+warning: hiding a lifetime that's elided elsewhere is confusing
+    --> packages/yaml-doc/third-party/arraydeque-0.5.1/src/lib.rs:1497:21
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<T, CAP, B>
+     |                     ^^^^^^^^^               ^^^^^^^^^^^^^^^^ the same lifetime is hidden here
+     |                     |
+     |                     the lifetime is elided here
+     |
+     = help: the same lifetime is referred to in inconsistent ways, making the signature confusing
+help: use `'_` for type paths
+     |
+1497 |     pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, CAP, B>
+     |                                                   +++
+
+warning: `arraydeque` (lib) generated 3 warnings (run `cargo fix --lib -p arraydeque` to apply 3 suggestions)
+   Compiling fgos-config v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-0829-red-tests-before-release-p01/packages/config/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.45s
+     Running tests/registry_defaults.rs (target/debug/deps/registry_defaults-70debad4a7c608a0)
+
+running 3 tests
+test the_first_slice_global_only_paths_are_global_only_in_the_bundled_set ... ok
+test every_doc_line_in_a_bundled_standard_file_is_the_render_of_its_schema_node ... ok
+test standard_files_equal_what_setup_seeds_except_the_named_differences ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+### exit=0

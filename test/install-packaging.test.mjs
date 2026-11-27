@@ -26,7 +26,10 @@ function mkTemp(prefix) {
 // plan.md's discovery notes) — it legitimately exists already, so the
 // "source repo untouched" proof must be a byte-snapshot diff, not an
 // existence check. Mirrors coexistence-canary.test.mjs's snapshotTree idiom.
-function snapshotDir(root) {
+// A leaked path can only appear in a file written during the test, so only files whose mtime is at or after
+// `sinceMs` are read; a long-lived main checkout's .fgos holds tens of gigabytes that no write here touched.
+// Symlinks are never followed: a link to a directory is not a file to read.
+function snapshotDir(root, sinceMs = 0) {
   const out = new Map();
   if (!fs.existsSync(root)) return out;
   function walk(dir) {
@@ -36,6 +39,8 @@ function snapshotDir(root) {
         walk(full);
         continue;
       }
+      if (!entry.isFile()) continue;
+      if (fs.statSync(full).mtimeMs < sinceMs) continue;
       out.set(path.relative(root, full), fs.readFileSync(full));
     }
   }
@@ -72,6 +77,7 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd ref
   // Three separate scratch dirs, per the cell's proof design: pack output,
   // install --prefix, and a fresh external cwd distinct from the repo, the
   // pack scratch dir, and the install prefix.
+  const startedMs = Date.now() - 1000;
   const packDir = mkTemp('fgos-pack-');
   const installPrefix = mkTemp('fgos-install-');
   const externalCwd = mkTemp('fgos-external-');
@@ -171,7 +177,7 @@ test('e2e: npm pack -> npm install -g -> fgos init from a fresh external cwd ref
     assert.equal(fs.existsSync(externalFgosDir), false, 'a refused init must not create .fgos/ in the external cwd');
     assert.equal(fs.existsSync(path.join(installPrefix, '.fgos')), false, '.fgos/ must not be created inside the install prefix');
 
-    const repoFgosAfter = snapshotDir(path.join(REPO_ROOT, '.fgos'));
+    const repoFgosAfter = snapshotDir(path.join(REPO_ROOT, '.fgos'), startedMs);
     assertNoLeakedPaths(repoFgosAfter, [externalCwd, installPrefix, packDir], 'fgos init from the external cwd');
   } finally {
     fs.rmSync(packDir, { recursive: true, force: true });

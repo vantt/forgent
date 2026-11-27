@@ -81,6 +81,25 @@ export function repositoryFiles(repoRoot, inspect) {
   const top = fs.realpathSync(facts.worktreeRoot);
   const prefix = path.relative(top, fs.realpathSync(repoRoot)).replaceAll('\\', '/');
   const under = (rel) => (prefix === '' ? rel : rel.startsWith(`${prefix}/`) ? rel.slice(prefix.length + 1) : null);
+  // A paged read whose index moves underneath it (another session lands mid-read) is refused
+  // `inspect-cursor-stale`; the whole read restarts so the set always comes from one index.
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return readRepositoryFiles(inspect, under);
+    } catch (error) {
+      if (attempt >= STALE_CURSOR_ATTEMPTS || !isStaleCursor(error)) throw error;
+    }
+  }
+}
+
+const STALE_CURSOR_ATTEMPTS = 5;
+
+function isStaleCursor(error) {
+  const text = `${error?.cause ?? ''} ${error?.message ?? ''}`;
+  return text.includes('inspect-cursor-stale');
+}
+
+function readRepositoryFiles(inspect, under) {
   const files = new Set();
   const add = (bytes) => { const rel = under(Buffer.from(bytes).toString('utf8')); if (rel) files.add(rel); };
   let cursor;

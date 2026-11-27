@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A running plan widens its own footprint through one verb, inside the approved acceptance criteria"
-status: running
+status: done
 priority: P0
 blockedBy: []
 base: b6b8681d2325f431be369175233c45180acef5c3
@@ -13,6 +13,7 @@ footprint:
   - apps/fgos/tests/supervision_verbs.rs
   - packages/host-runtime/contracts/command-manifest.json
   - src/cli/command-registry.mjs
+  - packages/host-runtime/contracts/command-routes.json
   - src/session-host/head-request.mjs
   - test/session-host/head-request.test.mjs
   - packages/session-host/contracts/head-permissions.v1.json
@@ -32,6 +33,8 @@ lead: head:lead-forgent-261127-0143-widen-cf3f1
 ---
 
 # A running plan widens its own footprint through one verb
+
+> **Footprint widened (lead:SUPERVISOR for the owner's P0 order, 2026-11-27 09:10):** phase 1 adds `packages/host-runtime/contracts/command-routes.json`, the generated route file that `node scripts/export-command-selectors.mjs` rewrites when the widen verb joins `src/cli/command-registry.mjs` (event 94e5e8bbb3d2cd7d).
 
 ## Outcome
 
@@ -131,9 +134,9 @@ priority P1 (after the eight goal plans), narrow footprint, built on the warning
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Widen verb in the supervision host](phase-01-widen-verb.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs | 1 | ready |
-| 2 | [Lead route and permission rows](phase-02-lead-route.md) | 1 | src/session-host/head-request.mjs, test/session-host/head-request.test.mjs, packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs | 2 | ready |
-| 3 | [Spec, skills, changelog and integration](phase-03-docs-and-integration.md) | 2 | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-lead/SKILL.md, core/skills/fgos-supervisor/SKILL.md, changelog.d/261127-0143-a-running-plan-widens-its-own-footprint.md, plans/261127-0143-widen-running-plan-footprint/reports/** | 3 | ready |
+| 1 | [Widen verb in the supervision host](phase-01-widen-verb.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/portfolio.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, packages/host-runtime/contracts/command-manifest.json, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json | 1 | done |
+| 2 | [Lead route and permission rows](phase-02-lead-route.md) | 1 | src/session-host/head-request.mjs, test/session-host/head-request.test.mjs, packages/session-host/contracts/head-permissions.v1.json, packages/session-host/rust/tests/permissions.rs, packages/run-supervisor/contracts/head-request.v1.json, packages/run-supervisor/rust/tests/head_request.rs | 2 | done |
+| 3 | [Spec, skills, changelog and integration](phase-03-docs-and-integration.md) | 2 | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, core/skills/fgos-lead/SKILL.md, core/skills/fgos-supervisor/SKILL.md, changelog.d/261127-0143-a-running-plan-widens-its-own-footprint.md, plans/261127-0143-widen-running-plan-footprint/reports/** | 3 | done |
 
 Phases 1 and 2 are `code:implement`, each reviewed (`code:review`) before it lands. Phase 3 is `code:implement` for
 the text then `code:test` for the integration gate. The phases are serial: the lead route calls the host verb, and

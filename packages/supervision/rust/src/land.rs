@@ -26,6 +26,8 @@ use std::process::{Command, Stdio};
 
 /// Failed fetch/push retries after the first attempt before `land-retries-exhausted`.
 const MAX_RETRIES: u32 = 3;
+/// The Cargo target every land command builds into, under the main checkout: it outlives each candidate.
+pub const LAND_CARGO_TARGET: &str = ".fgos/runtime/land/cargo-target";
 /// Bytes of a failing command's output kept in a refusal.
 const TAIL_BYTES: usize = 4096;
 /// Lines of a failing command's output that name a failure, kept in a refusal.
@@ -643,7 +645,15 @@ impl<'r> DoorWrites<'r> {
 
 enum Attempt {
     Landed(LandOutcome),
-    RemoteMoved,
+    /// The remote moved first. `Some` when this attempt had already passed its gates: the next attempt may reuse
+    /// them if the trunk moves only outside every gate and the regeneration.
+    RemoteMoved(Option<Gated>),
+}
+
+/// The gates one attempt passed, and the trunk it passed them on.
+struct Gated {
+    target: Oid,
+    gates_run: Vec<String>,
 }
 
 impl Lander<'_> {
@@ -1080,10 +1090,17 @@ impl Lander<'_> {
             Ok(file)
         };
         let file = open().map_err(|e| refuse(code, format!("{shown}: output log: {e}")))?;
+        // Every land builds against one Cargo target that outlives its candidate checkout, so the crates it
+        // already built are not built again; a caller that names its own target keeps it.
+        let shared = self.ports.repo.trusted_main_root().join(LAND_CARGO_TARGET);
+        let run = format!(
+            "[ -n \"$CARGO_TARGET_DIR\" ] || export CARGO_TARGET_DIR={}; {command}",
+            shell_quote(&shared.to_string_lossy())
+        );
         let ok = self
             .ports
             .runner
-            .run(cwd, command, &file)
+            .run(cwd, &run, &file)
             .map_err(|e| refuse(code, format!("{shown}: {e}")))?;
         if ok {
             // A command that passed leaves no log; only the failing one is kept.
@@ -1107,19 +1124,26 @@ impl Lander<'_> {
     fn land_branch(&self, command: &LandCommand, branch: &str) -> Result<LandOutcome, LandRefusal> {
         let target = self.target_branch(command)?;
         let mut retries = 0;
+        let mut gated: Option<Gated> = None;
         loop {
-            match self.branch_attempt(command, branch, &target, retries)? {
+            match self.branch_attempt(command, branch, &target, retries, gated.as_ref())? {
                 Attempt::Landed(mut outcome) => {
                     self.clean_landed_worktree(branch, &target, &mut outcome);
                     return Ok(outcome);
                 }
-                Attempt::RemoteMoved if retries >= MAX_RETRIES => {
+                Attempt::RemoteMoved(_) if retries >= MAX_RETRIES => {
                     return Err(refuse(
                         "land-retries-exhausted",
                         format!("the remote moved on every one of {} attempts", retries + 1),
                     ))
                 }
-                Attempt::RemoteMoved => retries += 1,
+                Attempt::RemoteMoved(passed) => {
+                    retries += 1;
+                    // An attempt that lost the race before its gates keeps what an earlier one passed.
+                    if passed.is_some() {
+                        gated = passed;
+                    }
+                }
             }
         }
     }
@@ -1212,6 +1236,7 @@ impl Lander<'_> {
         branch: &str,
         target_branch: &str,
         retries: u32,
+        gated: Option<&Gated>,
     ) -> Result<Attempt, LandRefusal> {
         let p = self.ports;
         let dest = format!("refs/heads/{target_branch}");
@@ -1275,7 +1300,7 @@ impl Lander<'_> {
             Ok(prepared) => prepared,
             // Another land took the slot first and moved the target: start over from a fresh fetch.
             Err(refusal) if refusal.code == "land-target-changed" => {
-                return Ok(Attempt::RemoteMoved)
+                return Ok(Attempt::RemoteMoved(None))
             }
             Err(refusal) => return Err(refusal),
         };
@@ -1285,6 +1310,7 @@ impl Lander<'_> {
             (&source, &target, &dest, target_branch),
             &mut live,
             retries,
+            gated,
         );
         if let Some((session, id)) = live.take() {
             // Nothing may stay pending after a refusal or a lost race: the door settles its own
@@ -1330,6 +1356,7 @@ impl Lander<'_> {
         (source, target, dest, target_branch): (&Oid, &Oid, &str, &str),
         live: &mut Option<(fgos_git::LandSession, String)>,
         retries: u32,
+        gated: Option<&Gated>,
     ) -> Result<Attempt, LandRefusal> {
         let p = self.ports;
         let no_candidate = || {
@@ -1338,7 +1365,9 @@ impl Lander<'_> {
                 "no candidate; run `fgos git recover`",
             )
         };
+        let reused = self.reusable(gated, target)?;
         let regenerates = match &self.config.regenerate {
+            _ if reused.is_some() => false,
             Some(regen) if !regen.when.is_empty() => {
                 let (session, _) = live.as_ref().ok_or_else(no_candidate)?;
                 let candidate = session.candidate().ok_or_else(no_candidate)?;
@@ -1372,14 +1401,20 @@ impl Lander<'_> {
         let candidate_oid = oid_of(p.repo, &candidate.candidate)?;
         let changed = self.changed_paths(target, &candidate_oid)?;
         self.check_tests(&candidate.worktree, &command.tests)?;
-        let mut gates_run = Vec::new();
-        self.run_gates(
-            &candidate.worktree,
-            &changed,
-            &command.tests,
-            &mut gates_run,
-            session_id,
-        )?;
+        let gates_run = match reused {
+            Some(passed) => passed,
+            None => {
+                let mut gates_run = Vec::new();
+                self.run_gates(
+                    &candidate.worktree,
+                    &changed,
+                    &command.tests,
+                    &mut gates_run,
+                    session_id,
+                )?;
+                gates_run
+            }
+        };
         // A gate that changed tracked or staged candidate bytes means the gated tree is not the
         // candidate: refuse before anything reaches the remote.
         self.require_clean_candidate(&candidate)?;
@@ -1388,7 +1423,12 @@ impl Lander<'_> {
         // other outcome leaves the session unsettled for `fgos git recover`.
         match self.push_candidate(session, target_branch) {
             Ok(true) => {}
-            Ok(false) => return Ok(Attempt::RemoteMoved),
+            Ok(false) => {
+                return Ok(Attempt::RemoteMoved(Some(Gated {
+                    target: target.clone(),
+                    gates_run,
+                })))
+            }
             Err(refusal) => return Err(self.unsettled(live, refusal)),
         }
         let digest = Sha256::digest(format!("{}\n{}", candidate.candidate, gates_run.join("\n")));
@@ -1424,6 +1464,37 @@ impl Lander<'_> {
             worktrees_kept: Vec::new(),
             worktree_list_error: None,
         }))
+    }
+
+    /// The gates an earlier attempt passed, when this attempt may land on them: the trunk moved since only by paths
+    /// that no gate's `when` and no regeneration's `when` names. A gate with no `when` names every path, so any move
+    /// runs the gates again, as does a move of a path a gate or the regeneration names.
+    fn reusable(
+        &self,
+        gated: Option<&Gated>,
+        target: &Oid,
+    ) -> Result<Option<Vec<String>>, LandRefusal> {
+        let Some(gated) = gated else { return Ok(None) };
+        let moved = self.changed_paths(&gated.target, target)?;
+        if let Some(regen) = &self.config.regenerate {
+            if self.any_matches(&moved, &regen.when)? {
+                return Ok(None);
+            }
+            // A regenerated file the trunk moved is one only the regeneration may settle.
+            for path in &moved {
+                let regenerated = fgos_write_scope::matches(path.as_bytes(), &self.regen_files)
+                    .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
+                if regenerated {
+                    return Ok(None);
+                }
+            }
+        }
+        for gate in &self.config.gates {
+            if self.any_matches(&moved, &gate.when)? {
+                return Ok(None);
+            }
+        }
+        Ok(Some(gated.gates_run.clone()))
     }
 
     fn merge_base(&self, target: &Oid, source: &Oid) -> Result<Oid, LandRefusal> {
@@ -2419,7 +2490,15 @@ impl Lander<'_> {
         // retries from a fresh sync.
         // A push that failed without an answer may have reached the remote: that commit stays, named,
         // for the next land's sync to find on origin or for a person.
-        if !self.push_local(target, held()?)? {
+        // A push the door refused before sending anything left the remote untouched: undo it too.
+        let pushed = match self.push_local_door(target, held()?) {
+            Ok(pushed) => pushed,
+            Err((code, refusal)) if code != ResultCode::RemoteOutcomeUnknown => {
+                return Err(unpublished(refusal));
+            }
+            Err((_, refusal)) => return Err(refusal),
+        };
+        if !pushed {
             let refusal = refuse(
                 "land-paths-push-rejected",
                 format!(
@@ -2482,8 +2561,21 @@ impl Lander<'_> {
 
     /// Push the local target branch itself; `false` when the remote rejected it as non-fast-forward.
     fn push_local(&self, branch: &str, held: Vec<BorrowedHandle<'_>>) -> Result<bool, LandRefusal> {
+        self.push_local_door(branch, held)
+            .map_err(|(_, refusal)| refusal)
+    }
+
+    /// `push_local`, with the Git door's code kept on a refusal so a caller can tell a push refused
+    /// before anything was sent from one whose outcome is unknown.
+    fn push_local_door(
+        &self,
+        branch: &str,
+        held: Vec<BorrowedHandle<'_>>,
+    ) -> Result<bool, (ResultCode, LandRefusal)> {
         let p = self.ports;
-        let name = ref_name(&format!("refs/heads/{branch}"))?;
+        let name = ref_name(&format!("refs/heads/{branch}"))
+            // Nothing was sent yet, so this is a pre-send refusal: the caller undoes the commit.
+            .map_err(|r| (ResultCode::Refused, r))?;
         let receipt = p
             .git
             .push_refs(
@@ -2497,13 +2589,13 @@ impl Lander<'_> {
                 p.writer,
                 &self.id(),
             )
-            .map_err(from_git)?;
+            .map_err(|e| (e.code, from_git(e)))?;
         match receipt.remote {
             Remote::Acknowledged => Ok(true),
             Remote::Rejected => Ok(false),
-            _ => Err(refuse(
-                "land-remote-outcome-unknown",
-                "the push outcome is unknown",
+            _ => Err((
+                ResultCode::RemoteOutcomeUnknown,
+                refuse("land-remote-outcome-unknown", "the push outcome is unknown"),
             )),
         }
     }
