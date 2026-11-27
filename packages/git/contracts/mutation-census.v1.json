@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "0f9d9eed04575f044c378b988512690a3a281f86056f5b6ddbe9a2a97b10dddd",
+  "payloadDigest": "0179db1789d7745b9867b4dcd8b4b4a793972276ecc1521af2e32a0d4614330f",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -203,7 +203,7 @@
     "apps/fgos/tests/attention_definitions.rs": "81db902eb0d8bf5515f7574bcf4b13f61db680dc0d569f4db55b4271e4df9a54",
     "apps/fgos/tests/authority.rs": "00cbf011cb50775ca81a79a7fc82bf900547acab89c95149d947387c5f5e915a",
     "apps/fgos/tests/cli_tests.rs": "8b7c32078e828bb11e095e98b62bd65ecef6d4590e1ce6d8b1ec8eb5240ef988",
-    "apps/fgos/tests/context_engine.rs": "92d4941d9b51765adb27dc13aa115938dfb67eb4d29b28a621198f1694ae9e7e",
+    "apps/fgos/tests/context_engine.rs": "d16462021b544c194ca070a3af2ad0a03cfeafda36fc63a70bd1ed9170197aa0",
     "apps/fgos/tests/doc_locate.rs": "96f6b44203e68a196cddac862580f335317265d316b111625c9736e8dbdeacc1",
     "apps/fgos/tests/driving_definitions.rs": "fa31e9456150a2e8038d54916be5b2373b434cb3521a2d97afb02219815c20a5",
     "apps/fgos/tests/git_recover_confirm_dead.rs": "baecaec991cbaa1833c279f0f1ed6f1e17423c2198eea6e171285f14f51662c6",
