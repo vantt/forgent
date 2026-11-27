@@ -11,7 +11,7 @@ import { FAKE_HERDR, bwrapUsable, createTerminalProject, noHost, readJson, waitU
 
 const projects = [];
 after(() => { for (const project of projects) project.stop(); });
-const newProject = async (name, options = {}) => { const project = await createTerminalProject({ name, ...options }); projects.push(project); return project; };
+const newProject = async (name, options = {}) => { const project = await createTerminalProject({ name, confined: true, ...options }); projects.push(project); return project; };
 
 /** Drive one attempt to its end the way a person-less CLI would: brief typed, taken, result written, agent leaves. */
 async function finishAttempt(project, run) {
