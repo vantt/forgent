@@ -2,10 +2,10 @@
 contract: plan-v1
 title: "Component authority declares four layerings as data, with fixed rule kinds in code"
 description: "Step A of CAS-D5: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; layering values sit on component rows under the layering id; the architecture checks run per fixed rule kind (order-downward, isolation, port-wiring) read from the model; no hardcoded layer or tier list remains."
-status: ready
+status: running
 priority: P2
 blockedBy: []
-base: 25f849e9d001553a9ade2883704fa1b51cea8b43
+base: c37f38d84ffd165e2defd603bc07614faae50091
 source:
   - plans/discussions/ds-zfqskcns7j-component-authority-scope-and-levels/DISCUSSION.md
   - p-adv35azsca
@@ -30,6 +30,7 @@ footprint:
   - docs/platform/workflow/spec.md
   - docs/platform/vision.md
   - CHANGELOG.md
+lead: head:lead-forgent-261127-1247-compon-477ba
 ---
 
 # Component authority declares four layerings
