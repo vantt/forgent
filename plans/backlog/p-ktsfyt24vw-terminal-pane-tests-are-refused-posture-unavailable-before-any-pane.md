@@ -1,7 +1,7 @@
 ---
 id: p-ktsfyt24vw
 title: "The herdr pane-lifecycle tests are refused posture-unavailable before any pane starts (run-supervisor, priority medium; source: start-context lead, fg-server, 2026-11-27)"
-status: proposed
+status: done
 priority: P2
 area: run-supervisor
 created: 2026-11-27
@@ -54,4 +54,11 @@ Left, each needing its case redesigned for confinement:
   confined case does.
 - Three cases (never started, limit screen, trust prompt) now fail on their own assertions about the run's exit.
 - One case (`invocations[]` declared flat) still waits for the brief.
+
+# Done (2026-11-27, fg-server)
+
+The remaining cases were adapted, and `terminal-cutover` (10 of 10) and `terminal-crash-matrix` pass:
+- the agent's notes are read while the run is live;
+- the never-started, limit-screen and trust-prompt cases assert the run door's documented exit codes (11, 10, 13);
+- an executor declared by `invocations[]` gives the harness its first invocation's fields.
 

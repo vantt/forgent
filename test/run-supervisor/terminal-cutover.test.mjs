@@ -16,18 +16,20 @@ const newProject = async (name, options = {}) => { const project = await createT
 /** Drive one attempt to its end the way a person-less CLI would: brief typed, taken, result written, agent leaves. */
 async function finishAttempt(project, run) {
   const brief = await project.waitBriefTyped();
+  // A confined agent writes its notes in its private home, which settlement removes: read them while it runs.
+  const agent = await waitUntil(() => project.agentEnv(), { what: 'the agent to start' });
   project.briefTaken();
   const resultPath = project.writeResult(brief);
   await waitUntil(() => project.sent().some((s) => s.kind === 'prompt' && s.text === '/exit'), { what: 'the exit command typed after the result' });
   project.letAgentExit();
   const exit = await Promise.race([run.exited, waitUntil(() => false, { timeoutMs: 90_000, what: 'the controller to settle' })]);
-  return { brief, resultPath, exit };
+  return { brief, resultPath, exit, agent };
 }
 
 test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervisor, pane closed once, settled by the step', { skip: noHost, timeout: 180_000 }, async () => {
   const project = await newProject('life');
   const run = project.startController();
-  const { brief, exit } = await finishAttempt(project, run);
+  const { brief, exit, agent } = await finishAttempt(project, run);
   assert.equal(exit.code, 0, JSON.stringify(run.output()));
   const answer = run.answer();
   assert.equal(answer?.ok, true, JSON.stringify(run.output()));
@@ -48,7 +50,7 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
   assert.equal(fs.readFileSync(envelope.launch.briefPath, 'utf8').trim(), brief.trim());
 
   // A claude REPL is given the run directory as a working directory, the one place its brief lives.
-  const argv = project.agentEnv().argv;
+  const argv = agent.argv;
   assert.equal(argv[argv.indexOf('--add-dir') + 1], attemptDir);
   assert.equal(argv.filter((arg) => arg === '--add-dir').length, 1, 'only the run directory is added');
   assert.equal(project.callsStarting('pane close').length, 1, 'exactly one pane close');
@@ -60,11 +62,10 @@ test('a herdr-spawn seat runs as a terminal attempt: brief typed by the supervis
 test('the agent runs as the attempt: its writer id is minted from the attempt, the controller\'s session ids, pane variables and every name outside the worker allowlist never reach it', { skip: noHost, timeout: 180_000 }, async () => {
   const project = await newProject('ident');
   const run = project.startController({ env: { CLAUDE_CODE_SESSION_ID: 'parent-session', CODEX_THREAD_ID: 'parent-thread', HERDR_PANE_ID: 'cockpit:p1', TERM: 'xterm-256color', CANARY_SECRET: 'x', CLAUDE_CODE_MESSAGING_TOKEN: 'x', CLAUDE_CODE_CHILD_SESSION: '1', SOME_PROVIDER_API_KEY: 'x' } });
-  const { exit } = await finishAttempt(project, run);
+  const { exit, agent } = await finishAttempt(project, run);
   assert.equal(exit.code, 0, JSON.stringify(run.output()));
 
   const envelope = readJson(path.join(project.attemptDir(), 'envelope.json'));
-  const agent = project.agentEnv();
   const canary = (names) => names.filter((name) => ['CANARY_SECRET', 'SOME_PROVIDER_API_KEY'].includes(name) || /^CLAUDE_CODE_|TOKEN$|_KEY$/.test(name));
   assert.deepEqual(canary(agent.envNames), [], 'a pane seat starts from the allowlist, not from the controller environment');
   assert.equal(agent.env.FGOS_SESSION_ID, `att-${envelope.attemptId}`);
@@ -102,7 +103,7 @@ test('an agent that never started settles as a failed attempt with a named reaso
   project.setFlag('no-process');
   const run = project.startController();
   const exit = await run.exited;
-  assert.equal(exit.code, 0, JSON.stringify(run.output()));
+  assert.equal(exit.code, 11, JSON.stringify(run.output())); // fgos run: 11 is an execution failure
   const { result } = run.answer();
   assert.equal(result.classification.execution.status, 'failed');
   assert.match(result.runnerNote.summary, /abandoned-not-started: the agent never received its brief/);
@@ -119,7 +120,7 @@ test('a pane stopped on the provider\'s own limit screen settles as a provider l
   project.setScreen("■ You've hit your usage limit. Upgrade to Pro or try again at 11:40 PM.\n");
   const run = project.startController();
   const exit = await run.exited;
-  assert.equal(exit.code, 0, JSON.stringify(run.output()));
+  assert.equal(exit.code, 10, JSON.stringify(run.output())); // fgos run: 10 is a provider limit
   const { result } = run.answer();
   assert.equal(result.classification.failure.code, 'provider-limit', JSON.stringify(result.classification));
   assert.equal(result.classification.failure.family, 'provider');
@@ -131,7 +132,7 @@ test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and 
   project.setVerdict('blocked');
   project.setScreen('  Trust this folder? Codex can read, edit, and run files here.\n› 1. Trust and continue\n  2. Back to Agent Command Center\n');
   const run = project.startController();
-  assert.equal((await run.exited).code, 0, JSON.stringify(run.output()));
+  assert.equal((await run.exited).code, 13, JSON.stringify(run.output())); // fgos run: 13 is blocked
   const { result } = run.answer();
   assert.equal(result.classification.failure.code, 'blocked');
   assert.equal(result.classification.outcome.category, 'blocked');
