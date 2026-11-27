@@ -485,6 +485,7 @@
         "help",
         "draft",
         "draft-file",
+        "exact",
         "area",
         "question",
         "eval"

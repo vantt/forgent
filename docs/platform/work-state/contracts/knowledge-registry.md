@@ -229,9 +229,11 @@ mode: explanation
 
 `docPath` in new attestations must equal the document's `currentPath`. Old capture events remain unchanged and are resolved through aliases.
 
+`doc.attest` also accepts an optional `locate`, written by `fgos knowledge attest ... --locate-file <path>`: the writer's locate decision (document identity 8.1 step 6) to grow this document. It has the shape of the handoff's `locate` (section 7.5), and the view keeps it as `decision: grow` per capture under `attestsByCapture[captureId]`. The attested document's own candidate (its `currentPath`) needs no `why_not`; every other candidate does. An event without `locate` replays exactly as before.
+
 ### 7.5 Handoff
 
-A handoff records that a retrospective item stated a claim no existing unit carries, and that the claim's material went to an admission request work item instead of a new document. It is the completion path [write door §6.4](../../documentation/subcomponents/write-door/spec.md#64-the-retrospective-writer) names. The event is `capture.handoff`, written by `fgos knowledge handoff --capture-id <id> --request <requestId> --claim <text> --material-file <path> --locate-file <path>`; the material and the locate result come from files, so no drafted text is spliced into a shell command.
+A handoff records that a retrospective item stated a claim no existing unit carries, and that the claim's material went to an admission request work item instead of a new document. It is the completion path [write door §6.4](../../documentation/subcomponents/write-door/spec.md#64-the-retrospective-writer) names. The event is `capture.handoff`, written by `fgos knowledge handoff --capture-id <id> --request <requestId> --claim <text> --material-file <path> --locate-file <path> [--decision create|no-place]`; the material and the locate result come from files, so no drafted text is spliced into a shell command.
 
 A handoff records:
 
@@ -239,6 +241,7 @@ A handoff records:
 captureId: tsk-123          # the retrospective item
 requestId: tsk-456          # the admission request work item
 claim: Reclaim keeps the branch of a merged worktree.
+decision: create            # create (default; an older event reads as create) or no-place
 material: <the drafted text the writer would have written>
 locate:
   query: reclaim keeps branch
@@ -247,6 +250,12 @@ locate:
       section: Reclaim > Branches   # optional, kept as given
       why_not: covers deletion, not keeping
   places: [docs/worktree-reclaim/]  # optional, kept as given
+  mentions:                         # optional; the literal hits of locate, each with how it was handled
+    - path: docs/worktree-reclaim/other.md
+      section: Reclaim              # optional
+      missedBySearch: true
+      handling: updated             # updated | unaffected | too-common
+      note: ...                     # required when handling is too-common
 ```
 
 Rules:
@@ -256,6 +265,8 @@ Rules:
 3. The material lives once, in this event; the request item's text links to it.
 4. One item may hand off several claims. The view keeps every handoff per capture under `handoffsByCapture`.
 5. The cleanup gate accepts a handoff as retrospective content while its request item still exists. A handoff whose request item is gone is not accepted.
+6. `decision` is `create` or `no-place`; any other value is refused. These fields, and `locate` on `doc.attest`, are the writer's locate decision of document identity 8.1 step 6. Replay of older events is unchanged.
+7. `locate.mentions` is optional on both `capture.handoff` and `doc.attest`. A mention needs `path`, a boolean `missedBySearch` and a `handling` of `updated`, `unaffected` or `too-common`; `too-common` needs a `note`. A mention without a valid `handling` is refused, naming its path. The verbs cannot check the list against the locate answer: that the list is complete is the writer's claim, not a checked fact.
 
 ## 8. Producer Enforcement
 

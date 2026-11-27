@@ -5385,6 +5385,10 @@
                 "type": "string",
                 "description": "A file holding one draft part (repeatable)."
               },
+              "exact": {
+                "type": "string",
+                "description": "A literal string to list every section that contains it (repeatable)."
+              },
               "area": {
                 "type": "string",
                 "description": "Guessed area value (repeatable): a folder under docs/platform/ with a spec.md, or \"platform\"."
@@ -5403,6 +5407,7 @@
           "examples": [
             "fgos doc locate --draft \"A worktree with live uncommitted work must not be reclaimed.\" --json",
             "fgos doc locate --draft-file draft.md --area git --question current-truth",
+            "fgos doc locate --draft \"A worktree with live uncommitted work must not be reclaimed.\" --exact worktree-reclaim",
             "fgos doc locate --eval docs/platform/documentation/subcomponents/document-identity/verification/recall/locate-gold-short.yaml --json"
           ]
         },
@@ -5717,7 +5722,15 @@
           },
           "locate-file": {
             "type": "string",
-            "description": "JSON file with the locate result: {query, candidates: [{path, section?, why_not}], places?} (handoff)."
+            "description": "JSON file with the writer's locate decision: {query, candidates: [{path, section?, why_not}], places?, mentions?: [{path, section?, missedBySearch, handling: updated|unaffected|too-common, note?}]}. Required for handoff; optional for attest, where it records decision grow and the attested document's own candidate needs no why_not. The verbs cannot check the mention list against the locate answer."
+          },
+          "decision": {
+            "type": "string",
+            "description": "The writer's decision on a handoff: create (default) or no-place.",
+            "enum": [
+              "create",
+              "no-place"
+            ]
           }
         },
         "required": []
@@ -5725,7 +5738,8 @@
       "examples": [
         "fgos knowledge status",
         "fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123",
-        "fgos knowledge handoff --capture-id tsk-123 --request tsk-456 --claim \"Reclaim keeps the branch\" --material-file material.md --locate-file locate.json"
+        "fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123 --locate-file locate.json",
+        "fgos knowledge handoff --capture-id tsk-123 --request tsk-456 --claim \"Reclaim keeps the branch\" --material-file material.md --locate-file locate.json --decision create"
       ],
       "touchesState": true,
       "externalEffect": false,
