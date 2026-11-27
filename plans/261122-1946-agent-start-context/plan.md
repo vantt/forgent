@@ -249,6 +249,17 @@ Result:
   finish..." (`test/scripts/mailbox-live-confined.test.mjs`), passes 19 of 19 when run alone, three times out of
   three: a timing race under full-suite load, not a defect.
 
+Final gate (2026-11-27 13:00, fg-server, main at `22a23e5d7`), green to the letter: `npm test` exits 0, with 6,545
+pass and 0 fail of 6,572; `cargo test --workspace` exits 0. The last failures were fixed at their cause:
+- `case-close`: the concurrent prune races in `src/workflow/case-close.mjs`;
+- the `.fgos` write witness: it now sees directories that `mkdtemp` makes;
+- the supervisor flag-drift test: it now reads the `widen` parser;
+- the config fixture: a duplicate entry removed;
+- the head-request host exec: it now waits out ETXTBSY.
+
+The owner chose to activate only on a green gate. Release `b6eb617b59e0` was built from this main and activated on
+fg-server. Its four red doctor rows (hook wiring, a missing tool, `tsk-5db`, provider quarantine) predate both plans.
+
 ### Progress (fg-server, 2026-11-27)
 
 Started on the owner's instruction of 2026-11-27 00:0x ("hoàn tất ... 261122-1946-agent-start-context"), which is taken
