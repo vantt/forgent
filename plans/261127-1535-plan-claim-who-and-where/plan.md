@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Claiming a plan: who runs it, on which machine, recorded on origin at once"
 description: "A plan's host field on origin is the one placement record. Admission on machine M admits only a plan whose host is absent or M, writes host with status running, and never leaves its commit unpushed: a paths land undoes its commit when the push is refused before sending, and a catch-up pushes this checkout's own leftover land commit. Running plans of another machine are never restarted here."
-status: draft
+status: ready
 priority: P1
 host: fg-server-sqs7es
 blockedBy: []
