@@ -339,6 +339,11 @@ impl Terminal {
         self.profile.pinned_version
     }
 
+    /// The pause between typing a line and pressing Enter.
+    pub fn enter_gap_ms(&self) -> u64 {
+        self.profile.enter_gap_ms
+    }
+
     pub fn exit_command(&self) -> ExitCommand {
         self.profile.exit
     }

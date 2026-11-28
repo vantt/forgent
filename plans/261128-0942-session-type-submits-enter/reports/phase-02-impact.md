@@ -12,3 +12,18 @@ GitNexus MCP tools were not available in this session, so the blast radius is fr
 
 Affected flow: the mailbox typed wake now waits the profile's `enter_gap_ms` (codex 600 ms, others 300 ms) and
 confirms the submit through `Terminal::confirm_submitted`; the mailbox's own rules and channel selection are unchanged.
+
+Latency. Typing a wake line used to end at its Enter (about 300 ms per CLI, 600 ms for codex, the profile's
+`enter_gap_ms`); it now goes on to `Terminal::confirm_submitted`, so a send can press Enter again and wait while the
+CLI shows working. The bounds it can spend, read in `packages/agent-protocol/rust/src/terminal/common.rs`, are:
+`SUBMIT_ENTER_EVERY_MS` 2500 ms between retried Enters, at most `SUBMIT_MAX_ENTERS` 6 of them (about 15 s of
+retrying), `SUBMIT_NO_DRAFT_POLLS` 4 consecutive draft-free looks at `POLL_MS` 700 ms before a quiet composer is
+judged, `SUBMIT_WORKING_MS` 8000 ms of continuous working counting as taken, all inside the `SUBMIT_CONFIRM_MS`
+60 s deadline. Worst-case mailbox send latency therefore rises from about 300 ms to about 15 s (up to the 60 s
+outer deadline if the CLI never confirms). Mailbox rules and channel selection are unchanged: the same line is sent
+on the same channel, only the confirmation of the submit is stricter.
+
+The wiring proof in `apps/fgos/tests/supervision_verbs.rs` is weaker than the typed wake's own proof: the fake pane
+serves one static screen that already holds the line, so `confirm_submitted` answers `Delivered` through
+`brief_echoed` without the screen ever changing. It proves the verb reaches the shared pane call and submits, not
+that a real CLI took the line; `packages/session-host/rust/tests/typed_wake.rs` owns that behaviour.

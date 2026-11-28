@@ -80,7 +80,7 @@ impl Panes for Fake {
         submit: bool,
     ) -> Result<SendOutcome, Refusal> {
         assert_eq!(key, "head-key");
-        assert!(self.inspected.get() >= 2, "re-observe before typing");
+        assert_eq!(self.inspected.get(), 2, "two observations before typing");
         assert!(!submit, "never the focus-moving prompt door");
         if !self.foreground_is_agent {
             return Ok(SendOutcome::ForegroundNotAgent {
@@ -164,8 +164,9 @@ fn each_cli_gets_raw_text_then_its_enter_gap_then_a_separate_enter() {
         let answer = pane.wake(cli, Some(protocol.pinned_version()), WAKE_LINE);
         assert_eq!(answer, TypedWake::Submitted, "{cli}");
         let steps = pane.steps.borrow();
+        // The whole sequence, not just its head: one text, one gap, one Enter, and nothing after.
         assert_eq!(
-            steps[..3],
+            *steps,
             [
                 Step::Text(WAKE_LINE.into()),
                 Step::Pause(protocol.enter_gap_ms()),
