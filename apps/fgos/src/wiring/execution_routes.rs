@@ -25,6 +25,9 @@
 //!   sockets (`sweepAttempts`). Result `{ adopt, adoptError }`.
 //! * `cancel`: `{ runDir, signal }`: publish the attempt's cancel request (`requestCancel`). Result
 //!   `{ requested }`.
+//! * `end-dead-attempt`: `{ runDir }`: on an explicit session stop, end the attempt whose run supervisor is proven
+//!   dead: stop its own systemd scope, wait for the gate, adopt it. Result `{ ended, unit?, adopt }` or
+//!   `{ refused: { code, message } }`.
 //! * `stale-runs`: `{ fgosDir, reconcile }`: the runs still marked running whose dispatch process is gone. Result
 //!   `{ orphans }`.
 //! * `purpose-seat`: `{ runnerConfig, purpose?, repoRoot? }`: what serves a purpose, the tools probed live. Result
@@ -70,13 +73,14 @@ pub const EXIT_VERSION_MISMATCH: i32 = 3;
 pub const EXIT_INVALID_REQUEST: i32 = 65;
 
 /// The operations this route serves, in the contract's order.
-pub const OPS: [&str; 9] = [
+pub const OPS: [&str; 10] = [
     "run-unit",
     "launch-session",
     "custody",
     "verify",
     "sweep-attempts",
     "cancel",
+    "end-dead-attempt",
     "stale-runs",
     "purpose-seat",
     "tool-abilities",
@@ -229,6 +233,7 @@ pub fn run(
         "custody" => custody(&request, peer),
         "verify" => verify_op(&request),
         "sweep-attempts" => sweep_attempts(&request),
+        "end-dead-attempt" => end_dead_attempt(&request),
         "stale-runs" => stale_runs(&request),
         "purpose-seat" => purpose_seat_op(&request),
         "tool-abilities" => tool_abilities(&request),
@@ -587,6 +592,13 @@ fn cancel(request: &Value) -> Result<Value, String> {
     let requested =
         fgos_run_supervisor::controller::cancel::request_cancel(Path::new(run_dir), signal);
     Ok(json!({ "requested": requested }))
+}
+
+fn end_dead_attempt(request: &Value) -> Result<Value, String> {
+    let run_dir = text(request, "runDir")?;
+    Ok(fgos_run_supervisor::controller::scope::end_dead_attempt(
+        Path::new(run_dir),
+    ))
 }
 
 #[cfg(test)]

@@ -60,7 +60,7 @@ test('a head whose run supervisor is gone is settled through adopt instead of be
     host,
     identity: () => ({ live: true }),
     supervisorAlive: (runDir) => { order.push(`alive:${runDir}`); return false; },
-    adopt: async (runDir) => { adopted.push(runDir); order.push(`adopt:${runDir}`); },
+    endAttempt: async (runDir) => { adopted.push(runDir); order.push(`adopt:${runDir}`); return { ended: true }; },
     // A gone supervisor can neither be asked to stop nor close the attempt; either call is the bug this proves absent.
     end: () => assert.fail('a head whose supervisor is gone is never asked to stop'),
     closed: () => assert.fail('a head whose supervisor is gone is not waited on'),
@@ -70,6 +70,20 @@ test('a head whose run supervisor is gone is settled through adopt instead of be
   assert.deepEqual(order, ['alive:/run/2', 'adopt:/run/2']);
   assert.deepEqual(adopted, ['/run/2']);
   assert.deepEqual(host.closes, [{ key: 'head-lead-x-1', how: 'close', groupKey: 'g1' }]);
+  assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
+});
+
+test('a dead supervisor whose attempt cannot be ended is refused by name, keeps the stamp and retires no pane', async (t) => {
+  const { projectRoot, dir } = lineage(t);
+  const host = hostOf();
+  await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, {
+    host,
+    identity: () => ({ live: true }),
+    supervisorAlive: () => false,
+    endAttempt: async () => ({ refused: { code: 'domain-not-scope', message: 'inherited' } }),
+    now: () => new Date('2026-11-19T01:02:03Z'),
+  }), (err) => err.code === 'stop-not-ended');
+  assert.deepEqual(host.closes, []);
   assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
 });
 
