@@ -3084,17 +3084,12 @@ fn session_of(target: &str) -> Result<fgos_identity::directory::Listed, Categori
 /// What the terminal driver takes to find the session's pane: its slot key when it has one, else its pane id, both
 /// as Identity recorded them.
 fn pane_of(session: &fgos_identity::directory::Listed) -> Result<String, CategorisedRefusal> {
-    session
-        .ids
-        .as_ref()
-        .and_then(|ids| ids.terminal.as_ref())
-        .map(|t| t.key.clone().unwrap_or_else(|| t.pane_id.clone()))
-        .ok_or_else(|| {
-            refused(
-                "session-has-no-pane",
-                format!("{} has no terminal pane in Identity", session.handle),
-            )
-        })
+    session.terminal_key().ok_or_else(|| {
+        refused(
+            "session-has-no-pane",
+            format!("{} has no terminal pane in Identity", session.handle),
+        )
+    })
 }
 
 fn terminal_refusal(refusal: fgos_terminal_control::port::Refusal) -> CategorisedRefusal {

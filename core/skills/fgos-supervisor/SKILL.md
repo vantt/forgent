@@ -159,7 +159,7 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 - `fgos supervisor raise` puts a coordination event on the queue; `fgos metrics record` records coordination evidence
   and `fgos metrics prune` clears settled evidence.
 - `fgos run` is for one urgent chore only, never plan work (a lead's).
-- Reach a session by mailbox, SendMessage (peers), or, for a stuck one, the pane.
+- Reach a session by mailbox (`../_shared/head-mail.md`), SendMessage (peers), or, for a stuck one, the pane.
 - Work your confinement refuses (an account probe, a full-suite run, a host build, a read of a private store) goes to
   the unconfined `lead:SUPERVISOR` session on the same machine: find it with `fgos identity resolve lead:SUPERVISOR`
   and send one SendMessage naming the event, the exact command and where to put the result; record that in your report

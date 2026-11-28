@@ -13,7 +13,7 @@ description: >-
 
 You lead exactly one plan (boundary: `core/agents/lead.yaml`). Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
 tip, bounds what a unit may write and what a land may bring in. You never change the footprint by hand: when a phase needs a path the plan
-missed and that path serves an acceptance criterion the owner approved, you widen it with `fgos supervisor widen` (below). You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
+missed and that path serves an acceptance criterion the owner approved, you widen it with `fgos supervisor widen` (below). You may mail only the secretary and supervisor (`../_shared/head-mail.md`) and have no peers: escalate with `fgos questions ask` or park the phase with a reason
 as an event (below), never as a commit of its plan file.
 
 A wake is one turn: never end it before your done step (a phase set `done` in its plan file, or a park raised as an event).
