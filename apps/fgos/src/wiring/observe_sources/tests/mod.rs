@@ -2,6 +2,7 @@
 //! state from a fake owner pair (the real Session Host needs a terminal).
 
 use super::head_state::{HeadFacts, HeadStateSource, HostHeadFacts};
+use super::main_commits::MainCommitsSource;
 use super::plan_history::PlanHistorySource;
 use fgos_observe::record::types::{AttrValue, Record};
 use fgos_observe::{RecordSource, Window};
@@ -305,6 +306,138 @@ fn the_board_log_lines_naming_an_existing_plan_dir_are_activity() {
     assert_eq!(logged.len(), 1);
     assert_eq!(logged[0].subject.id, format!("plans/{dir}"));
     assert_eq!(attr(logged[0], "fgos.board.lane"), Some("OPS"));
+    let _ = std::fs::remove_dir_all(&repo);
+}
+
+/// Commits `files` at minute `minute` of 2026-11-20 10:00 UTC; the minute is the commit's own instant.
+fn commit_at(repo: &Path, minute: u32, files: &[(&str, &str)], message: &str) {
+    for (path, text) in files {
+        let full = repo.join(path);
+        std::fs::create_dir_all(full.parent().unwrap()).unwrap();
+        std::fs::write(full, text).unwrap();
+    }
+    git(repo, &["add", "-A"]);
+    let at = format!("2026-11-20T10:{minute:02}:00Z");
+    git_env(
+        repo,
+        &["commit", "-m", message],
+        &[("GIT_AUTHOR_DATE", &at), ("GIT_COMMITTER_DATE", &at)],
+    );
+}
+
+fn main_commit_kinds(records: &[Record]) -> Vec<String> {
+    let mut sorted: Vec<&Record> = records.iter().collect();
+    sorted.sort_by(|a, b| a.ts.cmp(&b.ts));
+    sorted
+        .iter()
+        .map(|r| attr(r, "fgos.main.commit.kind").unwrap().to_owned())
+        .collect()
+}
+
+#[test]
+fn the_main_commits_source_sorts_each_trunk_commit_by_the_most_durable_kind_it_touched() {
+    let repo = scratch("main-commits");
+    git(&repo, &["init", "-q", "-b", "main"]);
+    let plan = "plans/261120-1000-fixture/plan.md";
+    commit_at(&repo, 0, &[("README", "seed\n")], "seed");
+    commit_at(&repo, 1, &[("src/lib.rs", "a\n")], "code");
+    commit_at(
+        &repo,
+        2,
+        &[(plan, &plan_text("draft", "P2"))],
+        "plan created",
+    );
+    commit_at(
+        &repo,
+        3,
+        &[(plan, &plan_text("ready", "P2"))],
+        "plan status",
+    );
+    commit_at(
+        &repo,
+        4,
+        &[(plan, &format!("{}\nnote\n", plan_text("ready", "P2")))],
+        "plan note",
+    );
+    commit_at(
+        &repo,
+        5,
+        &[("plans/261120-1000-fixture/reports/wake.md", "w\n")],
+        "report",
+    );
+    commit_at(
+        &repo,
+        6,
+        &[("plans/discussions/ds-x/DISCUSSION.md", "d\n")],
+        "discussion",
+    );
+    commit_at(&repo, 7, &[("plans/backlog.md", "row\n")], "backlog");
+    commit_at(
+        &repo,
+        8,
+        &[("src/lib.rs", "b\n"), ("plans/reports/r.md", "r\n")],
+        "mixed code and report",
+    );
+    git(&repo, &["checkout", "-q", "-b", "side"]);
+    commit_at(&repo, 9, &[("src/side.rs", "s\n")], "side");
+    git(&repo, &["checkout", "-q", "main"]);
+    let at = [
+        ("GIT_AUTHOR_DATE", "2026-11-20T10:10:00Z"),
+        ("GIT_COMMITTER_DATE", "2026-11-20T10:10:00Z"),
+    ];
+    git_env(
+        &repo,
+        &["merge", "--no-ff", "-m", "merge side", "side"],
+        &at,
+    );
+
+    let source = || MainCommitsSource::with_state_root(repo.join(".fgos-state"));
+
+    // No remote HEAD: the attached branch is not a known trunk, so there is nothing to read and nothing wrong.
+    assert!(source().records(&repo, &all_time()).unwrap().is_empty());
+
+    git(&repo, &["update-ref", "refs/remotes/origin/main", "HEAD"]);
+    git(
+        &repo,
+        &[
+            "symbolic-ref",
+            "refs/remotes/origin/HEAD",
+            "refs/remotes/origin/main",
+        ],
+    );
+    let records = source().records(&repo, &all_time()).unwrap();
+    assert_eq!(
+        main_commit_kinds(&records),
+        [
+            "code", "code", "plan-status", "plan-status", "plan-note", "report", "discussion",
+            "backlog", "code", "code"
+        ],
+        "one record per first-parent commit (the side commit is not one); a mixed commit is code; the merge is sorted by its first-parent diff"
+    );
+    assert!(records.iter().all(|r| r.kind == "fgos.main.commit"
+        && r.subject.kind == "branch"
+        && r.subject.id == "main"
+        && r.id.starts_with("main-commit:")));
+    let note = |r: &Record| r.measures["fgos.main.commit.note"].as_u64().unwrap();
+    let notes: u64 = records.iter().map(note).sum();
+    assert_eq!(
+        notes, 3,
+        "plan-note, report and discussion are notes; backlog is not"
+    );
+    assert!(records.iter().all(|r| {
+        let kind = attr(r, "fgos.main.commit.kind").unwrap();
+        r.measures[&format!("fgos.main.commit.{kind}")].as_u64() == Some(1)
+    }));
+
+    let window = Window {
+        since: Some("2026-11-20T10:03:00Z".to_owned()),
+        until: Some("2026-11-20T10:06:00Z".to_owned()),
+    };
+    assert_eq!(
+        main_commit_kinds(&source().records(&repo, &window).unwrap()),
+        ["plan-status", "plan-note", "report"],
+        "the window keeps its start and drops its end"
+    );
     let _ = std::fs::remove_dir_all(&repo);
 }
 

@@ -12,9 +12,21 @@
     "fgos.plan.activity.source": { "type": "string", "values": ["commit", "board-log"] },
     "fgos.plan.history": { "type": "string", "values": ["complete", "truncated"] },
     "fgos.git.commit": { "type": "string" },
-    "fgos.board.lane": { "type": "string" }
+    "fgos.board.lane": { "type": "string" },
+    "fgos.main.commit.kind": {
+      "type": "string",
+      "values": ["code", "plan-status", "backlog", "discussion", "report", "plan-note"]
+    }
   },
-  "measures": {},
+  "measures": {
+    "fgos.main.commit.note": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.code": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.plan-status": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.backlog": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.discussion": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.report": { "unit": "count", "aggs": ["sum"] },
+    "fgos.main.commit.plan-note": { "unit": "count", "aggs": ["sum"] }
+  },
   "kinds": {
     "fgos.head.state": {
       "subjects": ["head"],
@@ -30,6 +42,19 @@
       "subjects": ["plan"],
       "attrs": ["fgos.plan.activity.source", "fgos.git.commit", "fgos.board.lane", "fgos.plan.history"],
       "measures": []
+    },
+    "fgos.main.commit": {
+      "subjects": ["branch"],
+      "attrs": ["fgos.main.commit.kind", "fgos.git.commit"],
+      "measures": [
+        "fgos.main.commit.note",
+        "fgos.main.commit.code",
+        "fgos.main.commit.plan-status",
+        "fgos.main.commit.backlog",
+        "fgos.main.commit.discussion",
+        "fgos.main.commit.report",
+        "fgos.main.commit.plan-note"
+      ]
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a299faad14a2118d78dd110daabdb42e85e4c77654ad097c83bd6d83ce49df3a",
+  "payloadDigest": "18b43cdc12de447dbc96e628709eae084dc4ad7dd05aa1a75c5470600b1763d3",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -157,16 +157,17 @@
     "apps/fgos/src/wiring/mailbox_verbs.rs": "568acc9cf4d32f2d737c2bf6e4357c199a72e156ce8d94cc540a191c23443ce8",
     "apps/fgos/src/wiring/mailbox_verbs/typed_wake.rs": "5409c036e93153747feb88bd991558420ed1db88e0cc34c12442e0bca567ff5b",
     "apps/fgos/src/wiring/mailbox_verbs_unsupported.rs": "8f4ceadc33463deea690b89514b083d529675f2200052f2c67d151613eed7021",
-    "apps/fgos/src/wiring/metrics_sources.rs": "920724b870bc1493ccc3f014ba0473ddc91b43ed7e535db8f4e854997754a3a4",
+    "apps/fgos/src/wiring/metrics_sources.rs": "7387f53bbebc284aca960100a19eee10e4877996f1b151d88ed8bf9f7d09f971",
     "apps/fgos/src/wiring/migrate.rs": "5bed496533803f5363816d62adcf6b6134a468a70ad63f0daedfd671a0cd4212",
     "apps/fgos/src/wiring/mod.rs": "446541ee28a4a3faacf06a5d1d6aa03b27a30f4e730eb9a4fe7661cb3235f0ed",
     "apps/fgos/src/wiring/observe_declarations.rs": "84b6ce26227fd00df947e212acff92362900b34ad95a9ed0e8fcf2fbb20b36d4",
     "apps/fgos/src/wiring/observe_query.rs": "eb392c50c8617ac5e7451b94b21ba76f33151511819b188d0ecc17d89d1f738f",
     "apps/fgos/src/wiring/observe_sources/head_state.rs": "baca1bd783f125a29917b5ec63277f5899177912d60754353d7e36fddd80bfcd",
-    "apps/fgos/src/wiring/observe_sources/mod.rs": "d5fb81609b375af587eed807d6c81ff70565fbc7ca8cdea1f6a22f3f3149afc1",
+    "apps/fgos/src/wiring/observe_sources/main_commits.rs": "bd9711a92686b75159bc73be0c970fc71caafc10358938e1c70c75c651247270",
+    "apps/fgos/src/wiring/observe_sources/mod.rs": "b189c141f1bbf1bca4b3194eef342274439bff2c2dd5182a13092c6554b8a415",
     "apps/fgos/src/wiring/observe_sources/plan_history.rs": "38cec91849c282960311c3f851e99ec50608ff253de753a798c3af79d03fb185",
     "apps/fgos/src/wiring/observe_sources/plan_text.rs": "a71317e73180193a53d3e7f9b4b19ad18aef8c989a6e8981ba41108e1b1438c3",
-    "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "7fb9baf3992643d600cbb3da45a26fce791382495697a7479693eaa5237a7f5e",
+    "apps/fgos/src/wiring/observe_sources/tests/mod.rs": "3de000b77f74bf17bd6472627d095795930967e6060dccc857944bb069eade71",
     "apps/fgos/src/wiring/portfolio.rs": "0ea39de37c38fad889db38ca2af09dc360570f666d80bd7f833aa807e2001b62",
     "apps/fgos/src/wiring/questions.rs": "2f32997782ae88e901d6d27bc9b0ab948eb14e53eb3e0a559c388d1610a9e71f",
     "apps/fgos/src/wiring/questions_hook.rs": "0e843ad2efe12a28b9d166918804bd956a4f870a52f055f7936ba2c54db65862",
@@ -2414,7 +2415,7 @@
     },
     {
       "path": "apps/fgos/src/wiring/observe_sources/tests/mod.rs",
-      "line": 31,
+      "line": 32,
       "spawn": "Command::new",
       "binary": "git",
       "class": "rust-test"

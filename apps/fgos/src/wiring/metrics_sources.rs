@@ -62,11 +62,12 @@ impl RecordSource for HostDiscussionSource {
     }
 }
 
-/// The record sources the host adds to Observe's own: head state, plan history, owner questions and discussion status, projected from their owners.
+/// The record sources the host adds to Observe's own: head state, plan history, main commits, owner questions and discussion status, projected from their owners.
 pub fn build_host_record_sources() -> Vec<Box<dyn fgos_observe::RecordSource>> {
     vec![
         Box::new(super::observe_sources::head_state::HeadStateSource::new()),
         Box::new(super::observe_sources::plan_history::PlanHistorySource::new()),
+        Box::new(super::observe_sources::main_commits::MainCommitsSource::new()),
         Box::new(fgos_questions::source::QuestionSource::new(Box::new(
             super::questions::HostLogOpener::reader(),
         ))),
