@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The watcher counts the commits main takes by kind and raises an event when notes outrun code"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -25,11 +25,13 @@ footprint:
   - docs/platform/supervision/spec.md
   - changelog.d/261128-1139-watcher-counts-main-commits-by-kind.md
   - plans/261125-1558-watcher-counts-main-commits-by-kind/
-base: 23ce1f27da7f96b095c311500a7a0f8631e5aaa5
+base: 82e3ebc041f61f0a78958c4a9471576b3c2f259c
 source:
   - plans/discussions/ds-asrjk5u7hv-watcher-counts-main-commits-by-kind/DISCUSSION.md
   - p-huydgzc2wv
 created: 2026-11-25
+lead: head:lead-forgent-261125-1558-watche-72614
+host: fg-server2-jdp2bv
 ---
 
 # The watcher counts the commits main takes by kind and raises an event when notes outrun code
