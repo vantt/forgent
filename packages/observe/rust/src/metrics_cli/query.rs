@@ -401,7 +401,7 @@ mod tests {
         // A second entry may be an `any` group, so one flag value carries two shapes of breach.
         let any = r#"{"any":[[{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"const":12}}],
                        [{"lhs":{"agg":{"agg":"count"}},"op":"lt","rhs":{"const":1}}]]}"#;
-        let join =r#"{"kind":["fgos.run.attempt"],"on":"plan"}"#;
+        let join = r#"{"kind":["fgos.run.attempt"],"on":"plan"}"#;
         let without = r#"{"kind":["fgos.plan.status"],"within":"1h"}"#;
         let query = built(&[
             "--kind",

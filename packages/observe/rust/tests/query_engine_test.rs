@@ -1,7 +1,7 @@
 //! The query engine: each operator once on a fixed clock, and the detections and measures that consumers define as
 //! plain queries over test-local declarations (no engine code names them).
 
-use fgos_observe::query::{run, AggValue, Having, Query,QueryContext, QueryError, QueryResult};
+use fgos_observe::query::{run, AggValue, Having, Query, QueryContext, QueryError, QueryResult};
 use fgos_observe::record::registry::{DeclarationSource, Registry};
 use fgos_observe::record::types::Record;
 use fgos_observe::{RecordSource, SourceError, Window};
