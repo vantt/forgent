@@ -104,13 +104,13 @@ properties:
     type: object
     properties:
       noteShareMax:
-        description: The share of one clock hour's commits on main that notes, reports and discussion rounds may take before the event is raised. A fraction.
+        description: The share of one clock hour's commits on main that notes, reports and discussion rounds may take before main-notes-outrun-code is raised. A fraction.
         type: number
         minimum: 0
         maximum: 1
         x-fgos-scope: both
       perHourMax:
-        description: Commits main may take in one clock hour before the event is raised whatever their kind. In commits.
+        description: Commits main may take in one clock hour before main-notes-outrun-code is raised whatever their kind. In commits.
         type: integer
         minimum: 1
         x-fgos-scope: both
