@@ -1,7 +1,7 @@
 ---
 id: p-lfwmzs6zsr
 title: "fgos session type replaces a pane's input and never submits it, so supervisor nudges never land (session-host, priority medium; source: lead:SUPERVISOR, 2026-11-23)"
-status: proposed
+status: done
 priority: P2
 area: session-host
 created: 2026-11-23

@@ -1,0 +1,11 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T13:18:19.219Z",
+  "data_hash": "8977d64caf80d3b5636c9fb2dea298b37e3d7e823e67891ffa8bff9aca35489e",
+  "data": {
+    "session": "claude-4jvx@fg-server2",
+    "lines": 60,
+    "truncated": false,
+    "text": "  did, and you can stop it. Otherwise give me the\n  topic in a line or point me at its backlog row.\n  I'll then create the DISCUSSION.md, scout, and\n  open round 1.\n\n✻ Baked for 30s · done 7:52 PM\n\n❯ Reply with the single word ok.\n\n● ok\n\n✻ Cooked for 1s · done 8:17 PM\n\n───────────────────────────────────────────────────\n❯\n───────────────────────────────────────────────────\n  🤖 Opus 5.5 - 9%  ⌛ 5h 20% (2h41m)  wk 3% (4d…\n  ⏵⏵ bypass permissions on (shift+tab to cycle)\n"
+  }
+}

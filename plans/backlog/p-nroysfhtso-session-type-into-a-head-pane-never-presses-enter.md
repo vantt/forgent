@@ -1,7 +1,7 @@
 ---
 id: p-nroysfhtso
 title: "Text typed into a head's pane with fgos session type is never submitted: the Enter key is not pressed (session-host, priority high; source: owner via Miu, 2026-11-25)"
-status: proposed
+status: done
 priority: P1
 area: session-host
 created: 2026-11-25

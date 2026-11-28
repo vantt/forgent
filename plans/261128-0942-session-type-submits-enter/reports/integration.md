@@ -28,3 +28,16 @@ here.
 
 The tests this plan owns, run alone at `e8841a4eb4`: `terminal_vectors` 13 passed, `nudge_typed` 2 passed,
 `typed_wake` 6 passed.
+
+## Final gate after the live-check fixes
+
+The p04b (`a27546744d`) and p04c (`70e53c73a2`) fixes landed code after the runs above, so the gate ran again on
+worktree `forgent-worktrees/261128-0942-session-type-submits-enter-gate` at the new main tip `70e53c73a2`.
+
+| run | ticket | `npm test` | `cargo test --workspace` | note |
+|---|---|---|---|---|
+| 4 | c-82657-1795871635393 | - | - | Died with the host (OOM at 20:17). Ignored. |
+| 5 | c-1785-1795872019482 | **green** | 1 failed, run stopped | `git_recover_confirm_dead.rs:141` `ETXTBSY` again, load average 48. Without `--no-fail-fast`, only 13 targets ran. |
+| 6 | c-6197-1795873280492 | **green** | **green** | `green: true`, 462 cargo result blocks ok, tip `70e53c73a2`. |
+
+Verdict: criterion 5's gate part is met by one fully green run (run 6) on the final integrated tip.

@@ -1,7 +1,7 @@
 ---
 id: p-cdsvrsfnui
 title: "fgos session type puts text in the pane but never submits it, so a woken head stays idle (supervision; source: owner, 2026-11-25)"
-status: proposed
+status: done
 priority: P1
 area: supervision
 created: 2026-11-25
