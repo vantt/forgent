@@ -1536,8 +1536,10 @@ pub fn unhandled_count(root: &Path) -> Result<Option<usize>, String> {
 }
 
 /// The rows of a `metrics query --def` answer, mapped as `core/watcher/README.md` ("Row to event") says: kind,
-/// reason and next command from the definition's `row` template; subject from `origin.host` else `subject.id`;
-/// instant from `min:ts`, else `max:end`, else `max:ts`.
+/// reason and next command from the definition's `row` template, each `{<agg>}` in the reason filled from the
+/// row's aggregates (`reason_of`); subject from `origin.host` else `subject.id`; instant from the row's `bucket`
+/// (a bucketed definition's period start, which holds still while its window slides), else `min:ts`, else
+/// `max:end`, else `max:ts`.
 pub fn rows_of(answer: &Value) -> Result<Vec<watcher::Row>, String> {
     rows_from(answer, false)
 }
@@ -1581,17 +1583,61 @@ fn rows_from(answer: &Value, pace: bool) -> Result<Vec<watcher::Row>, String> {
                 kind: text(&template["kind"])
                     .or_else(|| pace.then(|| text(&def["name"])).flatten())
                     .unwrap_or_default(),
-                reason: text(&template["reason"]).unwrap_or_default(),
+                reason: reason_of(&text(&template["reason"]).unwrap_or_default(), aggs),
                 next_command: text(&template["nextCommand"]).unwrap_or_default(),
                 subject: text(&group["origin.host"]).or_else(|| text(&group["subject.id"])),
-                ts: ["min:ts", "max:end", "max:ts"]
-                    .iter()
-                    .find_map(|key| text(&aggs[*key])),
+                ts: text(&row["bucket"]).or_else(|| {
+                    ["min:ts", "max:end", "max:ts"]
+                        .iter()
+                        .find_map(|key| text(&aggs[*key]))
+                }),
                 unmeasured: false,
             });
         }
     }
     Ok(rows)
+}
+
+/// A row template's `reason` with each `{<agg name>}` filled from the row's aggregates, so one definition can name
+/// the counts it measured. A placeholder whose aggregate is absent or null stays as written, and text with no
+/// placeholder comes back unchanged.
+fn reason_of(template: &str, aggs: &Value) -> String {
+    let mut filled = String::with_capacity(template.len());
+    let mut rest = template;
+    while let Some(open) = rest.find('{') {
+        filled.push_str(&rest[..open]);
+        let after = &rest[open + 1..];
+        let Some(close) = after.find('}') else {
+            filled.push_str(&rest[open..]);
+            return filled;
+        };
+        let name = &after[..close];
+        match agg_text(aggs, name) {
+            Some(value) => filled.push_str(&value),
+            None => {
+                filled.push('{');
+                filled.push_str(name);
+                filled.push('}');
+            }
+        }
+        rest = &after[close + 1..];
+    }
+    filled.push_str(rest);
+    filled
+}
+
+/// One aggregate as the reason writes it: a whole number without a fraction, anything else as the answer holds it.
+fn agg_text(aggs: &Value, name: &str) -> Option<String> {
+    match aggs.get(name)? {
+        Value::Null => None,
+        Value::String(text) => Some(text.clone()),
+        Value::Number(number) => Some(match number.as_f64() {
+            Some(n) if n.fract() == 0.0 && n.abs() < 9.0e15 => (n as i64).to_string(),
+            Some(n) => n.to_string(),
+            None => number.to_string(),
+        }),
+        other => Some(other.to_string()),
+    }
 }
 
 /// Refreshes the per-machine questions view by listing once: `<host> questions --json`.
@@ -4058,15 +4104,36 @@ mod tests {
                 {"group": {"subject.id": "plans/y"}, "insufficient": true, "aggs": {}}
              ]},
             {"name": "broken", "unmeasured": "records-missing"},
-            {"name": "no-template", "rows": [{"group": {"subject.id": "z"}, "aggs": {}}]}
+            {"name": "no-template", "rows": [{"group": {"subject.id": "z"}, "aggs": {}}]},
+            {"name": "main-notes-outrun-code",
+             "row": {"kind": "main-notes-outrun-code", "nextCommand": "n",
+                     "reason": "main took {count} commits: {sum:fgos.main.commit.note} notes, {sum:fgos.main.commit.gone} gone"},
+             "rows": [
+                {"group": {"subject.id": "branch:main"}, "bucket": "2026-04-01T03:00:00Z",
+                 "aggs": {"count": 21, "min:ts": "2026-04-01T03:20:00Z", "sum:fgos.main.commit.note": 18}},
+                {"group": {"subject.id": "branch:main"}, "bucket": "2026-04-01T04:00:00Z",
+                 "aggs": {"count": 14, "min:ts": "2026-04-01T04:05:00Z"}}
+             ]}
         ]});
         let rows = rows_of(&answer).unwrap();
-        assert_eq!(rows.len(), 3);
+        assert_eq!(rows.len(), 5);
         assert_eq!(rows[0].subject.as_deref(), Some("h1"));
         assert_eq!(rows[0].ts.as_deref(), Some("2026-01-01T00:00:00Z"));
         assert_eq!(rows[1].subject.as_deref(), Some("plans/x"));
         assert_eq!(rows[1].ts.as_deref(), Some("2026-02-01T00:00:00Z"));
         assert!(rows[2].unmeasured && rows[2].kind == "broken");
+        // A bucketed row takes the bucket start as its instant, ahead of the aggregate instants, and its reason
+        // names the counts the aggregates hold; an aggregate the row does not carry leaves its placeholder as written.
+        assert_eq!(rows[3].ts.as_deref(), Some("2026-04-01T03:00:00Z"));
+        assert_eq!(
+            rows[3].reason,
+            "main took 21 commits: 18 notes, {sum:fgos.main.commit.gone} gone"
+        );
+        assert_eq!(rows[4].ts.as_deref(), Some("2026-04-01T04:00:00Z"));
+        assert_eq!(
+            rows[4].reason,
+            "main took 14 commits: {sum:fgos.main.commit.note} notes, {sum:fgos.main.commit.gone} gone"
+        );
     }
 
     #[test]
