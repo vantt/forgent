@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "23493d8798693d3babeeefb3ba06aa16d643393cd9e9614aaad6213af187b4ea",
+  "payloadDigest": "3220cbc93a49525a163124e49106c46af0860708a8c6367ba5cd9a0583d0e215",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1016,7 +1016,7 @@
     "packages/mailbox/rust/store/src/adapters/extension.rs": "ec641ab27420f28c1d1c6e8cf81863da73e9ff2f12bd34d872df896e1e47d21a",
     "packages/mailbox/rust/store/src/adapters/mod.rs": "b50a27f186e165e504706d560d79dc3d184ef99ae2f66d08bb6c845fcf79a99d",
     "packages/mailbox/rust/store/src/adapters/payload_head.rs": "e38c7cbd1511d58d6e249a15ce3db54ff55e09bad41d5c09b7cf2b880daa88ab",
-    "packages/mailbox/rust/store/src/adapters/version.rs": "169df70833e5d9698b0dcff29630b485d66f6a809e89e5a4f883d72028083809",
+    "packages/mailbox/rust/store/src/adapters/version.rs": "a7d02a33ceaf07e1475da4610b2fa18d8c181d34c5268c05b053f8cdec11abd3",
     "packages/mailbox/rust/store/src/ancestry.rs": "a40fd1d35244bbca405789470938b55cbd10f67c7f1b78897ddbec8271fa520c",
     "packages/mailbox/rust/store/src/head.rs": "572de2dabda7fe84ad6b54bcf652ec9f84b2560dd503dd05f4e117a856bb9b63",
     "packages/mailbox/rust/store/src/hook/breaker.rs": "003289c47b49333c5c85863fd8b7476a211466b8e0341ce74bc676fe484019da",
@@ -1057,7 +1057,7 @@
     "packages/mailbox/rust/store/tests/record_ingest.rs": "5f84c2b6c8f3b600ba706da70bf6edc6c34016971fba79d0925a7fd19d97cc88",
     "packages/mailbox/rust/store/tests/record_prune.rs": "72ae0203f2840ed402c12e0fa84f720d3443d0f36382af8896822de670fbd4ba",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "81af621aef7bc189863a2f3992a12a207b8845fb932d57f11535aa905b3de94a",
-    "packages/mailbox/rust/store/tests/verbs.rs": "5f3360c232d69fdf07f9729aeb04ac67ffa2382f495d159e739fea5d4d65ba84",
+    "packages/mailbox/rust/store/tests/verbs.rs": "7ecee54280bacd8741aa05ed2c84813ab5e18ce84bf4a84842039650e48df16e",
     "packages/observe/rust/src/case_journal.rs": "efa3ba0f2eade3c40434349d03f9e011d5ba88c4ebbeaf9f85d6a1c4d9494161",
     "packages/observe/rust/src/contract.rs": "3f81b85bc2053002443961cf3b9735c9028bc10cbcf9838db310efaa3aafa2c0",
     "packages/observe/rust/src/definition/mod.rs": "523fafd2596773070ff36053fe33c5e3b807c7a06cdb4c01e78ceeb250fed027",
@@ -1645,7 +1645,7 @@
     "src/session-host/head-plan.mjs": "bb2ea6fee98451914cc7f235a4885bf853837c6afe2ddf044329c1afb1e47763",
     "src/session-host/head-request-client.mjs": "eab9e61a4ca6e8185f7fb3d40e42ac55151bf8564ee4233a6c7f686fa032e052",
     "src/session-host/head-request.mjs": "fab6d88789f10f3db19968c38136b2fc2597dde5de02cd9011e4f2d0ddfb9589",
-    "src/session-host/head-start.mjs": "5b056e3c80c917ec798916729aea1547f2d08cff4362dc3b6e196548c3fff45d",
+    "src/session-host/head-start.mjs": "d342b1033da4aada33f6b82e6e9aba86f7c62a0edc37a41dbd01fd3015c8178d",
     "src/session-host/head-stop.mjs": "77354b4ab67ba5df24a0d0501c755052c0716c1f100b23af1268d3f5802ac202",
     "src/session-rotation/handoff-store.mjs": "6d4593a26fa1e1cfe03e8b9fe4fa63533b118aa7c030f96d8a09e9855f691ac9",
     "src/session-rotation/rotate.mjs": "d3ef32980ddd2809f6c92832402dcf21c844dabf49c57570e102605e6ed423b9",
@@ -3729,7 +3729,7 @@
     },
     {
       "path": "packages/mailbox/rust/store/src/adapters/version.rs",
-      "line": 82,
+      "line": 124,
       "spawn": "Command::new",
       "binary": "codex",
       "class": "argv-runner",
@@ -3754,6 +3754,13 @@
       "line": 279,
       "spawn": "Command::new",
       "binary": "sh",
+      "class": "rust-test"
+    },
+    {
+      "path": "packages/mailbox/rust/store/tests/verbs.rs",
+      "line": 242,
+      "spawn": "Command::new",
+      "binary": "? name of spawn_named_copy",
       "class": "rust-test"
     },
     {

@@ -305,7 +305,7 @@ export function isClaudeCodeBinding(binding, runnerConfig) {
   return executorId === 'claude';
 }
 
-export function mergeStatusLineSettings(args = []) {
+export function mergeClaudeLaunchSettings(args = []) {
   const result = [...args];
   const STATUS_LINE = {
     type: 'command',
@@ -319,6 +319,7 @@ export function mergeStatusLineSettings(args = []) {
       try { parsed = JSON.parse(raw); } catch {}
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         parsed.statusLine = STATUS_LINE;
+        parsed.promptSuggestionEnabled = false;
         result[idx] = `--settings=${JSON.stringify(parsed)}`;
       }
     } else if (idx + 1 < result.length) {
@@ -331,11 +332,12 @@ export function mergeStatusLineSettings(args = []) {
       }
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         parsed.statusLine = STATUS_LINE;
+        parsed.promptSuggestionEnabled = false;
         result[idx + 1] = JSON.stringify(parsed);
       }
     }
   } else {
-    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE }));
+    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE, promptSuggestionEnabled: false }));
   }
   return result;
 }
@@ -360,7 +362,7 @@ export function withHeadSettings(runnerConfig, binding) {
   const targetExec = cfg.executors[executorId];
   for (const inv of targetExec.invocations) {
     if (!invocationId || inv?.id === invocationId) {
-      inv.args = mergeStatusLineSettings(inv.args);
+      inv.args = mergeClaudeLaunchSettings(inv.args);
     }
   }
   return cfg;

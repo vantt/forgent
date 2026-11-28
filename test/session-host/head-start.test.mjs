@@ -270,7 +270,7 @@ test('the session launches with its role, its grant and the opening composed fro
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('a Claude binding carries statusLine on the launch invocation, a non-Claude binding does not', async () => {
+test('a Claude binding carries statusLine and promptSuggestionEnabled=false on the launch invocation, a non-Claude binding carries neither', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
   ports.runnerConfig = () => ({
@@ -305,10 +305,11 @@ test('a Claude binding carries statusLine on the launch invocation, a non-Claude
     type: 'command',
     command: 'fgos hook session-rotation --event status-line',
   });
+  assert.strictEqual(settings.promptSuggestionEnabled, false);
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 
-test('a head launch merges statusLine into an existing --settings object on the invocation', async () => {
+test('a head launch merges statusLine and promptSuggestionEnabled=false into an existing --settings object on the invocation', async () => {
   const projectRoot = scratch();
   const { calls, ports } = fakes();
   ports.runnerConfig = () => ({
@@ -330,6 +331,7 @@ test('a head launch merges statusLine into an existing --settings object on the 
   const merged = JSON.parse(invocation.args[settingsIdx + 1]);
   assert.deepEqual(merged, {
     enabledMcpjsonServers: ['test'],
+    promptSuggestionEnabled: false,
     statusLine: {
       type: 'command',
       command: 'fgos hook session-rotation --event status-line',
