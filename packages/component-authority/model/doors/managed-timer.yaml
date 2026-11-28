@@ -25,5 +25,7 @@ allowed:
   - path: apps/fgos/src/wiring/uninstall.rs
     count: 2
     reason: calls the door
+  - path: packages/run-supervisor/rust/src/controller/scope.rs
+    reason: "end-dead-attempt stops and kills the attempt's own fgos-run-<attemptId> scope for an explicit session stop through the process door's bounded runner; not a timer"
 debt: []
 reason: the OS timers fgOS writes (systemd user units, launchd plists) are rendered, checked, enabled and removed in one Rust module; the scheduler calls go through the process door's bounded runner
