@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Communication standard (tiêu chuẩn giao tiếp): one always-loaded standard for how every agent talks to the owner, and cheap answers in the question door"
-status: running
+status: done
 priority: P1
 blockedBy: []
 footprint:
@@ -169,7 +169,7 @@ D with the recommended one first, and the owner can answer with the letter alone
 | 2 | [Friction layer value for owner communication](phase-02-friction-layer.md) | - | packages/observe/rust/friction-kinds.json, packages/observe/rust/src/friction.rs, docs/platform/observe/spec.md | 1 | done |
 | 3 | [Stated default and lettered options in the question door](phase-03-question-door.md) | 1 | packages/questions/contracts/questions-input.v1.json, packages/questions/contracts/question-event-payloads.v1.json, packages/questions/contracts/refusals.v1.json, packages/questions/rust/src/shape.rs, packages/questions/rust/src/record.rs, packages/questions/rust/src/usecase.rs, packages/questions/rust/tests/store_usecases.rs, apps/fgos/src/wiring/questions.rs, apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx, apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx, docs/platform/questions/spec.md, `apps/fgos/tests/questions_verb.rs`, `packages/questions/rust/tests/store_support.rs`, `apps/fgos/tests/questions_head.rs`, `apps/fgos/tests/authority.rs`, `apps/fgos/tests/supervision_verbs.rs`, `packages/run-supervisor/rust/src/head_request.rs` | 2 | done |
 | 4 | [Skills that ask questions fill the default](phase-04-skills-fill-default.md) | 1, 3 | core/skills/_shared/owner-communication.md, core/skills/_shared/plan-contract.md, core/skills/fgos-lead/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-shaping/SKILL.md, core/skills/fgos-secretary/SKILL.md, domains/coding/skills/fgos-coding-shaping/SKILL.md, domains/coding/skills/fgos-coding-planning/SKILL.md, packages/git/contracts/mutation-census.v1.json, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/** | 3 | done |
-| 5 | [Integration: changelog fragment and full gate](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261122-1950-owner-communication-standard.md, plans/261122-1950-owner-communication-standard/reports/** | 4 | ready |
+| 5 | [Integration: changelog fragment and full gate](phase-05-integration.md) | 1, 2, 3, 4 | changelog.d/261122-1950-owner-communication-standard.md, plans/261122-1950-owner-communication-standard/reports/** | 4 | done |
 
 Wave reasoning: phase 1 and phase 2 share no file and run at once. Phase 3 waits for phase 1 only because both
 edit `docs/platform/questions/spec.md`. Phase 4 waits for phase 3 because skills must not tell agents to fill a

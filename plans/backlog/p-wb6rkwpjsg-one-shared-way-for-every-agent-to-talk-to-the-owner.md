@@ -1,7 +1,7 @@
 ---
 id: p-wb6rkwpjsg
 title: "One shared way for every agent to talk to the owner: complete information, one clear action, low cognitive load (core, priority high under Release con nguoi; source: owner via Miu, 2026-11-22)"
-status: proposed
+status: done
 priority: P1
 area: core
 created: 2026-11-22
