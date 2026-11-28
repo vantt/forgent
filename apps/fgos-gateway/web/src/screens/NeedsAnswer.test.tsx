@@ -71,6 +71,35 @@ const letteredDetail = {
   },
 }
 
+// A question whose recommended option is written second and whose labels both carry a hand letter, so the letter of a
+// place on screen differs from the letter the asker wrote.
+const handLetteredDetail = {
+  question: {
+    state: 'open',
+    asked: {
+      id: 'q-abc',
+      headline: 'Who carries the release?',
+      blocks: 'phase 8',
+      parts: {
+        what: 'Nobody holds the release yet',
+        cause: 'Two owners stepped back',
+        options: [
+          { label: 'A. Wait for Keeper', does: 'wait', gain: 'safety', harm: 'delay', cost: '2d' },
+          { label: 'B. Keeper carries', does: 'carry', gain: 'speed', harm: 'risk', cost: '1d', recommended: true },
+        ],
+        recommendation: 'Keeper carries',
+        scope: { allows: 'phase 8', forbids: 'phase 9' },
+      },
+    },
+  },
+}
+
+const handLetteredRow = {
+  ...storeRow,
+  headline: 'Who carries the release?',
+  recommended: 'B. Keeper carries',
+}
+
 const list = {
   needsYou: 3,
   questions: [storeRow],
@@ -123,7 +152,9 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     expect(screen.getByTestId('tag-workflow:r1#s1').textContent).toBe('GATE')
     expect(screen.getByTestId('door-workflow:r1#s1').textContent).toBe('fgos workflow answer r1 s1')
     expect(screen.getByText('Needs answer · 3')).toBeTruthy()
-    expect(screen.getByTestId('recommended-q-abc').textContent).toContain('Recommended: B')
+    // The recommended option's label is the bare letter `B`, which carries no hand letter, under the letter of the
+    // place it holds on screen.
+    expect(screen.getByTestId('recommended-q-abc').textContent).toContain('Recommended: A. B')
   })
 
   it('expanding a store question shows the five parts and preselects the recommended option', async () => {
@@ -153,6 +184,30 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     expect(screen.getByTestId('default-q-abc').textContent).toBe(
       'Default if no answer: wait until phase 9 opens, then ship',
     )
+  })
+
+  it('replaces a hand-lettered label with the letter of its new place, in the rows and in the options', async () => {
+    let body: unknown
+    stubGateway(
+      (_url, init) => {
+        body = JSON.parse(String(init?.body))
+        return jsonResponse(envelope({ id: 'q-abc', state: 'answered' }))
+      },
+      { ...list, questions: [handLetteredRow] },
+      handLetteredDetail,
+    )
+    renderScreen()
+    await waitFor(() => expect(screen.getByTestId('expand-q-abc')).toBeTruthy())
+    expect(screen.getByTestId('recommended-q-abc').textContent).toContain('Recommended: A. Keeper carries')
+
+    fireEvent.click(screen.getByTestId('expand-q-abc'))
+    await waitFor(() => expect(screen.getByTestId('detail-q-abc')).toBeTruthy())
+    const labels = Array.from(screen.getByTestId('options-q-abc').querySelectorAll('strong')).map((node) => node.textContent)
+    expect(labels).toEqual(['A. Keeper carries', 'B. Wait for Keeper'])
+
+    fireEvent.click(screen.getByTestId('option-q-abc-A. Wait for Keeper'))
+    fireEvent.click(screen.getByTestId('question-submit-q-abc'))
+    await waitFor(() => expect(body).toEqual({ option: 'A. Wait for Keeper' }))
   })
 
   it('shows no default line when the question states none', async () => {

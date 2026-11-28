@@ -46,10 +46,31 @@ function shownOptions(options: QuestionOptionDetail[]): ShownOption[] {
  */
 type QuestionParts = QuestionDetail['asked']['parts'] & { default?: string }
 
-/** The letter and the option's own label; a label already starting with its letter and a dot is not doubled. */
+/**
+ * The words of a label the asker lettered by hand (`A. words`), or null when the label carries no hand letter: a place
+ * letter `A` to `D`, a dot, and words after it. The same rule as the Rust `hand_lettered`, so both doors read a label
+ * the same way.
+ */
+function handLettered(label: string): string | null {
+  const letter = label.charAt(0)
+  if (!/^[A-D]$/.test(letter) || !label.charAt(1).startsWith('.')) return null
+  const afterDot = label.slice(2)
+  const words = afterDot.startsWith(' ') ? afterDot.slice(1) : afterDot
+  return words.trim() === '' ? null : words
+}
+
+/**
+ * The letter of a place on screen and the option's own words. A letter the asker wrote by hand is replaced by the
+ * letter of the place the option holds now, so a label is never lettered twice and never carries a place it no longer
+ * holds.
+ */
+function letteredLabel(letter: string, label: string): string {
+  const words = handLettered(label)
+  return `${letter}. ${words === null ? label : words.trim()}`
+}
+
 function shownLabel({ letter, option }: ShownOption): string {
-  const prefix = `${letter}.`
-  return option.label.startsWith(prefix) ? option.label : `${prefix} ${option.label}`
+  return letteredLabel(letter, option.label)
 }
 
 /** What the asker does, and when, if no answer comes. */
@@ -213,8 +234,11 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
               <p data-testid={`tag-${q.id}`} className="mt-1 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-muted">
                 QUESTION
               </p>
+              {/* The recommended option is always the first place on screen, so it is the one the CLI list line
+                  letters `A`; the row names it the same way. */}
               <p data-testid={`recommended-${q.id}`} className="mt-1 text-xs text-ink-muted">
-                Recommended: {q.recommended ?? 'none'} · blocks: {q.blocks} · {q.age}
+                Recommended: {typeof q.recommended === 'string' ? letteredLabel('A', q.recommended) : 'none'} · blocks:{' '}
+                {q.blocks} · {q.age}
               </p>
               <button
                 data-testid={`expand-${q.id}`}
