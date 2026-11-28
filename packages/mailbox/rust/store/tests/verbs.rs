@@ -226,6 +226,40 @@ fn report_of(fgos: &TempFgos, to: &str, versions: &VersionSources) -> Vec<String
     answer.text.lines().map(String::from).collect()
 }
 
+/// A copy of `sleep` named `name` inside `<dir>/<parent>/`, spawned.
+fn spawn_named_copy(dir: &std::path::Path, parent: &str, name: &str) -> Child {
+    let folder = dir.join(parent);
+    std::fs::create_dir_all(&folder).unwrap();
+    let copy = folder.join(name);
+    std::fs::copy("/bin/sleep", &copy).unwrap();
+    Child(std::process::Command::new(copy).arg("60").spawn().unwrap())
+}
+
+#[test]
+fn a_claude_head_without_a_session_file_takes_its_version_from_the_executable_it_runs() {
+    let fgos = TempFgos::new("verb-version-exe");
+    let cli = fgos_mailbox_core::Cli::new("claude").unwrap();
+    let read = |head: &str| {
+        fgos_mailbox::adapters::version::recipient_version(&cli, head, &no_versions())
+    };
+
+    let versioned = spawn_named_copy(&fgos.scratch(), "versions", "9.8.7");
+    assert_eq!(read(&versioned.head_text()).as_deref(), Some("9.8.7"));
+
+    // A start time of another process generation: the pid is not the head.
+    let mut record = fgos_process::facts::identity_of(fgos_process::ProcId(versioned.0.id()))
+        .unwrap()
+        .to_record();
+    record.start_time = Some("1".into());
+    assert_eq!(read(&fgos_mailbox::head::head_text(&record)), None);
+
+    // An executable that is not a versioned binary names no version.
+    let unversioned = spawn_named_copy(&fgos.scratch(), "versions", "latest");
+    assert_eq!(read(&unversioned.head_text()), None);
+    let elsewhere = spawn_named_copy(&fgos.scratch(), "bin", "9.8.7");
+    assert_eq!(read(&elsewhere.head_text()), None);
+}
+
 #[test]
 fn send_adds_the_untested_version_clause_from_the_recipients_version() {
     let fgos = TempFgos::new("verb-version-untested");

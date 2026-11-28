@@ -319,6 +319,7 @@ export function mergeStatusLineSettings(args = []) {
       try { parsed = JSON.parse(raw); } catch {}
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         parsed.statusLine = STATUS_LINE;
+        parsed.promptSuggestionEnabled = false;
         result[idx] = `--settings=${JSON.stringify(parsed)}`;
       }
     } else if (idx + 1 < result.length) {
@@ -331,11 +332,12 @@ export function mergeStatusLineSettings(args = []) {
       }
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         parsed.statusLine = STATUS_LINE;
+        parsed.promptSuggestionEnabled = false;
         result[idx + 1] = JSON.stringify(parsed);
       }
     }
   } else {
-    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE }));
+    result.push('--settings', JSON.stringify({ statusLine: STATUS_LINE, promptSuggestionEnabled: false }));
   }
   return result;
 }
