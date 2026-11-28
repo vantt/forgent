@@ -1,7 +1,7 @@
 ---
 id: p-nnaksnxtwu
 title: "A head that lacks a power or a door can always speak up: to the owner and to a peer, with the exact missing grant named (agent communication, priority high under Release con nguoi; source: owner via Miu, 2026-11-25)"
-status: in-flight
+status: done
 priority: P1
 area: session-host
 created: 2026-11-25

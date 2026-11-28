@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Heads learn mail from one shared file: send once with --wake, read the answer; session-host spec and the pane lookup follow the mail door"
-status: running
+status: done
 priority: P2
 blockedBy: []
 base: a09103f46836e72c39a65e3c0c06b0d37e4a13b1
@@ -76,7 +76,7 @@ Anything in plan `261125-2313` (code of the mail door); the owner channel; new g
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Shared know-how, skills, spec and pane lookup](phase-01-knowhow-skills-spec.md) | - | core/skills/_shared/head-mail.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/session-host/spec.md, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, changelog.d/261128-0541-heads-mail-each-other-from-inside-the-cage.md | 1 | ready |
+| 1 | [Shared know-how, skills, spec and pane lookup](phase-01-knowhow-skills-spec.md) | - | core/skills/_shared/head-mail.md, core/skills/fgos-secretary/SKILL.md, core/skills/fgos-supervisor/SKILL.md, core/skills/fgos-lead/SKILL.md, .agents/skills/**, plugins/fgOS/skills/**, .claude/skills/**, docs/platform/session-host/spec.md, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, changelog.d/261128-0541-heads-mail-each-other-from-inside-the-cage.md | 1 | done |
 
 One phase: the files are small and the renders are a hot generated file set with one writer.
 
