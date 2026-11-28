@@ -1,10 +1,10 @@
 ---
 contract: plan-v1
 title: "The watcher tick reads the supervision queue once: batch raise with one fold, and the fold through the checkpointed read"
-status: ready
+status: running
 priority: P1
 blockedBy: []
-base: 556d3179381b32248e731c598da2f9e17b8b30b7
+base: f7ead28d30bd1afe43220ec35e23895f0434b5fb
 footprint:
   - plans/261128-2236-watcher-tick-reads-queue-once/**
   - packages/supervision/rust/src/queue.rs
@@ -19,6 +19,7 @@ source:
   - p-q3kmkcn2kk
 created: 2026-11-28
 host: fg-server2-jdp2bv
+lead: head:lead-forgent-261128-2236-watche-dc5b6
 ---
 
 # The watcher tick reads the supervision queue once
