@@ -86,7 +86,9 @@ process.stdin.on('end', () => {
 /// A bridge that dies before it answers.
 const BRIDGE_THAT_FAILS: &str = "process.stderr.write('bridge broke\\n'); process.exit(3);\n";
 
-const QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"plan p phase 3","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","scope":{"allows":"A for this plan","forbids":"changing other plans"}}}"#;
+/// A decided question whose options reveal the display: the recommended one is not the first the asker wrote, and
+/// one label is lettered by hand with a letter that is not the letter of its place on screen.
+const QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"plan p phase 3","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"keep both","does":"d","gain":"g","harm":"h","cost":"c"},{"label":"fold into one","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B. rewrite","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"fold into one","default":"fold into one after two days","scope":{"allows":"one store for this plan","forbids":"changing other plans"}}}"#;
 
 /// A repository with one commit holding `plans/p/plan.md`, a private state root with a machine id, and a release.
 struct Scene {
@@ -188,6 +190,34 @@ fn under_an_agent() -> bool {
 }
 
 #[test]
+fn a_blank_default_is_refused_by_the_ask_door_and_nothing_is_stored() {
+    // The shape check refuses a default that says nothing, at every stage, so no question can reach the store with
+    // one and the `Default if no answer:` line is never printed empty. The refusal itself, stage by stage, is owned
+    // by the crate test `a_blank_default_is_refused_even_where_the_default_is_optional`; this proves the door
+    // carries it out to the caller.
+    let scene = Scene::new("blank-default", BRIDGE_WITH_WORK);
+    let blank = QUESTION.replace("fold into one after two days", "   ");
+    let asked = scene.run(
+        &["questions", "ask", "--ref", "plan:p", "--input", "-"],
+        blank.as_bytes(),
+    );
+    assert_eq!(asked.status.code(), Some(4), "ask: {asked:?}");
+    assert!(
+        stderr(&asked).contains("[question-unclear]") && stderr(&asked).contains("parts.default"),
+        "{}",
+        stderr(&asked)
+    );
+    let listed = scene.run(&["questions"], b"");
+    assert!(listed.status.success(), "list: {listed:?}");
+    // Nothing was stored: the only needs-you count left is the work section's own two rows.
+    assert!(
+        text(&listed).starts_with("needs you: 2\n"),
+        "{}",
+        text(&listed)
+    );
+}
+
+#[test]
 fn the_list_puts_the_needs_you_count_first_then_the_store_rows_then_the_work_section() {
     let scene = Scene::new("list", BRIDGE_WITH_WORK);
     let id = scene.ask();
@@ -201,10 +231,11 @@ fn the_list_puts_the_needs_you_count_first_then_the_store_rows_then_the_work_sec
     assert!(lines[1].starts_with(&id), "{listed}");
     for part in [
         "Which store do we use?",
-        "[recommended: A]",
+        // The shown label carries the letter of its place on screen: the recommended option is shown first.
+        "[recommended: A. fold into one]",
         "blocks: plan p phase 3",
         "age: 0m",
-        &format!("answer: fgos questions answer {id} --option \"A\""),
+        &format!("answer: fgos questions answer {id} --option A"),
     ] {
         assert!(lines[1].contains(part), "{part} in {}", lines[1]);
     }
@@ -217,7 +248,7 @@ fn the_list_puts_the_needs_you_count_first_then_the_store_rows_then_the_work_sec
     let doc: serde_json::Value = serde_json::from_slice(&json.stdout).unwrap();
     assert_eq!(doc["data"]["needsYou"], 3);
     assert_eq!(doc["data"]["questions"][0]["id"], id.as_str());
-    assert_eq!(doc["data"]["questions"][0]["recommended"], "A");
+    assert_eq!(doc["data"]["questions"][0]["recommended"], "fold into one");
     assert_eq!(
         doc["data"]["work"]["gates"][0]["ref"],
         "workflow:case-1#approve"
@@ -281,12 +312,39 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
     for part in [
         "What is happening: choose a store",
         "Cause: two stores exist",
-        "(recommended)",
+        // The options in the order the owner reads them (recommended first), each with the letter of its place; a
+        // label the asker lettered by hand is shown with the letter of the place that option holds now.
+        "  A. fold into one (recommended): d",
+        "  B. keep both: d",
+        "  C. rewrite: d",
         "cost: c",
-        "Scope of the answer: allows A for this plan; forbids changing other plans",
+        // The recommendation names the recommended option the way the option list does: the letter of its place on
+        // screen, then its own words, never the asker's raw recommendation string beside a lettered option.
+        "Recommendation: A. fold into one",
+        "Default if no answer: fold into one after two days",
+        "Scope of the answer: allows one store for this plan; forbids changing other plans",
     ] {
         assert!(shown.contains(part), "{part} in {shown}");
     }
+    let position = |part: &str| {
+        shown
+            .find(part)
+            .unwrap_or_else(|| panic!("{part} in {shown}"))
+    };
+    assert!(
+        position("  A. fold into one (recommended)") < position("  B. keep both")
+            && position("  B. keep both") < position("  C. rewrite"),
+        "{shown}"
+    );
+    // The hand letter the asker wrote in front of the last label is replaced by the letter of its place, so it is
+    // never doubled (`B. C. rewrite`) and never keeps the place it no longer holds (`B. rewrite` is at C).
+    assert!(!shown.contains("B. rewrite"), "{shown}");
+    assert!(!shown.contains("C. C."), "{shown}");
+    // The recommendation carries the letter too, so the owner never reads two letters for one option.
+    assert!(
+        !shown.contains("Recommendation: fold into one\n"),
+        "{shown}"
+    );
 
     let answered = scene.run(&["questions", "answer", &id, "--option", "A"], b"");
     if under_an_agent() {

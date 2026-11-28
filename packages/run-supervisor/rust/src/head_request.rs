@@ -1728,6 +1728,7 @@ fn ask_owner(cfg: &Config, request: &Request, words: &[String]) -> Outcome {
                 {"label": "Run it by hand", "does": "The owner runs the same argv outside the cage.", "gain": "The chore is done once.", "harm": "The owner is the one who waits and acts.", "cost": "One command."}
             ],
             "recommendation": "Do not run it here; if the chore recurs, add a row to the permission table in a landed change.",
+            "default": "If no answer comes, the argv is never run: this request was already refused `asked` carrying the question's id, so the head went on without the chore and nothing retries it by itself.",
             "scope": {"allows": "Answering this one argv for this one request.", "forbids": "Any other argv, any persona's table, or a standing grant."}
         }
     });
@@ -2100,6 +2101,7 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
                     {"label": "Do not apply", "does": "Nothing is applied; the active release stays as it is.", "gain": "No irreversible change is made.", "harm": "The landed work stays unreleased.", "cost": "None; a later release run asks again."}
                 ],
                 "recommendation": "Apply: every check passed, and the owner alone decides because the recipe cannot undo it.",
+                "default": "If no answer comes, nothing is applied: the run ends `asked` with this question's id, the trunk stays unreleased, and the next release run asks again.",
                 "scope": {"allows": "Applying this one release.", "forbids": "Any other release, or a standing grant."}
             }),
         )
@@ -2127,6 +2129,7 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
                     {"label": "Look into it", "does": "The owner inspects the release by hand.", "gain": "A finding the line did not give.", "harm": "None to the release, which has already ended.", "cost": "Some minutes."}
                 ],
                 "recommendation": "Noted, unless the line says something failed.",
+                "default": "If no answer comes, nothing waits and nothing changes: the run has already ended, and the line stays in the question store for the owner to read.",
                 "scope": {"allows": "Reading this one release report.", "forbids": "Any other release, or a standing grant."}
             }),
         ) {

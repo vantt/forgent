@@ -159,6 +159,7 @@ pub fn input(reference: &str) -> Value {
             "cause": "two stores exist",
             "options": [option("A", true), option("B", false)],
             "recommendation": "A",
+            "default": "Without an answer the asker keeps store A for this plan.",
             "scope": { "allows": "A for this plan", "forbids": "changing other plans" }
         }
     })

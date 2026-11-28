@@ -51,7 +51,7 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 
 | Entity | Fields | Contract |
 |---|---|---|
-| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `questions.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
+| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, default?, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `questions.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
 | Answer | `id`, `option?`, `text?` (at least one), `by`, `via?`, `answeredAt` | payload of `questions.answered` |
 | Ack | `id`, `by`, `at` | payload of `questions.acked` |
 | Cancel | `id`, `by`, `reason`, `at` | payload of `questions.cancelled` |
@@ -60,6 +60,12 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
   door: every measurable limit is data there (headline one line, at most 120 characters; `what` and `cause` at most
   600 characters each; 2-4 options; a `label` of at most 60 characters; exactly one option recommended; `scope.allows`
   and `scope.forbids`; `blocks` present). The guide carries the rules a program cannot measure.
+- **The stated default.** A decision question also states `parts.default`: what the asker does, and when, if no answer
+  comes. It is required exactly when the options are, so a decision question without it is refused `question-unclear`
+  naming `parts.default`; it is optional under the discovery exception, which offers no option to default to. A
+  `parts.default` that is present but empty or blank is refused `question-unclear` naming `parts.default` at every
+  stage, discovery included (`minLength: 1` in the contract). The field is optional on read, so a question asked
+  before it existed still folds.
 - Discovery exception: options and the recommendation may be empty when `stage` is `discovery` or `exploring`, when the
   ref is a `discussion:` ref and `stage` is `shaping`, or when the question is `--migrated`. Never on a caller flag.
 - `--ref` is one of `discussion:<topic>#Q<n>`, `plan:<dir>[#phase-<nn>]`, `case:<runId>[#<gate>]`. It is checked in the
@@ -94,11 +100,21 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 | Verb | Effect |
 |---|---|
 | `fgos questions [list] [--all] [--answered] [--json]` | One line per question: headline, recommended option, `blocks`, age, answer command; a "needs you" count first. Open gates and `fgos ask` items appear beside the store's questions through the doctor bridge request `work-questions`, fail-open (`work-sources: unavailable <reason>`). `--open` is not accepted. |
-| `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. |
-| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
-| `answer <id> [--option <label>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
+| `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. Options are shown recommended first, each prefixed `A.` to `D.`; the `Recommendation:` line names the recommended option by the letter of its place and its own words, and a line `Default if no answer: <default>` follows it. |
+| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. A decision question states `parts.default` (section 2), refused `question-unclear` naming the field when absent. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
+| `answer <id> [--option <label\|letter>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
 | `ack <id>` | Appends `questions.acked`. |
 | `cancel <id> --reason <t>` | Appends `questions.cancelled`. |
+
+**The letters are one order.** `questions list`, `show`, the answer command and the gateway dashboard all show the
+options recommended first, then the rest as the asker wrote them, each prefixed with the letter of its place (`A.` to
+`D.`). A letter the asker wrote by hand in front of a label is replaced by the letter of the place the option holds,
+so a label is never lettered twice and never carries a place it no longer holds. The same order gives
+the display and the letter an answer names, so the two cannot drift: the list row and the list line print the command
+with that letter, `fgos questions answer <id> --option A`. `show` prints no answer command; it prints the options in
+this order under these letters, and its `Recommendation:` line names the recommended option the same way, as the
+letter of its place (always `A`, since it is shown first) and the label with any hand letter replaced, never the
+asker's raw recommendation string. The dashboard shows the same letters, order, recommendation line and default line.
 
 **Head-socket verbs.** A confined head reaches the door through its request socket: `questions ask`, `questions ack`
 and `questions cancel` for every head, `questions answer` for the secretary only. They are declared in
@@ -113,6 +129,12 @@ the store.
 |---|---|
 | answer | only the owner: refused with `answer-not-owner` when an agent CLI is among the caller's process ancestors (a walk of the process tree matching the kernel names of the known agent CLIs; env is never read). Exceptions: the secretary head answers through its socket with `--source secretary`, and `by` is the owner; the detached gateway and a terminal with no agent ancestor pass as the owner |
 | ack, cancel | the asker session; any session holding the same `head:` role (a rotated successor, or a successor started with the gone asker's role); any head session for a question whose asker held no `head:` role or which is `migrated` |
+
+**How an answer names its option.** `--option` takes an exact label first, then a single letter (`A` to `D`, in
+either case) names the place on screen. A letter past the last option names no option and is refused
+`question-unclear` on `option`, as an unknown label is. A hand letter an asker wrote in front of a label (`B. Keeper
+...`) is replaced by the letter of the place that option holds on display, so a label is never lettered twice and
+never carries a place it no longer holds. The record keeps the option's own label, not the letter.
 
 **The owner rule guards against mistakes, not attack.** It stops an agent answering in the owner's place by accident. It
 is not a security boundary: a determined local process can still reach the store.

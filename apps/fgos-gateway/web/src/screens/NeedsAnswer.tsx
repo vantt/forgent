@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ApiClient } from '../api/client'
 import { GatewayUnreachableError } from '../api/errors'
 import { hostOf, isNonLoopbackHost } from '../lib/network'
-import type { ListQuestionsData, QuestionDetail } from '../api/types'
+import type { ListQuestionsData, QuestionDetail, QuestionOptionDetail } from '../api/types'
 
 // S04 — Questions needing answer (docs/platform/ui-spec/architecture/screens/S04-questions-
 // needing-answer.md). Renders exactly what GET /v1/questions returns, in three groups: store
@@ -18,6 +18,76 @@ export interface NeedsAnswerProps {
 /** The id of the Work item behind an `fgos ask` row's `work:<id>` ref. */
 function workIdOf(ref: string): string {
   return ref.startsWith('work:') ? ref.slice('work:'.length) : ref
+}
+
+interface ShownOption {
+  /** `A` for the first option the owner reads, `B` for the second, and so on. */
+  letter: string
+  option: QuestionOptionDetail
+}
+
+/**
+ * The options in the order the owner reads them: the recommended one first, then the rest as the asker wrote them.
+ * The answer command `fgos questions answer <id> --option <letter>` speaks in these letters, so the display and the
+ * letter the owner types cannot drift.
+ */
+function shownOptions(options: QuestionOptionDetail[]): ShownOption[] {
+  const recommended = options.filter((option) => option.recommended === true)
+  const rest = options.filter((option) => option.recommended !== true)
+  return [...recommended, ...rest].map((option, index) => ({
+    letter: String.fromCharCode('A'.charCodeAt(0) + index),
+    option,
+  }))
+}
+
+/**
+ * The five parts as the gateway serves them: the same shape as `QuestionDetail['asked']['parts']`, plus the stated
+ * default, which the API type does not carry yet.
+ */
+type QuestionParts = QuestionDetail['asked']['parts'] & { default?: string }
+
+/**
+ * The words of a label the asker lettered by hand (`A. words`), or null when the label carries no hand letter: a place
+ * letter `A` to `D`, a dot, and words after it. The same rule as the Rust `hand_lettered`, so both doors read a label
+ * the same way.
+ */
+function handLettered(label: string): string | null {
+  const letter = label.charAt(0)
+  if (!/^[A-D]$/.test(letter) || !label.charAt(1).startsWith('.')) return null
+  const afterDot = label.slice(2)
+  const words = afterDot.startsWith(' ') ? afterDot.slice(1) : afterDot
+  return words.trim() === '' ? null : words
+}
+
+/**
+ * The letter of a place on screen and the option's own words. A letter the asker wrote by hand is replaced by the
+ * letter of the place the option holds now, so a label is never lettered twice and never carries a place it no longer
+ * holds.
+ */
+function letteredLabel(letter: string, label: string): string {
+  const words = handLettered(label)
+  return `${letter}. ${words === null ? label : words.trim()}`
+}
+
+function shownLabel({ letter, option }: ShownOption): string {
+  return letteredLabel(letter, option.label)
+}
+
+/**
+ * The recommended option as the owner reads it: the letter of its place on screen (always `A`, since the recommended
+ * option is shown first) and the option's own words, with any hand letter the asker wrote replaced. The owner must
+ * never see two letters for one option, so the asker's recommendation string is not printed beside a lettered option.
+ * Null when no option is recommended; the caller then keeps the asker's words.
+ */
+function recommendedLabel(options: QuestionOptionDetail[]): string | null {
+  const shown = shownOptions(options).find((candidate) => candidate.option.recommended === true)
+  return shown === undefined ? null : shownLabel(shown)
+}
+
+/** What the asker does, and when, if no answer comes. */
+function statedDefault(parts: QuestionParts): string | null {
+  const value = parts.default
+  return typeof value === 'string' && value.trim() !== '' ? value : null
 }
 
 export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswerProps) {
@@ -168,14 +238,21 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
         {questions.length > 0 && <h2 className="text-xs font-semibold uppercase text-ink-muted">Questions</h2>}
         {questions.map((q) => {
           const detail = details[q.id]
+          const defaultLine = detail ? statedDefault(detail.asked.parts as QuestionParts) : null
+          const recommendation = detail
+            ? (recommendedLabel(detail.asked.parts.options) ?? detail.asked.parts.recommendation)
+            : null
           return (
             <div key={q.id} data-testid={`row-${q.id}`} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
               <span className="text-sm font-semibold text-ink">{q.headline}</span>
               <p data-testid={`tag-${q.id}`} className="mt-1 inline-block rounded-full bg-surface-muted px-2 py-0.5 text-xs font-medium text-ink-muted">
                 QUESTION
               </p>
+              {/* The recommended option is always the first place on screen, so it is the one the CLI list line
+                  letters `A`; the row names it the same way. */}
               <p data-testid={`recommended-${q.id}`} className="mt-1 text-xs text-ink-muted">
-                Recommended: {q.recommended ?? 'none'} · blocks: {q.blocks} · {q.age}
+                Recommended: {typeof q.recommended === 'string' ? letteredLabel('A', q.recommended) : 'none'} · blocks:{' '}
+                {q.blocks} · {q.age}
               </p>
               <button
                 data-testid={`expand-${q.id}`}
@@ -197,28 +274,33 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
                   <p>
                     <strong>Cause:</strong> {detail.asked.parts.cause}
                   </p>
-                  <fieldset className="space-y-1">
-                    {detail.asked.parts.options.map((option) => (
-                      <label key={option.label} className="block rounded-lg border border-border p-2">
+                  <fieldset data-testid={`options-${q.id}`} className="space-y-1">
+                    {shownOptions(detail.asked.parts.options).map((shown) => (
+                      <label key={shown.option.label} className="block rounded-lg border border-border p-2">
                         <input
                           type="radio"
                           name={`option-${q.id}`}
-                          data-testid={`option-${q.id}-${option.label}`}
-                          checked={picked[q.id] === option.label}
-                          onChange={() => setPicked((prev) => ({ ...prev, [q.id]: option.label }))}
+                          data-testid={`option-${q.id}-${shown.option.label}`}
+                          checked={picked[q.id] === shown.option.label}
+                          onChange={() => setPicked((prev) => ({ ...prev, [q.id]: shown.option.label }))}
                           disabled={stale}
                         />{' '}
-                        <strong>{option.label}</strong>
-                        {option.recommended === true ? ' (recommended)' : ''}: {option.does}
+                        <strong>{shownLabel(shown)}</strong>
+                        {shown.option.recommended === true ? ' (recommended)' : ''}: {shown.option.does}
                         <span className="block text-xs text-ink-muted">
-                          gain: {option.gain} · harm: {option.harm} · cost: {option.cost}
+                          gain: {shown.option.gain} · harm: {shown.option.harm} · cost: {shown.option.cost}
                         </span>
                       </label>
                     ))}
                   </fieldset>
                   <p>
-                    <strong>Recommendation:</strong> {detail.asked.parts.recommendation}
+                    <strong>Recommendation:</strong> {recommendation}
                   </p>
+                  {defaultLine && (
+                    <p data-testid={`default-${q.id}`}>
+                      <strong>Default if no answer:</strong> {defaultLine}
+                    </p>
+                  )}
                   <p>
                     <strong>Scope of the answer:</strong> allows {detail.asked.parts.scope.allows}; forbids{' '}
                     {detail.asked.parts.scope.forbids}

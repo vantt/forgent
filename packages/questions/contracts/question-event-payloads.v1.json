@@ -69,6 +69,7 @@
         "cause": { "$ref": "#/$defs/text" },
         "options": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/option" } },
         "recommendation": { "type": "string" },
+        "default": { "$ref": "#/$defs/text" },
         "scope": {
           "type": "object",
           "additionalProperties": false,

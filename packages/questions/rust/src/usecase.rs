@@ -5,8 +5,8 @@
 use crate::caller::{Caller, CallerSource};
 use crate::notifier::{Notifier, OwnerMailbox};
 use crate::record::{
-    Acked, AnswerPayload, Answered, Asked, Asker, Cancelled, DeliveryPending, Recipient, ACKED,
-    ANSWERED, ASKED, CANCELLED, DELIVERY_PENDING,
+    Acked, AnswerPayload, Answered, Asked, Asker, Cancelled, DeliveryPending, QuestionOption,
+    Recipient, ACKED, ANSWERED, ASKED, CANCELLED, DELIVERY_PENDING,
 };
 use crate::refcheck;
 use crate::refusal::Refusal;
@@ -46,6 +46,79 @@ pub struct Listing {
     /// How many questions wait for the owner.
     pub needs_you: usize,
     pub questions: Vec<Question>,
+}
+
+/// One option as the owner reads it: the letter of its place on screen and the option itself.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ShownOption<'a> {
+    /// `A` for the first option shown, `B` for the second, and so on.
+    pub letter: char,
+    pub option: &'a QuestionOption,
+}
+
+/// The options in the order the owner reads them: the recommended one first, then the rest as the asker wrote
+/// them. This one order gives both the display and the letter the owner answers with, so the two cannot drift.
+/// The contract allows at most four options, so the places an answer can name are `A` to `D`; a longer list read
+/// from an older record wraps the letter.
+pub fn shown_options(options: &[QuestionOption]) -> Vec<ShownOption<'_>> {
+    let (recommended, rest): (Vec<_>, Vec<_>) = options
+        .iter()
+        .partition(|option| option.recommended == Some(true));
+    recommended
+        .into_iter()
+        .chain(rest)
+        .enumerate()
+        .map(|(index, option)| ShownOption {
+            letter: char::from(b'A' + (index % 26) as u8),
+            option,
+        })
+        .collect()
+}
+
+/// The words of a label an asker lettered by hand (`B. Keeper's lead ...`): the letter `A` to `D`, a dot and an
+/// optional space are dropped, so the display can give the label the letter of its place instead.
+fn hand_lettered(label: &str) -> Option<&str> {
+    let mut characters = label.chars();
+    let letter = characters.next()?;
+    if !matches!(letter, 'A'..='D') {
+        return None;
+    }
+    let rest = characters.as_str().strip_prefix('.')?;
+    let words = rest.strip_prefix(' ').unwrap_or(rest);
+    (!words.trim().is_empty()).then_some(words)
+}
+
+/// A shown option's label: the letter of its place on screen, a dot and the option's own words. A letter the asker
+/// wrote by hand in front of the label is replaced by the letter of the place the option holds now, so a label is
+/// never lettered twice and never carries a place it no longer holds.
+pub fn shown_label(shown: &ShownOption<'_>) -> String {
+    let prefix = format!("{}.", shown.letter);
+    let label = shown.option.label.as_str();
+    match hand_lettered(label) {
+        Some(words) => format!("{prefix} {}", words.trim()),
+        None => format!("{prefix} {label}"),
+    }
+}
+
+/// The option a `--option` value names: an option whose label is exactly the value, or the option at the place on
+/// screen a single letter `A` to `D` (in either case) names. An exact label is matched first, so a label that is
+/// itself one letter (`B`) names its own option, and the letter is the way to name a place. A letter past the last
+/// option, and any letter past `D`, names nothing.
+pub fn resolve_option<'a>(
+    options: &'a [QuestionOption],
+    value: &str,
+) -> Option<&'a QuestionOption> {
+    if let Some(named) = options.iter().find(|option| option.label == value) {
+        return Some(named);
+    }
+    let mut characters = value.trim().chars();
+    let letter = characters.next()?.to_ascii_uppercase();
+    if characters.next().is_none() && matches!(letter, 'A'..='D') {
+        if let Some(shown) = shown_options(options).get((letter as u8 - b'A') as usize) {
+            return Some(shown.option);
+        }
+    }
+    None
 }
 
 /// The wiring of one call.
@@ -103,27 +176,34 @@ fn not_asker(id: &str) -> Refusal {
     )
 }
 
-fn check_answer(
-    question: &Question,
-    option: Option<&str>,
+/// Checks an answer and returns the label of the option it names, which is what the record keeps: the option's
+/// own label, or the letter at that place on screen. A question with no options keeps a free-text option.
+fn check_answer<'a>(
+    question: &'a Question,
+    option: Option<&'a str>,
     text: Option<&str>,
-) -> Result<(), Refusal> {
-    if option.is_none() && text.is_none() {
-        return Err(Refusal::incomplete(
-            "an answer needs option, text or both",
-            vec!["option|text".into()],
-        ));
-    }
-    if let Some(label) = option {
-        let options = &question.asked.parts.options;
-        if !options.is_empty() && !options.iter().any(|o| o.label == label) {
-            return Err(Refusal::unclear(
-                "option",
-                "must be the label of one of the options",
+) -> Result<Option<&'a str>, Refusal> {
+    let Some(value) = option else {
+        if text.is_none() {
+            return Err(Refusal::incomplete(
+                "an answer needs option, text or both",
+                vec!["option|text".into()],
             ));
         }
+        return Ok(None);
+    };
+    let options = &question.asked.parts.options;
+    if options.is_empty() {
+        return Ok(Some(value));
     }
-    Ok(())
+    resolve_option(options, value)
+        .map(|chosen| Some(chosen.label.as_str()))
+        .ok_or_else(|| {
+            Refusal::unclear(
+                "option",
+                "must be the label of one of the options, or the letter A to D of its place on screen",
+            )
+        })
 }
 
 fn io_refusal(detail: impl Into<String>) -> Refusal {
@@ -318,7 +398,7 @@ impl Questions<'_> {
             }
             State::Cancelled => return Err(not_open(id, "answer", question.state)),
         }
-        check_answer(question, option, text)?;
+        let option = check_answer(question, option, text)?;
         self.append(
             ANSWERED,
             &Answered {
@@ -366,7 +446,7 @@ impl Questions<'_> {
         }
         let option = payload.option.as_deref().filter(|s| !s.is_empty());
         let text = payload.text.as_deref().filter(|s| !s.is_empty());
-        check_answer(question, option, text)?;
+        let option = check_answer(question, option, text)?;
         self.append(
             ANSWERED,
             &Answered {

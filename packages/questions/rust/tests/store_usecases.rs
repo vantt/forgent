@@ -2,8 +2,8 @@
 //! authority to ack and cancel, supersede, the view after a write, and the events with their attrs.
 
 mod store_support;
-use fgos_questions::store::State;
-use fgos_questions::usecase::Which;
+use fgos_questions::store::{LoggedEvent, State};
+use fgos_questions::usecase::{shown_label, shown_options, Which};
 use serde_json::{json, Value};
 use store_support::*;
 
@@ -254,6 +254,80 @@ fn options_and_recommendation_may_be_empty_only_for_discovery_stages_shaping_dis
 }
 
 #[test]
+fn a_decision_question_without_the_default_is_refused_naming_parts_default() {
+    let absent = ask_refusal(|v| {
+        v["parts"].as_object_mut().unwrap().remove("default");
+    });
+    assert_eq!(
+        (absent.code.as_str(), absent.field.as_deref()),
+        ("question-unclear", Some("parts.default"))
+    );
+    assert!(absent.rule.is_some(), "the refusal names its rule");
+    let empty = ask_refusal(|v| v["parts"]["default"] = json!(""));
+    assert_eq!(
+        (empty.code.as_str(), empty.field.as_deref()),
+        ("question-unclear", Some("parts.default"))
+    );
+}
+
+#[test]
+fn a_blank_default_is_refused_even_where_the_default_is_optional() {
+    // The contract gives the field `minLength: 1`, always: a default of spaces says nothing to the owner, so it is
+    // refused at every stage, and the discovery exception that lets the field be absent does not let it be blank.
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    for stage in ["planning", "discovery", "exploring"] {
+        let mut value = input("plan:p");
+        value["parts"]["default"] = json!("   \n\t ");
+        value["stage"] = json!(stage);
+        let refusal = refused(wired(&log, &who, &checkout).ask(&value));
+        assert_eq!(
+            (refusal.code.as_str(), refusal.field.as_deref()),
+            ("question-unclear", Some("parts.default")),
+            "{stage}"
+        );
+    }
+    assert!(log.events.borrow().is_empty(), "nothing was written");
+}
+
+#[test]
+fn a_discovery_question_needs_no_default_because_it_offers_no_option_to_default_to() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    let mut value = input("plan:p");
+    for part in ["options", "recommendation", "default"] {
+        value["parts"].as_object_mut().unwrap().remove(part);
+    }
+    value["stage"] = json!("discovery");
+    let id = wired(&log, &who, &checkout).ask(&value).unwrap().value;
+    let asked = wired(&log, &who, &checkout).show(&id).unwrap().value.asked;
+    assert_eq!(asked.parts.default, None);
+    assert!(asked.parts.options.is_empty());
+}
+
+#[test]
+fn a_question_stored_before_the_field_existed_still_folds_and_is_shown() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    log.events.borrow_mut().push(LoggedEvent {
+        event_type: "questions.asked".into(),
+        payload: json!({
+            "id": "q-old", "askedAt": "2026-11-18T01:00:00.000Z",
+            "asker": { "sessionId": "m-1/a", "handle": "a-handle", "roles": ["head:coder-x"], "machine": "m-1" },
+            "stage": "planning", "ref": { "value": "plan:p", "branch": "work", "commit": "abcdef1" },
+            "headline": "h", "blocks": "b",
+            "parts": { "what": "w", "cause": "c", "options": [option("A", true), option("B", false)], "recommendation": "A", "scope": { "allows": "x", "forbids": "y" } },
+            "migrated": false
+        }),
+    });
+    let shown = wired(&log, &who, &checkout).show("q-old").unwrap().value;
+    assert_eq!(shown.state, State::Open);
+    assert_eq!(shown.asked.parts.recommendation, "A");
+    assert_eq!(shown.asked.parts.default, None);
+    assert_eq!(shown.asked.parts.options.len(), 2);
+}
+
+#[test]
 fn an_answer_is_written_once_by_the_owner_and_a_second_is_refused() {
     let (log, checkout) = (MemLog::default(), checkout());
     let id = ask_as(
@@ -318,6 +392,152 @@ fn an_answer_needs_a_known_open_question_an_option_label_that_exists_and_some_co
     assert_eq!(
         refused(q.answer(&id, Some("A"), None, None)).code,
         "question-not-open"
+    );
+}
+
+/// A question whose recommended option is written second, so the letter of a place on screen and the asker's
+/// own order disagree: the owner answers the place, not the label the asker happened to write first.
+fn asked_with_the_recommendation_second(log: &MemLog, checkout: &Checkout) -> String {
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("keep two stores", false),
+        option("fold into one", true),
+    ]);
+    value["parts"]["recommendation"] = json!("fold into one");
+    value["parts"]["default"] = json!("fold into one");
+    ask_as(log, head("m-1/a", "head:coder-x"), checkout, &value)
+}
+
+#[test]
+fn an_answer_by_the_letter_of_a_place_stores_the_label_of_that_place_recommended_first() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let first = asked_with_the_recommendation_second(&log, &checkout);
+    let second = asked_with_the_recommendation_second(&log, &checkout);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // A is the place the recommended option holds, even though the asker wrote it second.
+    q.answer(&first, Some("A"), None, None).unwrap();
+    assert_eq!(
+        q.show(&first).unwrap().value.answer.unwrap().option,
+        Some("fold into one".into())
+    );
+    // A lower-case letter names the same place: b is the second place, which is the asker's first option.
+    q.answer(&second, Some("b"), None, None).unwrap();
+    assert_eq!(
+        q.show(&second).unwrap().value.answer.unwrap().option,
+        Some("keep two stores".into())
+    );
+}
+
+#[test]
+fn a_hand_lettered_label_is_shown_with_the_letter_of_its_place_and_answered_by_that_place() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    // The shape askers write today: each label lettered by hand, and the recommended one written second.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("A. Wait for the keeper", false),
+        option("B. Keeper's lead takes it", true),
+    ]);
+    value["parts"]["recommendation"] = json!("B. Keeper's lead takes it");
+    value["parts"]["default"] = json!("B. Keeper's lead takes it");
+    let id = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    let asked = q.show(&id).unwrap().value.asked;
+    let shown: Vec<String> = shown_options(&asked.parts.options)
+        .iter()
+        .map(shown_label)
+        .collect();
+    // Each hand letter is replaced by the letter of the place its option holds now, so the recommended option is
+    // `A` although the asker lettered it `B`, and no label carries a place it no longer holds.
+    assert_eq!(
+        shown,
+        [
+            "A. Keeper's lead takes it".to_owned(),
+            "B. Wait for the keeper".to_owned()
+        ]
+    );
+    q.answer(&id, Some("A"), None, None).unwrap();
+    assert_eq!(
+        q.show(&id).unwrap().value.answer.unwrap().option,
+        Some("B. Keeper's lead takes it".into()),
+        "the first place is the recommended option, not the label hand-lettered A"
+    );
+}
+
+#[test]
+fn an_exact_label_that_is_one_letter_names_its_own_option_and_the_letter_names_the_place() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    // Options whose labels are the single letters `A` and `B`, the recommended one written second.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([option("A", false), option("B", true)]);
+    value["parts"]["recommendation"] = json!("B");
+    value["parts"]["default"] = json!("B");
+    let exact = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let place = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // `B` is the label of the recommended option, so it names that option, not the second place.
+    q.answer(&exact, Some("B"), None, None).unwrap();
+    assert_eq!(
+        q.show(&exact).unwrap().value.answer.unwrap().option,
+        Some("B".into())
+    );
+    // A letter that matches no label still names a place: `b` is the second place, the option labelled `A`.
+    q.answer(&place, Some("b"), None, None).unwrap();
+    assert_eq!(
+        q.show(&place).unwrap().value.answer.unwrap().option,
+        Some("A".into())
+    );
+}
+
+#[test]
+fn the_last_place_is_a_letter_that_answers_and_the_place_past_it_is_refused_question_unclear_on_option(
+) {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let last = asked_with_the_recommendation_second(&log, &checkout);
+    let past = asked_with_the_recommendation_second(&log, &checkout);
+    let beyond = asked_with_the_recommendation_second(&log, &checkout);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // B is the last place of a two-option question; C is one past it and names nothing.
+    q.answer(&last, Some("B"), None, None).unwrap();
+    assert_eq!(
+        q.show(&last).unwrap().value.answer.unwrap().option,
+        Some("keep two stores".into())
+    );
+    let refusal = refused(q.answer(&past, Some("C"), None, None));
+    assert_eq!(
+        (refusal.code.as_str(), refusal.field.as_deref()),
+        ("question-unclear", Some("option"))
+    );
+    // E is past `D`, the last letter a place can have, so it names nothing even when a fourth place exists.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("A", true),
+        option("B", false),
+        option("C", false),
+        option("D", false),
+    ]);
+    let four = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let refusal = refused(q.answer(&four, Some("E"), None, None));
+    assert_eq!(
+        (refusal.code.as_str(), refusal.field.as_deref()),
+        ("question-unclear", Some("option")),
+        "a letter past D names no place"
+    );
+    let refusal = refused(q.answer(&beyond, Some("e"), None, None));
+    assert_eq!(refusal.code, "question-unclear", "in either case");
+    // The four places before it are named, so the refusal is about the letter and not about the count.
+    q.answer(&four, Some("D"), None, None).unwrap();
+    assert_eq!(
+        q.show(&four).unwrap().value.answer.unwrap().option,
+        Some("D".into())
+    );
+    assert_eq!(
+        q.show(&past).unwrap().value.state,
+        State::Open,
+        "nothing was written"
     );
 }
 

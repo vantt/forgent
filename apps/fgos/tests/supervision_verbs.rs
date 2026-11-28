@@ -879,7 +879,7 @@ fn a_running_plan_whose_named_lead_role_is_held_by_a_live_non_head_session_repor
     assert_eq!(view["leadsWaiting"], 0, "{view}");
 }
 
-const PHASE_QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"phase 1","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","scope":{"allows":"A for this plan","forbids":"changing other plans"}}}"#;
+const PHASE_QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"phase 1","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","default":"Without an answer the asker keeps store A for this plan","scope":{"allows":"A for this plan","forbids":"changing other plans"}}}"#;
 
 #[test]
 fn a_live_lead_whose_only_open_phase_has_an_open_question_in_the_store_is_counted_waiting() {
