@@ -266,6 +266,11 @@ runner:
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
+  # @fgos:doc Settings of the transient systemd user scope wrapping each run supervisor.
+  supervisorScope:
+    # @fgos:doc Memory cap for the run supervisor's systemd scope in systemd size syntax (e.g. 8G); empty means no cap. Default: 8G.
+    # @fgos:why [c160549d-8032-4983-8e07-2306ae9a1c26] the release recipe (npm test at concurrency 6, then cargo test --workspace) peaks above 8G; the kernel OOM-killed the release run twice on 2026-11-28 at 8G, so no release could finish. Machine has 30G.
+    memoryMax: 12G
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
