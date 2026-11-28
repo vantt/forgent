@@ -1,0 +1,4 @@
+2307232 /usr/bin/zsh
+2308616 /usr/bin/bwrap
+2308617 /home/vantt/.local/state/fgos/releases/sha256:0de56517938835fbbba0f55b6e54d50d3157dc4bcf58598bac29e15e9823e206/bin/fgos
+2309026 /home/vantt/.local/share/claude/versions/2.1.332

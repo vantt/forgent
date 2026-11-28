@@ -1,0 +1,11 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T12:53:16.413Z",
+  "data_hash": "449717102a0b4edaf2232277316f4962697ff97dab0ab233bc76796bdcccf706",
+  "data": {
+    "session": "claude-4jvx@fg-server2",
+    "lines": 60,
+    "truncated": false,
+    "text": "  that later gets landed on main. So I haven't\n  created or saved anything.\n\n  What topic should this discussion shape, and in\n  which domain (coding or another)? If this was\n  only a check that a shaper session starts, it\n  did, and you can stop it. Otherwise give me the\n  topic in a line or point me at its backlog row.\n  I'll then create the DISCUSSION.md, scout, and\n  open round 1.\n\n✻ Baked for 30s · done 7:52 PM\n\n───────────────────────────────────────────────────\n❯\n───────────────────────────────────────────────────\n  🤖 Opus 5.5 - 9%  ⌛ 5h 15% (3h7m)  wk 2% (4d)…\n  ⏵⏵ bypass permissions on (shift+tab to cycle)\n"
+  }
+}
