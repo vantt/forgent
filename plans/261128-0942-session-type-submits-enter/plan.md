@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "fgos session type submits what it types, or refuses by name"
-status: ready
+status: running
 priority: P1
 blockedBy: []
 footprint:
@@ -32,13 +32,15 @@ footprint:
   - .agents/skills/fgos-supervisor/SKILL.md
   - plugins/fgOS/skills/fgos-supervisor/SKILL.md
   - changelog.d/261128-0942-session-type-submits.md
-base: 89a347aeab781be7070386e1992a03b3110f2d07
+base: 95f46f9b464538cc0cfd02e33097e47f5139e5a3
 source:
   - plans/discussions/ds-itzp2debmh-session-type-submits-enter/DISCUSSION.md
   - p-nroysfhtso
   - p-cdsvrsfnui
   - p-lfwmzs6zsr
 created: 2026-11-28
+lead: head:lead-forgent-261128-0942-sessio-d40a0
+host: fg-server2-jdp2bv
 ---
 
 # fgos session type submits what it types, or refuses by name
