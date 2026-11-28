@@ -77,8 +77,6 @@ pub const VALID_REASONS: &[&str] = &["answer", "done", "wontfix", "clarify-pass"
 /// A resolve reason may also be `filed:<backlog-id>`: the friction became that backlog row.
 const FILED_PREFIX: &str = "filed:";
 
-pub const VALID_DOC_TYPES: &[&str] = &["tutorial", "how-to", "reference", "explanation"];
-
 /// What a friction may point at besides its subject.
 pub const REF_KINDS: &[&str] = &[
     "run", "session", "plan", "phase", "backlog", "executor", "case", "work",
@@ -182,11 +180,12 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
         return Err(invalid_input("producer must not be empty"));
     }
     if let Some(dt) = &input.doc_type {
-        if !one_of(dt, VALID_DOC_TYPES) {
+        let doc_types = published_values(DOC_TYPE_ATTR)?;
+        if !doc_types.contains(dt) {
             return Err(invalid_input(format!(
                 "invalid docType \"{}\". Allowed docTypes: {}",
                 dt,
-                VALID_DOC_TYPES.join(", ")
+                listed(doc_types)
             )));
         }
     }
@@ -1183,7 +1182,7 @@ pub fn rank_by_bucket(
         .into_iter()
         .filter_map(Event::projected)
         .collect();
-    let registry = Registry::from_embedded(&[FRICTION_DECLARATION]).map_err(|e| e.to_string())?;
+    let registry = registry()?;
     let source = UnsettledSource(records.clone());
     let sources: [&dyn RecordSource; 1] = [&source];
     let now_millis = parse_rfc3339_millis(&now_iso()).unwrap_or_default();
@@ -1197,7 +1196,7 @@ pub fn rank_by_bucket(
     let result = run(
         &query,
         &QueryContext {
-            registry: &registry,
+            registry,
             sources: &sources,
             root,
             now_millis,
