@@ -578,6 +578,48 @@
         "reason": "login"
       },
       "source": "the real tail of a pi exit on a missing key, shown on a pane screen"
+    },
+    {
+      "name": "composer-state-empty-idle-composer",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "real frame recorded at pi 1.3.0 with fgos session read, idle after a provider error",
+      "script": { "frames": [{ "at": 0, "file": "idle-empty-1.3.0" }] },
+      "expect": { "composerState": "empty" }
+    },
+    {
+      "name": "composer-state-half-typed-line-is-not-empty",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "real frame recorded at pi 1.3.0 with fgos session read, a draft typed into a capture head",
+      "script": { "frames": [{ "at": 0, "file": "half-typed-1.3.0" }] },
+      "expect": { "composerState": "not-empty" }
+    },
+    {
+      "name": "composer-state-working-frame-is-unknown",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "real frame recorded at pi 1.3.0 with fgos session read, mid-turn",
+      "script": { "frames": [{ "at": 0, "file": "working-1.3.0" }] },
+      "expect": { "composerState": "unknown" }
+    },
+    {
+      "name": "composer-state-without-a-composer-on-screen-is-unknown",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "synthesized: a screen with no composer rules cannot be read with confidence",
+      "script": { "frames": [{ "at": 0, "screen": "starting up\n" }] },
+      "expect": { "composerState": "unknown" }
+    },
+    {
+      "name": "composer-state-detector-prompt-text-is-not-empty",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "synthesized: the detector reads text out of the composer while the screen shows no rules",
+      "script": {
+        "frames": [{ "at": 0, "screen": "x\n", "inspection": { "state": "idle", "visibleIdle": true, "promptText": "draft" } }]
+      },
+      "expect": { "composerState": "not-empty" }
     }
   ]
 }

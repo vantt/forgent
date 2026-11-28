@@ -1,0 +1,60 @@
+  Nghĩa 2: sổ ghi lịch sử quyết định thiết kế. Đây là file decision-kinds.yaml, chỉ có 9 mục. Nó không nói component làm gì. Nó chỉ nói khi chốt một D-ADR  │…2-step2-core-write-door/reports/g2-drafts/en-vi-01.txt
+  về chủ đề X thì ghi narrative vào thư mục nào.                                                                                                            │…2-step2-core-write-door/reports/g2-drafts/en-vi-02.txt
+  - Sổ này được thêm dần mỗi khi có ai cần, nên mới có 9.                                                                                                   │↓ 38 more below (opt+↓ to scroll)
+  - Component-authority giữ sổ này vì nó là nơi trả lời "ai giữ cái gì", và một trong những thứ cần giữ là chỗ ghi lịch sử.                                 │
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+  Em đề xuất gỡ rối như sau:                                                                                                                                │.fgos/distribution.json                                     [ ask ]
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+  1. Sửa câu chữ nguyên tắc 7 theo đúng câu của anh: "mỗi component đảm nhiệm một việc; không component thứ hai làm việc tương tự". Bỏ chữ "decision" khỏi  │ 2    "schemaVersion": 1,
+     câu này.                                                                                                                                               │ 3    "projectRuntime": {
+  2. Gộp sổ lịch sử vào hàng component. Mỗi hàng đã có trường spec. Mặc định, lịch sử quyết định của component nằm ở mục "Lịch sử quyết định" trong spec đó,│ 4      "policy": "exact-digest",
+     nên cả 73 hàng tự có chỗ ghi mà không cần sổ riêng. Chỉ khi một component ghi lịch sử ở chỗ khác (ví dụ thư mục decisions/ riêng) thì mới khai thêm    │ 5 -    "artifactDigest": "sha256:abe41ad0e5644e1e56eaf34a074ec2ae7
+     một trường trên hàng đó.                                                                                                                               │   -735400477a340e84750e0d4fc31e044",
+     - Khi đó file decision-kinds.yaml có thể bỏ, và hai nghĩa không còn dùng chung chữ.                                                                    │ 6 -    "releaseVersion": "v0.2.0-rc.12",
+     - Bảng trong governance.md vẫn sinh ra được, chỉ đổi nguồn sang hàng component.                                                                        │ 5 +    "artifactDigest": "sha256:0b0992f632d6524596ef8d0dc6ab10db7
+     - Hướng này làm mô hình nhỏ đi, đúng RUL104.                                                                                                           │   +1ed50ab279e62f40d16ef91e6d0cab9",
+     - CAS-D20 sửa theo: bỏ vế "sở hữu một decision kind". Ba component trước đây giữ được nhờ vế này (agent-confinement, enduser-docs-*) sẽ phải giữ bằng  │ 6 +    "releaseVersion": null,
+       code, contract hoặc door. Em sẽ kiểm lại ba hàng đó trước khi ghi.                                                                                   │ 7      "channel": null,
+  3. Việc bắt trùng trách nhiệm vẫn do người soát. Em không đề xuất thêm cơ chế máy, vì owns là chữ tự do và máy không so được nghĩa. Riêng phần code thì đã│ 8      "allowPrerelease": false
+     có phép kiểm phủ: mỗi file thuộc đúng một component.                                                                                                   │ 9    }
+                                                                                                                                                            │
+  Anh đồng ý hướng này không? Nếu đồng ý, em sẽ ghi thành CAS-D25.                                                                                          │───────────────────────────────────────────────────────────────────
+                                                                                                                                                            │…-rule/reports/lead-261127-1116-when-to-ask-lead-notes.md (untracke
+✻ Sautéed for 21s · done 10:41 PM                                                                                                                           │                                                         d)
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+❯ 1 đồng ý; về decision này có phải là ADR không                                                                                                            │New file not yet staged.
+                                                                                                                                                            │Run `git add :/plans/261127-0144-when-to-ask-owner-rule/reports/lea
+  Ran 1 shell command                                                                                                                                       │d-261127-1116-when-to-ask-lead-notes.md` to see line counts.
+                                                                                                                                                            │
+● Đúng, "quyết định" ở nghĩa 2 chính là ADR: các bản ghi D-ADR#### (Architecture Decision Record). Mỗi bản ghi là một quyết định thiết kế bền, ví dụ:       │───────────────────────────────────────────────────────────────────
+  - D-ADR0057: Git là một component Rust duy nhất, giữ mọi thao tác ghi git.                                                                                │…0144-when-to-ask-owner-rule/reports/recapture-goldens.sh (untracke
+  - D-ADR0062: RUL104, tốt hơn chứ không to hơn.                                                                                                            │                                                         d)
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+  Một ADR có ba phần:                                                                                                                                       │New file not yet staged.
+  - Số: lấy từ fgos identity mint d-adr.                                                                                                                    │Run `git add :/plans/261127-0144-when-to-ask-owner-rule/reports/rec
+  - Phạm vi (scope): cột đầu của docs/decisions/index.md, ví dụ runner, observe, platform-foundations.                                                      │apture-goldens.sh` to see line counts.
+  - Narrative: đoạn giải thích đầy đủ, ghi vào mục "Lịch sử quyết định" trong spec.md của khu vực đó, hoặc vào thư mục decisions/.                          │
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+  File decision-kinds.yaml là sổ trả lời "ADR có scope X thì ai giữ và narrative ghi ở đâu". Sổ chỉ có 9 mục, trong khi index đã dùng những scope không có  │…when-to-ask-owner-rule/reports/widen-goldens-command.txt (untracke
+  trong sổ (architecture-map, platform-foundations). Những scope đó đang được tra qua bảng trong governance.md. Như vậy hôm nay có hai chỗ tra, và sổ thiếu │                                                         d)
+  hàng.                                                                                                                                                     │───────────────────────────────────────────────────────────────────
+                                                                                                                                                            │New file not yet staged.
+  Đề xuất 2 nói theo chữ ADR thì như sau:                                                                                                                   │Run `git add :/plans/261127-0144-when-to-ask-owner-rule/reports/wid
+  - Scope của một ADR là id của component giữ quyết định đó, ví dụ runner, git, workflow.                                                                   │en-goldens-command.txt` to see line counts.
+  - Narrative mặc định ghi vào mục "Lịch sử quyết định" trong spec của chính component đó. Cả 73 component đều tự có chỗ.                                   │
+  - Bỏ decision-kinds.yaml. Bảng trong governance.md và cột scope của index đều đọc từ hàng component. Tên cũ như architecture-map thành alias của component│───────────────────────────────────────────────────────────────────
+    kế nhiệm, đúng như cách CAS-D21 xử lý hàng retired.                                                                                                     │…p2-core-write-door/reports/baseline-topics-per-item.json (untracke
+  - Điểm 1 (anh vừa đồng ý) tách chữ cho rõ: trách nhiệm là việc component làm (owns); ADR là quyết định thiết kế về component đó.                          │                                                         d)
+                                                                                                                                                            │───────────────────────────────────────────────────────────────────
+  Anh đồng ý điểm 2 không? Em sẽ ghi cả hai điểm vào CAS-D25 rồi land một lần.                                                                              │New file not yet staged.
+                                                                                                                                                            │Run `git add :/plans/261127-1003-h2-step2-core-write-door/reports/b
+✻ Cooked for 17s · done 10:45 PM                                                                                                                            │aseline-topics-per-item.json` to see line counts.
+                                                                                                                                                            │
+※ recap: Chúng ta đang chốt mô hình component-authority, và anh vừa đồng ý sửa nguyên tắc 7 thành "mỗi component một việc, không trùng". Việc tiếp theo là  │───────────────────────────────────────────────────────────────────
+  anh trả lời có gộp sổ ADR (`decision-kinds.yaml`) vào hàng component không, rồi em ghi CAS-D25 và land.                                                   │…ep2-core-write-door/reports/baseline-topics-per-item.mjs (untracke
+                                                                                                                    new task? /clear to save 155.1k tokens  │
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  🤖 Opus 5.5 - 15%  ⌛ wk 66% (1d)  📁 ~/projects/forgent  🌿 main
+  ⏵⏵ bypass permissions on (shift+tab to cycle)

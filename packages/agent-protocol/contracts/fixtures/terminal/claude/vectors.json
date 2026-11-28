@@ -459,41 +459,10 @@
       "source": "synthesized: the agent's own words while it works"
     },
     {
-      "name": "composer-state-placeholder-or-identical-draft-is-unknown",
+      "name": "composer-state-frame-from-an-older-claude-version-is-unknown",
       "step": "composer-state",
       "version": "2.1.302",
-      "script": {
-        "frames": [
-          {
-            "at": 0,
-            "file": "ready"
-          }
-        ]
-      },
-      "expect": {
-        "composerState": "unknown"
-      }
-    },
-    {
-      "name": "composer-state-empty-turn-finished",
-      "step": "composer-state",
-      "version": "2.1.302",
-      "script": {
-        "frames": [
-          {
-            "at": 0,
-            "file": "turn-finished"
-          }
-        ]
-      },
-      "expect": {
-        "composerState": "empty"
-      }
-    },
-    {
-      "name": "composer-state-half-typed",
-      "step": "composer-state",
-      "version": "2.1.302",
+      "source": "real frame recorded at 2.1.302, before the pin moved to 2.1.332; its banner makes the predicate refuse it",
       "script": {
         "frames": [
           {
@@ -503,18 +472,69 @@
         ]
       },
       "expect": {
-        "composerState": "not-empty"
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-empty-idle-after-a-turn",
+      "step": "composer-state",
+      "version": "2.1.332",
+      "source": "real frame recorded at 2.1.332 with fgos session read",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "idle-empty-2.1.332"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-idle-after-a-turn-second-frame",
+      "step": "composer-state",
+      "version": "2.1.332",
+      "source": "real frame recorded at 2.1.332 with fgos session read, a different session",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "idle-empty-b-2.1.332"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-working-frame-at-the-pinned-version-is-unknown",
+      "step": "composer-state",
+      "version": "2.1.332",
+      "source": "real frame recorded at 2.1.332 with fgos session read",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working-2.1.332"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
       }
     },
     {
       "name": "composer-state-half-typed-try-line",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "script": {
         "frames": [
           {
             "at": 0,
-            "screen": "Claude Code v2.1.302\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u276f try running the tests\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n",
+            "screen": "Claude Code v2.1.332\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u276f try running the tests\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n",
             "inspection": {
               "state": "idle",
               "visibleIdle": true,
@@ -529,25 +549,9 @@
       }
     },
     {
-      "name": "composer-state-draft-in-composer",
-      "step": "composer-state",
-      "version": "2.1.302",
-      "script": {
-        "frames": [
-          {
-            "at": 0,
-            "file": "draft-in-composer"
-          }
-        ]
-      },
-      "expect": {
-        "composerState": "not-empty"
-      }
-    },
-    {
       "name": "composer-state-dialog-blocked",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "script": {
         "frames": [
           {
@@ -563,7 +567,7 @@
     {
       "name": "composer-state-busy-working",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "script": {
         "frames": [
           {
@@ -579,7 +583,7 @@
     {
       "name": "composer-state-blank-first-line-draft",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: short multiline draft with no prompt inspection, before the closing separator",
       "script": {
         "frames": [{
@@ -592,7 +596,7 @@
     {
       "name": "composer-state-another-quoted-try-placeholder-is-unknown",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: placeholder wording can vary",
       "script": {
         "frames": [{
@@ -605,7 +609,7 @@
     {
       "name": "composer-state-screen-only-quoted-try-placeholder-is-unknown",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: placeholder wording can vary without prompt inspection",
       "script": {
         "frames": [{
@@ -618,7 +622,7 @@
     {
       "name": "composer-state-screen-only-half-typed-try-line",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: prompt inspection unavailable",
       "script": {
         "frames": [{
@@ -631,7 +635,7 @@
     {
       "name": "composer-state-screen-only-draft-ending-in-bare-greater-than",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: a draft continuation is not the prompt line when prompt inspection is unavailable",
       "script": {
         "frames": [{
@@ -644,7 +648,7 @@
     {
       "name": "composer-state-typed-prompt-symbol-is-not-empty",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: a draft consists of a prompt-like symbol",
       "script": {
         "frames": [{
@@ -657,11 +661,11 @@
     {
       "name": "composer-state-unicode-before-matching-banner",
       "step": "composer-state",
-      "version": "2.1.302",
+      "version": "2.1.332",
       "source": "synthesized: Unicode whose lowercase has a different byte length precedes an ASCII banner",
       "script": {
         "frames": [{
-          "screen": "İİİ CLAUDE CODE v2.1.302\n❯\n",
+          "screen": "İİİ CLAUDE CODE v2.1.332\n❯\n",
           "inspection": { "state": "idle", "visibleIdle": true, "promptText": "❯\n" }
         }]
       },

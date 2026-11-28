@@ -38,7 +38,7 @@
   "typedNudges": {
     "claude": {
       "channel": "typed",
-      "versions": ["2.1.302"],
+      "versions": ["2.1.332"],
       "source": "packages/agent-protocol/contracts/fixtures/terminal/claude/: composer vectors; typed only through session-host's idle, empty and dialog-free gate"
     },
     "codex": {
