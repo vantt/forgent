@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "fgos session type submits what it types, or refuses by name"
-status: draft
+status: withdrawn
 priority: P1
 blockedBy:
   - 261125-2315-head-mail-knowhow-in-skills
@@ -29,6 +29,8 @@ created: 2026-11-26
 ---
 
 # fgos session type submits what it types
+
+Status: superseded by plans/261128-0942-session-type-submits-enter (done, 0d2c097d9a), planned from the same discussion and rows. Kept below for reference.
 
 Answers the settled discussion `plans/discussions/ds-itzp2debmh-session-type-submits-enter/DISCUSSION.md`
 (D1 to D6). The three source rows are one fault: the verb pastes the line and never submits it, yet answers
