@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "3220cbc93a49525a163124e49106c46af0860708a8c6367ba5cd9a0583d0e215",
+  "payloadDigest": "255d98bdf506a47ed2e94702c75087eddff5011cb1410e2e9ce55d96e05988ae",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -180,7 +180,7 @@
     "apps/fgos/src/wiring/session_rotation_hook_unsupported.rs": "a02dbd8ee5af50c05f69b4aabbd5c4c4cbe36e0fe261e463997abd04176e4c4a",
     "apps/fgos/src/wiring/session_write_publish.rs": "b1f24eab79bd3d4ec9fc3cd497a036632f7f36d05cf99e4cf5087eb072a51d62",
     "apps/fgos/src/wiring/start_context.rs": "7a24a7f0b0ce664ed77cb34d75ec5bb2625d31067f09ba249fecdefafc5feaf8",
-    "apps/fgos/src/wiring/supervision.rs": "bf64df4a5303c06f3569fe9a818c7881cd567cb35ccd675673175caddbf4bfd7",
+    "apps/fgos/src/wiring/supervision.rs": "0a88f126245e0ad556aaa1e0c826e369b3c70aa6173221f1f9ac92bfbaa0d678",
     "apps/fgos/src/wiring/terminal_route.rs": "e29a3ec670db995fbf7a3e00c70ed8bf3870fd772f298a01ebe9e4198096aed0",
     "apps/fgos/src/wiring/terminal_tabs.rs": "a519a4903b296a3f6bfd486f41ea93d1ceb1489c28a4e6dc6dcfe03223ce3130",
     "apps/fgos/src/wiring/uninstall.rs": "1fd8cdeef4360bb32ae0dd1452bdc6cb09c57427d95645c030105a24533dceff",
@@ -220,7 +220,7 @@
     "apps/fgos/tests/questions_verb.rs": "b0ccc8a1c82bbf81b7ad84eecfdcf4a2e3c350eb297cf6749645b4ee1a3296dd",
     "apps/fgos/tests/session_write_publish.rs": "3aea334b5ec2766dca33a89462f897932488645f34150678c2d3c49454cebfaa",
     "apps/fgos/tests/start_context.rs": "940d9237fbb964ca7194b8b10fdf318ce2b29ed963fdeb6f6b975d6983940930",
-    "apps/fgos/tests/supervision_verbs.rs": "00ca52ac328cb77d2dbcea86b87834ac678f6c35856e4da10ffabe587599a71a",
+    "apps/fgos/tests/supervision_verbs.rs": "0f9aa2a9b5554a2861ef24b7fda934652f65ba2bd4a0c85b0c199fb9eb612710",
     "apps/fgos/tests/windows_borrow.rs": "deeb68f3b777b64c076bfd317baac95b11cff6c0bceede7eb3774a3d6d25f7bf",
     "apps/fgos/tests/windows_cwd_lease_owner.rs": "c3e833710c3dfa42f98addbca06e1dd7935470e73880a5ce7bb9622a9991f26a",
     "apps/fgos/tests/windows_doctor_lock_rows.rs": "943ba00e7be5382a532ad47bfa38f6fef888428910e5f70ee18518edeb1eeb63",
@@ -1057,7 +1057,7 @@
     "packages/mailbox/rust/store/tests/record_ingest.rs": "5f84c2b6c8f3b600ba706da70bf6edc6c34016971fba79d0925a7fd19d97cc88",
     "packages/mailbox/rust/store/tests/record_prune.rs": "72ae0203f2840ed402c12e0fa84f720d3443d0f36382af8896822de670fbd4ba",
     "packages/mailbox/rust/store/tests/record_snapshot.rs": "81af621aef7bc189863a2f3992a12a207b8845fb932d57f11535aa905b3de94a",
-    "packages/mailbox/rust/store/tests/verbs.rs": "7ecee54280bacd8741aa05ed2c84813ab5e18ce84bf4a84842039650e48df16e",
+    "packages/mailbox/rust/store/tests/verbs.rs": "e869038439e2131ddc4c2951aac7c8f751be678df1b98d30ef9c2095ff424a5a",
     "packages/observe/rust/src/case_journal.rs": "efa3ba0f2eade3c40434349d03f9e011d5ba88c4ebbeaf9f85d6a1c4d9494161",
     "packages/observe/rust/src/contract.rs": "3f81b85bc2053002443961cf3b9735c9028bc10cbcf9838db310efaa3aafa2c0",
     "packages/observe/rust/src/definition/mod.rs": "523fafd2596773070ff36053fe33c5e3b807c7a06cdb4c01e78ceeb250fed027",
@@ -2779,6 +2779,20 @@
       "class": "rust-test"
     },
     {
+      "path": "apps/fgos/tests/supervision_verbs.rs",
+      "line": 1625,
+      "spawn": "Command::new",
+      "binary": "? None, }",
+      "class": "rust-test"
+    },
+    {
+      "path": "apps/fgos/tests/supervision_verbs.rs",
+      "line": 1625,
+      "spawn": "Command::new",
+      "binary": "? Terminal { profile }",
+      "class": "rust-test"
+    },
+    {
       "path": "apps/fgos/tests/windows_borrow.rs",
       "line": 140,
       "spawn": "Command::new",
@@ -3758,7 +3772,7 @@
     },
     {
       "path": "packages/mailbox/rust/store/tests/verbs.rs",
-      "line": 242,
+      "line": 245,
       "spawn": "Command::new",
       "binary": "? name of spawn_named_copy",
       "class": "rust-test"

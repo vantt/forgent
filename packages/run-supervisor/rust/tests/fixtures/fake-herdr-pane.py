@@ -16,6 +16,7 @@ that a test edits while it runs:
   gone           when present, every pane command says pane_not_found
   closed.<pane>  written when that pane is closed; its commands then say pane_not_found
   unreadable     when present, `pane read`, `agent get` and `agent explain` fail as an unreachable server does
+  foreground.pid when present, `pane process-info` lists that live pid as the pane's foreground process
   no-process     when present, `pane process-info` reports only the pane's shell
   shell-stuck    when present, the pane's shell never runs a typed command line: a probe prints nothing
   calls.log      every call, arguments joined by a tab (written here)
@@ -180,6 +181,11 @@ if (group, action) == ("pane", "process-info"):
             except OSError:
                 continue
             live.append({"argv": argv, "cmdline": " ".join(argv), "cwd": "/", "name": os.path.basename(argv[0]) if argv else "", "pid": child})
+    forced = read("foreground.pid").strip()
+    if forced and not os.path.exists(path("no-process")):
+        pid = int(forced)
+        argv = read_proc(f"/proc/{pid}/cmdline").split("\0")[:-1]
+        live = [{"argv": argv, "cmdline": " ".join(argv), "cwd": "/", "name": os.path.basename(argv[0]) if argv else "", "pid": pid}]
     if not live:
         live = [{"argv": ["sh"], "cmdline": "sh", "cwd": "/", "name": "sh", "pid": shell}]
     say({"process_info": {"foreground_process_group_id": live[0]["pid"], "foreground_processes": live, "pane_id": TARGET, "shell_pid": shell}, "type": "pane_process_info"})

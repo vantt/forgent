@@ -226,7 +226,7 @@ fn report_of(fgos: &TempFgos, to: &str, versions: &VersionSources) -> Vec<String
     answer.text.lines().map(String::from).collect()
 }
 
-/// A copy of `sleep` named `name` inside `<dir>/<parent>/`, spawned.
+/// A copy of the system shell named `name` inside `<dir>/<parent>/`, spawned.
 fn spawn_named_copy(dir: &std::path::Path, parent: &str, name: &str) -> Child {
     let folder = dir.join(parent);
     std::fs::create_dir_all(&folder).unwrap();
@@ -234,12 +234,20 @@ fn spawn_named_copy(dir: &std::path::Path, parent: &str, name: &str) -> Child {
     // `install` writes the executed copy in its own process: a file this process writes can be
     // held open by a child another test thread forks, and exec then fails with ETXTBSY.
     let installed = std::process::Command::new("install")
-        .args(["-m", "700", "/bin/sleep"])
+        .args(["-m", "700"])
+        .arg(std::fs::canonicalize("/bin/sh").unwrap())
         .arg(&copy)
         .status()
         .unwrap();
     assert!(installed.success());
-    Child(std::process::Command::new(copy).arg("60").spawn().unwrap())
+    // The shell blocks reading its piped stdin until killed or the pipe closes; it runs under any name.
+    Child(
+        std::process::Command::new(copy)
+            .args(["-c", "read line"])
+            .stdin(std::process::Stdio::piped())
+            .spawn()
+            .unwrap(),
+    )
 }
 
 #[test]

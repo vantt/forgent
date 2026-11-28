@@ -1344,18 +1344,18 @@ fn a_confined_land_that_names_the_footprint_is_refused_before_the_socket() {
 
 /// A live session of this project holding `role`, with a terminal pane in Identity; returns its handle.
 fn register_session(scene: &Scene, role: &str, value: &str) -> String {
-    register_session_at(scene, role, value, None, false)
+    register_session_at(scene, role, value, None, false, None)
 }
 
-/// [`register_lead_session`] whose CLI session carries this test process's pid, so the host can read the head's CLI
-/// version from a Claude sessions file named after that pid.
+/// [`register_lead_session`] whose CLI session record carries no pid and no start time: the confined shape of a
+/// head whose CLI version can only come from the process running in its pane.
 fn register_claude_head(scene: &Scene, role: &str, value: &str, key: &str) -> String {
-    register_session_at(scene, role, value, Some(key), true)
+    register_session_at(scene, role, value, Some(key), true, None)
 }
 
 /// [`register_session`] whose terminal group names the slot `key`, as a lead's supervisor records it.
 fn register_lead_session(scene: &Scene, role: &str, value: &str, key: &str) -> String {
-    register_session_at(scene, role, value, Some(key), false)
+    register_session_at(scene, role, value, Some(key), false, None)
 }
 
 fn register_session_at(
@@ -1364,6 +1364,7 @@ fn register_session_at(
     value: &str,
     key: Option<&str>,
     with_cli_session: bool,
+    cli_pid: Option<u32>,
 ) -> String {
     let state = scene.root.join("state");
     let info = fgos_identity::session_for(
@@ -1392,7 +1393,7 @@ fn register_session_at(
             name: None,
             name_source: None,
             socket: None,
-            pid: Some(std::process::id()),
+            pid: cli_pid,
             start_time: None,
         }),
         terminal: Some(fgos_identity::directory::TerminalIds {
@@ -1522,7 +1523,8 @@ fn session_read_resolves_its_target_through_identity_before_it_reaches_the_termi
 }
 
 #[test]
-fn session_type_is_refused_until_an_open_event_names_the_target_session() {
+fn session_type_takes_the_cli_version_from_the_process_in_the_pane_and_is_refused_until_an_open_event_names_the_session(
+) {
     let scene = Scene::new("type", WATCHER_CONFIG);
     let handle = register_session(&scene, "lead:S6A", "type-target");
     let args = [
@@ -1602,19 +1604,32 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
         "stuck with an unsent wake line",
         "--json",
     ]);
-    let config_dir = scene.root.join("claude-config");
-    fs::create_dir_all(config_dir.join("sessions")).unwrap();
+    // The pane's foreground process is a Claude whose executable sits in `versions/<pin>`; the verb takes
+    // the version from that process, not from the head's identity record.
+    let pin = fgos_agent_protocol::terminal::adapter_for("claude")
+        .unwrap()
+        .pinned_version()
+        .to_string();
+    let folder = scene.root.join("claude-exe/versions");
+    fs::create_dir_all(&folder).unwrap();
+    let exe = folder.join(&pin);
+    // `install` writes the executed copy in its own process, so no forked child holds it open (ETXTBSY).
+    assert!(std::process::Command::new("install")
+        .args(["-m", "700"])
+        .arg(std::fs::canonicalize("/bin/sh").unwrap())
+        .arg(&exe)
+        .status()
+        .unwrap()
+        .success());
+    // A shell copy, not `sleep`: a multicall `sleep` refuses to run under a version-number name.
+    let mut foreground = std::process::Command::new(&exe)
+        .args(["-c", "read line"])
+        .stdin(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
     fs::write(
-        config_dir
-            .join("sessions")
-            .join(format!("{}.json", std::process::id())),
-        format!(
-            r#"{{"pid":{},"version":"{}"}}"#,
-            std::process::id(),
-            fgos_agent_protocol::terminal::adapter_for("claude")
-                .unwrap()
-                .pinned_version()
-        ),
+        herdr.dir.join("foreground.pid"),
+        foreground.id().to_string(),
     )
     .unwrap();
     let type_to_head = |extra: &[&str]| {
@@ -1623,7 +1638,6 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
         ];
         args.extend_from_slice(extra);
         let mut command = scene.command(&args);
-        command.env("CLAUDE_CONFIG_DIR", &config_dir);
         for (k, v) in &herdr.env {
             command.env(k, v);
         }
@@ -1647,6 +1661,8 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
     let answer: Value = serde_json::from_slice(&held.stdout).unwrap();
     assert_eq!(answer["data"]["held"], true, "{answer}");
     assert!(answer["data"].get("typed").is_none(), "{answer}");
+    let _ = foreground.kill();
+    let _ = foreground.wait();
 }
 
 #[test]
