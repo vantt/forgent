@@ -9,8 +9,10 @@ Capability: `code:implement`. Wave 2, after phase 1 (shared file `docs/platform/
   holds the required options and recommendation).
 - `packages/questions/rust/src/shape.rs` (validation, `exactly one option recommended`), `record.rs` (stored
   shape), `usecase.rs` (`answer`, around line 226), `packages/questions/contracts/question-event-payloads.v1.json`.
-- `apps/fgos/src/wiring/questions.rs`: list line (around 383), detail view (around 400 to 440), `answer_command`
-  (around 296), `answer` (around 603).
+- `apps/fgos/src/wiring/questions.rs`: `recommended` (around 285), `answer_command` (around 296), the list line
+  (around 389), the detail view (around 420 to 450).
+- `apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx` and its test `NeedsAnswer.test.tsx`: the web dashboard's
+  view of open questions, which also renders the options.
 - `docs/platform/questions/spec.md` sections 4 and 5.
 
 ## Files it may write
@@ -19,7 +21,8 @@ Capability: `code:implement`. Wave 2, after phase 1 (shared file `docs/platform/
 `packages/questions/contracts/refusals.v1.json` (only if a new refusal wording is needed; prefer the existing
 `question-unclear`), `packages/questions/rust/src/shape.rs`, `packages/questions/rust/src/record.rs`,
 `packages/questions/rust/src/usecase.rs`, `packages/questions/rust/tests/store_usecases.rs`,
-`apps/fgos/src/wiring/questions.rs`, `docs/platform/questions/spec.md`.
+`apps/fgos/src/wiring/questions.rs`, `apps/fgos-gateway/web/src/screens/NeedsAnswer.tsx`,
+`apps/fgos-gateway/web/src/screens/NeedsAnswer.test.tsx`, `docs/platform/questions/spec.md`.
 
 ## Steps
 
@@ -31,7 +34,9 @@ Capability: `code:implement`. Wave 2, after phase 1 (shared file `docs/platform/
    fold.
 3. Display: options are shown in order recommended first, each prefixed `A.` to `D.`; the detail view adds a line
    `Default if no answer: <default>` after the recommendation when present; the list line's `[recommended: ...]`
-   shows the letter and label; `answer_command` uses `--option A`.
+   shows the letter and label; `answer_command` uses `--option A`. A label that already starts with its own
+   letter and a dot (askers do this by hand today, e.g. "B. Keeper's lead ...") is shown as is, not doubled. The
+   gateway's `NeedsAnswer.tsx` shows the same letters, order and default line; extend `NeedsAnswer.test.tsx`.
 4. Answer: `--option` accepts a single letter `A` to `D` (case-insensitive) as the option at that display position,
    besides the exact label; a letter beyond the number of options is refused with the existing unknown-option
    refusal.
@@ -45,9 +50,10 @@ Capability: `code:implement`. Wave 2, after phase 1 (shared file `docs/platform/
 ## Verify
 
 ```bash
-cargo test -p fgos-questions   # the questions crate's package name from packages/questions/rust/Cargo.toml
+cargo test -p fgos-questions
 cargo test -p fgos --test questions   # if the wiring has its own test target; otherwise cargo test -p fgos
 cargo test --workspace
+(cd apps/fgos-gateway/web && npx vitest run src/screens/NeedsAnswer.test.tsx)
 ```
 
 Pass: all green, and the four cases in step 5 are present and fail when their behaviour is removed.

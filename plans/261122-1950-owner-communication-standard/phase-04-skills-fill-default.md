@@ -24,13 +24,14 @@ Capability: `code:implement`. Wave 3, after phases 1 and 3.
    the default says what the asker does, and when, if no answer comes.
 3. In `fgos-secretary`, where it shows owner questions, say they are shown with lettered options, recommended
    first, and the default, and that the owner may answer with the letter alone.
-4. Rebuild with `npm run build:skills` and regenerate the mutation census through its script.
+4. Rebuild with `npm run build:skills` and regenerate the mutation census through `scripts/git-one-door-scan.mjs`.
 
 ## Verify
 
 ```bash
 git grep -n "questions ask" core/skills domains/*/skills   # every hit's example carries default
 npm run build:skills && git status --porcelain -- .agents plugins .claude   # empty
+node --test test/setup/git-mutation-census.test.mjs
 npm test
 ```
 
