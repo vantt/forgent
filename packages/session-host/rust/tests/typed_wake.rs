@@ -159,8 +159,11 @@ fn empty_composer(cli: &str) -> &'static str {
 fn each_cli_gets_raw_text_then_its_enter_gap_then_a_separate_enter() {
     for cli in ["claude", "codex", "agy"] {
         let protocol = adapter_for(cli).unwrap();
-        let pane = Fake::new(vec![(PaneState::Live, "idle", empty_composer(cli))])
-            .after((PaneState::Live, "working", "thinking"));
+        let pane = Fake::new(vec![(PaneState::Live, "idle", empty_composer(cli))]).after((
+            PaneState::Live,
+            "working",
+            "thinking",
+        ));
         let answer = pane.wake(cli, Some(protocol.pinned_version()), WAKE_LINE);
         assert_eq!(answer, TypedWake::Submitted, "{cli}");
         let steps = pane.steps.borrow();
@@ -202,10 +205,7 @@ fn an_unsafe_pane_or_unjudgeable_cli_types_nothing_and_is_refused_by_name() {
             let pane = Fake::new(frames);
             assert_eq!(
                 pane.wake("claude", Some(pin), "wake"),
-                TypedWake::Refused {
-                    cause,
-                    draft: None
-                }
+                TypedWake::Refused { cause, draft: None }
             );
             assert!(!pane.typed_anything());
         }
@@ -274,8 +274,11 @@ fn a_typed_line_whose_enter_fails_or_whose_pane_goes_unreadable_is_delivery_unkn
         .borrow()
         .contains(&Step::Text("wake".into())));
 
-    let unreadable = Fake::new(vec![(PaneState::Live, "idle", "❯\n──────")])
-        .after((PaneState::Unknown, "idle", ""));
+    let unreadable = Fake::new(vec![(PaneState::Live, "idle", "❯\n──────")]).after((
+        PaneState::Unknown,
+        "idle",
+        "",
+    ));
     let answer = unreadable.wake("claude", Some(pin), "wake");
     assert_eq!(answer, TypedWake::DeliveryUnknown);
     assert_eq!(answer.cause(), "delivery-unknown");

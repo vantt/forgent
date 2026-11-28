@@ -1550,11 +1550,7 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
     // With an event naming the session the gate opens; the session has no CLI version to judge, so nothing is typed.
     let typed = scene.run(&args);
     assert!(!typed.status.success(), "{}", text(&typed));
-    assert!(
-        text(&typed).contains("[unknown]"),
-        "{}",
-        text(&typed)
-    );
+    assert!(text(&typed).contains("[unknown]"), "{}", text(&typed));
     assert!(
         !text(&typed).contains("target-not-stuck"),
         "{}",
@@ -1622,7 +1618,9 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
     )
     .unwrap();
     let type_to_head = |extra: &[&str]| {
-        let mut args = vec!["session", "type", "lead:S6B", "--text", "continue", "--json"];
+        let mut args = vec![
+            "session", "type", "lead:S6B", "--text", "continue", "--json",
+        ];
         args.extend_from_slice(extra);
         let mut command = scene.command(&args);
         command.env("CLAUDE_CONFIG_DIR", &config_dir);

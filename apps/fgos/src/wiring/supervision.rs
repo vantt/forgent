@@ -113,14 +113,19 @@ pub enum Verb {
     Wake,
     Plans,
     Queue,
-    Handled { ids: Vec<String> },
+    Handled {
+        ids: Vec<String>,
+    },
     Raise(RaiseCommand),
     Done,
     Widen(WidenCommand),
     Land(LandCommand),
     Slots,
     Tune(TuneCommand),
-    SessionRead { target: String, lines: u32 },
+    SessionRead {
+        target: String,
+        lines: u32,
+    },
     SessionType {
         target: String,
         text: String,
