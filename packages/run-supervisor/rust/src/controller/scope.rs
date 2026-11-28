@@ -349,7 +349,15 @@ pub fn end_dead_attempt_with(run_dir: &Path, ports: &mut dyn EndDeadPorts) -> Va
             ),
         );
     }
-    let gate = binding.get("gate").cloned().unwrap_or(Value::Null);
+    let Some(gate) = binding.get("gate").filter(|gate| gate.is_object()).cloned() else {
+        return refused(
+            "no-binding",
+            format!(
+                "the binding of {} carries no gate record, so the end of its domain cannot be proven",
+                run_dir.display()
+            ),
+        );
+    };
     // A stop that could not be issued still leaves the gate poll to decide what is left of the domain.
     let mut trouble: Option<String> = None;
     if let Err(message) = ports.stop_unit(unit, false) {
@@ -572,7 +580,7 @@ mod tests {
     }
 
     /// A run dir under the temp directory holding one `supervisor-binding.json`.
-    fn scratch_run_dir(name: &str, binding: Value) -> PathBuf {
+    fn scratch_run_dir(name: &str, binding: Value) -> ScratchDir {
         let dir = std::env::temp_dir().join(format!(
             "rs-scope-end-dead-{name}-{}",
             std::process::id()
@@ -584,7 +592,23 @@ mod tests {
             serde_json::to_vec(&binding).unwrap(),
         )
         .unwrap();
-        dir
+        ScratchDir(dir)
+    }
+
+    /// A scratch run dir that is removed when the test ends.
+    struct ScratchDir(PathBuf);
+
+    impl std::ops::Deref for ScratchDir {
+        type Target = Path;
+        fn deref(&self) -> &Path {
+            &self.0
+        }
+    }
+
+    impl Drop for ScratchDir {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
     }
 
     fn binding(domain: Value) -> Value {
@@ -683,6 +707,20 @@ mod tests {
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("scope-mismatch"));
         assert!(ports.stops.is_empty(), "only the named attempt's own scope is stopped");
+        assert_eq!(ports.adopted, 0);
+    }
+
+    #[test]
+    fn a_binding_without_a_gate_record_is_refused_and_nothing_is_stopped() {
+        let mut no_gate = dead_scoped();
+        no_gate.as_object_mut().unwrap().remove("gate");
+        let dir = scratch_run_dir("no-gate", no_gate);
+        let mut ports = FakePorts::new(true, 0);
+        let answer = end_dead_attempt_with(&dir, &mut ports);
+        assert_eq!(answer["refused"]["code"], json!("no-binding"));
+        let message = answer["refused"]["message"].as_str().unwrap();
+        assert!(message.contains("gate"), "{message}");
+        assert!(ports.stops.is_empty(), "nothing is signalled without a gate to judge");
         assert_eq!(ports.adopted, 0);
     }
 

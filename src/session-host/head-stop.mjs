@@ -89,9 +89,10 @@ async function defaultEndAttempt(runDir, projectRoot) {
  *
  * A supervisor judged gone can neither answer a stop request nor close the attempt, so that head is never asked to stop:
  * its attempt is ended through the run supervisor's `end-dead-attempt` op (the attempt's own systemd scope is stopped, the
- * empty domain adopted and `closed.json` published) and its pane retired, and the stamp stays. An attempt whose domain is
- * not a scope of its own, or that cannot be ended, is refused by name (`stop-not-ended`) with the stamp kept. The next
- * generation starts through `fgos session start`.
+ * empty domain adopted and `closed.json` published) and its pane is retired only once the attempt is closed. A refusal
+ * that signalled nothing (no-binding, supervisor-alive, domain-not-scope, scope-mismatch) is `stop-not-ended` with the
+ * stamp put back; `domain-not-ended`, or an answer whose adopt did not close the attempt, is `stop-not-ended` with the
+ * stamp kept and the pane left alone. The next generation starts through `fgos session start`.
  *
  * A short role is resolved through Identity to its live session, and its lineage (run directory, pane and `retiredAt`
  * stamp) is the head its record names (`ids.head`), ended exactly as a head is. A lead whose record names no lineage with
@@ -176,11 +177,18 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
         while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
         if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
       } else {
-        // From here the head's attempt may end at any moment, so a refusal leaves the stamp in place.
-        requested = true;
         const ended = await (ports.endAttempt ?? ((runDir) => defaultEndAttempt(runDir, projectRoot)))(record.runDir);
         if (ended?.refused) {
+          // Only `domain-not-ended` signalled the scope; every other refusal signalled nothing, so the stamp is put back.
+          if (ended.refused.code === 'domain-not-ended') requested = true;
           throw new HeadStopError('stop-not-ended', `${role} could not be ended: ${ended.refused.code} (${ended.refused.message})`);
+        }
+        // The scope was stopped, so the stamp stays; the pane is retired only once the attempt is closed.
+        requested = true;
+        const state = ended?.adopt?.state;
+        if (state !== 'closed' && !(ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json'))))(record.runDir)) {
+          const why = ended?.adopt?.reason;
+          throw new HeadStopError('stop-not-ended', `${role} did not close: adopt answered ${state}${why ? ` (${why})` : ''}`);
         }
       }
     }

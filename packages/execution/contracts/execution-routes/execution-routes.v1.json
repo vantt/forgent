@@ -40,7 +40,7 @@
     "end-dead-attempt": {
       "payload": { "runDir": "string: the attempt directory <fgos>/assignments/<id>/runs/<NN>" },
       "result": { "ended": "boolean: true once the domain is empty and adopt ran", "unit": "string?: the scope stopped", "adopt": "the adopt verdict line ({ v, protocol, attemptDir, state, outcome?, pendingStep?, reason? })", "refused": "{ code: no-binding|supervisor-alive|domain-not-scope|scope-mismatch|domain-not-ended, message }: instead of ended; nothing outside the attempt's own scope is ever signalled" },
-      "implementation": "end_dead_attempt in packages/run-supervisor/rust/src/controller/scope.rs"
+      "implementation": "end_dead_attempt in packages/run-supervisor/rust/src/controller/scope.rs; meant only for an explicit `fgos session stop` (src/session-host/head-stop.mjs is its one caller)"
     },
     "stale-runs": {
       "payload": { "fgosDir": "string", "reconcile": "boolean" },

@@ -60,7 +60,7 @@ test('a head whose run supervisor is gone is settled through adopt instead of be
     host,
     identity: () => ({ live: true }),
     supervisorAlive: (runDir) => { order.push(`alive:${runDir}`); return false; },
-    endAttempt: async (runDir) => { adopted.push(runDir); order.push(`adopt:${runDir}`); return { ended: true }; },
+    endAttempt: async (runDir) => { adopted.push(runDir); order.push(`adopt:${runDir}`); return { ended: true, adopt: { state: 'closed' } }; },
     // A gone supervisor can neither be asked to stop nor close the attempt; either call is the bug this proves absent.
     end: () => assert.fail('a head whose supervisor is gone is never asked to stop'),
     closed: () => assert.fail('a head whose supervisor is gone is not waited on'),
@@ -73,17 +73,41 @@ test('a head whose run supervisor is gone is settled through adopt instead of be
   assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
 });
 
-test('a dead supervisor whose attempt cannot be ended is refused by name, keeps the stamp and retires no pane', async (t) => {
+async function deadStop(t, endAttempt, extra = {}) {
   const { projectRoot, dir } = lineage(t);
   const host = hostOf();
-  await assert.rejects(stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, {
-    host,
+  const retired = [];
+  const outcome = await stopHeadSession({ persona: 'lead', name: 'x', projectRoot }, {
+    host: { ...host, retireAsync: async (...args) => { retired.push(args[0].key); return host.retireAsync(...args); } },
     identity: () => ({ live: true }),
     supervisorAlive: () => false,
-    endAttempt: async () => ({ refused: { code: 'domain-not-scope', message: 'inherited' } }),
+    endAttempt,
+    closed: () => false,
     now: () => new Date('2026-11-19T01:02:03Z'),
-  }), (err) => err.code === 'stop-not-ended');
-  assert.deepEqual(host.closes, []);
+    ...extra,
+  }).then(() => null, (err) => err);
+  return { outcome, retired, dir };
+}
+
+test('a dead supervisor whose attempt signalled nothing is refused by name, puts the stamp back and retires no pane', async (t) => {
+  const { outcome, retired, dir } = await deadStop(t, async () => ({ refused: { code: 'domain-not-scope', message: 'inherited' } }));
+  assert.equal(outcome?.code, 'stop-not-ended');
+  assert.deepEqual(retired, []);
+  assert.equal(readHeadPlacement(dir).retiredAt, undefined);
+});
+
+test('a dead supervisor whose scope survived the kill is refused domain-not-ended and keeps the stamp', async (t) => {
+  const { outcome, retired, dir } = await deadStop(t, async () => ({ refused: { code: 'domain-not-ended', message: 'gate alive' } }));
+  assert.equal(outcome?.code, 'stop-not-ended');
+  assert.deepEqual(retired, []);
+  assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
+});
+
+test('a dead supervisor whose adopt did not close the attempt keeps the stamp and retires no pane', async (t) => {
+  const { outcome, retired, dir } = await deadStop(t, async () => ({ ended: true, adopt: { state: 'running', reason: 'gate-alive' } }));
+  assert.equal(outcome?.code, 'stop-not-ended');
+  assert.match(outcome.message, /did not close: adopt answered running \(gate-alive\)/);
+  assert.deepEqual(retired, []);
   assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
 });
 
