@@ -1,6 +1,6 @@
 ---
 id: p-c6au2dlxpt
-title: "Split runner by role when it is worth it: runner carries three orchestration-ring roles today (selection, routing, launching) (component-authority, priority P3; source: ds-zfqskcns7j CAS-D22, owner via Miu, 2026-11-28)"
+title: "Split runner by role when it is worth it: runner carries three orchestration-ring roles today (selection, routing, launching) (component-authority, priority P3; source: ds-zfqskcns7j, owner via Miu, 2026-11-28)"
 status: proposed
 priority: P3
 area: component-authority
@@ -9,7 +9,7 @@ created: 2026-11-28
 
 # Why
 
-`runner` carries three ring roles (`loop.mjs` orchestrator, `operation-choice.mjs` router, `work-dispatch.mjs` launcher) through path exceptions. CAS-D22 says splitting is a separate item, done only when it is worth it.
+`runner` carries three ring roles (`loop.mjs` orchestrator, `operation-choice.mjs` router, `work-dispatch.mjs` launcher) through path exceptions. The component-authority discussion (`ds-zfqskcns7j`) says splitting is a separate item, done only when it is worth it.
 
 # Done when
 
