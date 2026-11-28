@@ -113,15 +113,25 @@ pub enum Verb {
     Wake,
     Plans,
     Queue,
-    Handled { ids: Vec<String> },
+    Handled {
+        ids: Vec<String>,
+    },
     Raise(RaiseCommand),
     Done,
     Widen(WidenCommand),
     Land(LandCommand),
     Slots,
     Tune(TuneCommand),
-    SessionRead { target: String, lines: u32 },
-    SessionType { target: String, text: String },
+    SessionRead {
+        target: String,
+        lines: u32,
+    },
+    SessionType {
+        target: String,
+        text: String,
+        /// Press Enter after the text (the default); `--no-enter` leaves it typed.
+        submit: bool,
+    },
 }
 
 /// `supervisor widen`: widen a running or ready plan's footprint.
@@ -182,6 +192,14 @@ fn refused(code: &str, detail: impl std::fmt::Display) -> CategorisedRefusal {
         "events-unhandled"
         | "land-gate-missing"
         | "target-not-stuck"
+        | "dialog-open"
+        | "busy"
+        | "composer-not-empty"
+        | "foreground-not-agent"
+        | "no-cli-profile"
+        | "unknown"
+        | "delivery-unknown"
+        | "no-pane"
         | "plan-not-widenable"
         | "plan-reread-failed"
         | "write-branch-ahead"
@@ -376,9 +394,11 @@ fn session_verb(call: &Call) -> Result<Verb, CategorisedRefusal> {
                     "--text is over {MAX_TYPED_BYTES} bytes"
                 )));
             }
+            let submit = !call.switch("no-enter").map_err(validation)?;
             Ok(Verb::SessionType {
                 target: target.clone(),
                 text,
+                submit,
             })
         }
         other => Err(validation(format!(
@@ -3150,7 +3170,9 @@ fn type_into_session(
     payload_root: PayloadRoot,
     target: &str,
     text: &str,
+    submit: bool,
 ) -> Result<Value, CategorisedRefusal> {
+    use fgos_session_host::pane_io::{PaneIo, TypedWake};
     let session = session_of(target)?;
     let open = open_queue(root)?.unhandled().map_err(queue_refusal)?;
     if !open.iter().any(|e| names_session(&e.subject, &session)) {
@@ -3164,22 +3186,58 @@ fn type_into_session(
     }
     let pane = pane_of(&session)?;
     let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(root);
-    backend
-        .core()
-        .type_text(&pane, text)
-        .map_err(terminal_refusal)?;
-    record_coordination(
-        root,
-        payload_root,
-        "type",
-        SubjectRef {
-            kind: "session".to_owned(),
-            id: session.id.clone(),
-        },
-        "typed",
-    );
-    Ok(json!({"session": session.handle, "typed": true}))
+    let subject = SubjectRef {
+        kind: "session".to_owned(),
+        id: session.id.clone(),
+    };
+    if !submit {
+        backend
+            .core()
+            .type_text(&pane, text)
+            .map_err(terminal_refusal)?;
+        record_coordination(root, payload_root, "type", subject, "held");
+        return Ok(json!({"session": session.handle, "held": true}));
+    }
+    let cli = fgos_mailbox_core::Cli::new(&session.cli)
+        .ok()
+        .filter(|cli| !cli.as_str().is_empty());
+    let version = cli.as_ref().and_then(|cli| {
+        let cli_session = session.ids.as_ref()?.cli_session.as_ref()?;
+        let head = json!({"pid": cli_session.pid, "startTime": cli_session.start_time});
+        let versions = super::mailbox_verbs::version_sources(MAX_VERSION_READ_BYTES);
+        fgos_mailbox::adapters::version::recipient_version(cli, &head.to_string(), &versions)
+    });
+    let core = backend.core();
+    let answer = PaneIo::new(&core, &pane).typed_wake(&session.cli, version.as_deref(), text);
+    record_coordination(root, payload_root, "type", subject, answer.cause());
+    match answer {
+        TypedWake::Submitted => Ok(json!({"session": session.handle, "submitted": true})),
+        TypedWake::Refused {
+            cause: "composer-not-empty",
+            draft,
+        } => Err(refused(
+            "composer-not-empty",
+            format!(
+                "{} has a draft in its composer: {}",
+                session.handle,
+                draft.as_deref().unwrap_or("(unreadable)")
+            ),
+        )),
+        other => Err(refused(
+            other.cause(),
+            match other {
+                TypedWake::DeliveryUnknown => format!(
+                    "{}: the line was typed but the pane did not confirm the CLI took it",
+                    session.handle
+                ),
+                _ => format!("{}: nothing was typed", session.handle),
+            },
+        )),
+    }
 }
+
+/// The largest CLI session file the version read takes, the mailbox hook's default bound.
+const MAX_VERSION_READ_BYTES: u64 = 1_048_576;
 
 // ---------------------------------------------------------------------------------------------
 // A confined caller's door
@@ -3432,9 +3490,18 @@ pub fn answer(
             let text = data["text"].as_str().unwrap_or_default().to_owned();
             Ok(done(data, text))
         }
-        Verb::SessionType { target, text } => {
-            let data = type_into_session(root, payload_root, target, text)?;
-            Ok(done(data, format!("typed into {target}")))
+        Verb::SessionType {
+            target,
+            text,
+            submit,
+        } => {
+            let data = type_into_session(root, payload_root, target, text, *submit)?;
+            let line = if *submit {
+                format!("submitted to {target}")
+            } else {
+                format!("held in {target}")
+            };
+            Ok(done(data, line))
         }
         Verb::Done => {
             let queue = open_queue(root)?;

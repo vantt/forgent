@@ -599,10 +599,26 @@ fn portfolio_host(text: &str) -> Option<String> {
 /// an idle agent; the returned listener is the fake server's socket and stays open while the test runs.
 struct IdleHerdr {
     env: Vec<(String, String)>,
+    dir: PathBuf,
     _server: UnixListener,
 }
 
+impl Drop for IdleHerdr {
+    /// Stops the agent process a test launched in the fake pane.
+    fn drop(&mut self) {
+        if let Ok(pid) = fs::read_to_string(self.dir.join("script.pid")) {
+            let _ = Command::new("kill").arg(pid.trim()).status();
+        }
+    }
+}
+
 fn idle_herdr(scene: &Scene, key: &str) -> IdleHerdr {
+    idle_herdr_with(scene, key, false)
+}
+
+/// [`idle_herdr`]; with `agent_running` the slot also runs a long-lived process in its foreground, and the screen
+/// shows an idle Claude Code composer under an earlier exchange that already holds the line `continue`.
+fn idle_herdr_with(scene: &Scene, key: &str, agent_running: bool) -> IdleHerdr {
     use fgos_terminal_control::{
         core::{Core, CoreConfig},
         driver::herdr::{HerdrConfig, HerdrDriver},
@@ -655,7 +671,24 @@ fn idle_herdr(scene: &Scene, key: &str) -> IdleHerdr {
         env: Default::default(),
     })
     .expect("allocate the lead's slot");
+    if agent_running {
+        let earlier: String = (1..=8).map(|n| format!("tool output line {n}\n")).collect();
+        let screen = format!("> continue\n{earlier}❯\n──────\n");
+        fs::write(dir.join("screen.txt"), screen).unwrap();
+        core.launch(
+            key,
+            &fgos_terminal_control::port::LaunchSpec {
+                command: "sh".into(),
+                args: vec!["-c".into(), "sleep 300; true".into()],
+                cwd: "/".into(),
+                env: Default::default(),
+                expect: None,
+            },
+        )
+        .expect("launch the stand-in agent");
+    }
     IdleHerdr {
+        dir: dir.clone(),
         env: vec![
             ("FGOS_HERDR_BIN".into(), bin.to_string_lossy().into_owned()),
             ("FAKE_HERDR_DIR".into(), dir.to_string_lossy().into_owned()),
@@ -1311,15 +1344,27 @@ fn a_confined_land_that_names_the_footprint_is_refused_before_the_socket() {
 
 /// A live session of this project holding `role`, with a terminal pane in Identity; returns its handle.
 fn register_session(scene: &Scene, role: &str, value: &str) -> String {
-    register_session_at(scene, role, value, None)
+    register_session_at(scene, role, value, None, false)
+}
+
+/// [`register_lead_session`] whose CLI session carries this test process's pid, so the host can read the head's CLI
+/// version from a Claude sessions file named after that pid.
+fn register_claude_head(scene: &Scene, role: &str, value: &str, key: &str) -> String {
+    register_session_at(scene, role, value, Some(key), true)
 }
 
 /// [`register_session`] whose terminal group names the slot `key`, as a lead's supervisor records it.
 fn register_lead_session(scene: &Scene, role: &str, value: &str, key: &str) -> String {
-    register_session_at(scene, role, value, Some(key))
+    register_session_at(scene, role, value, Some(key), false)
 }
 
-fn register_session_at(scene: &Scene, role: &str, value: &str, key: Option<&str>) -> String {
+fn register_session_at(
+    scene: &Scene,
+    role: &str,
+    value: &str,
+    key: Option<&str>,
+    with_cli_session: bool,
+) -> String {
     let state = scene.root.join("state");
     let info = fgos_identity::session_for(
         &state,
@@ -1341,6 +1386,15 @@ fn register_session_at(scene: &Scene, role: &str, value: &str, key: Option<&str>
         fgos_identity::current::os_record(std::process::id()),
     );
     entry.ids = Some(fgos_identity::directory::Ids {
+        cli_session: with_cli_session.then(|| fgos_identity::directory::CliSessionIds {
+            source: "CLAUDE_CODE_SESSION_ID".to_string(),
+            id: value.to_string(),
+            name: None,
+            name_source: None,
+            socket: None,
+            pid: Some(std::process::id()),
+            start_time: None,
+        }),
         terminal: Some(fgos_identity::directory::TerminalIds {
             driver: "herdr".to_string(),
             key: key.map(str::to_owned),
@@ -1493,14 +1547,10 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
         "stuck on a prompt",
         "--json",
     ]);
-    // With an event naming the session the gate opens; the scene has no terminal host, so the terminal port refuses.
+    // With an event naming the session the gate opens; the session has no CLI version to judge, so nothing is typed.
     let typed = scene.run(&args);
     assert!(!typed.status.success(), "{}", text(&typed));
-    assert!(
-        text(&typed).contains("terminal-refused"),
-        "{}",
-        text(&typed)
-    );
+    assert!(text(&typed).contains("[unknown]"), "{}", text(&typed));
     assert!(
         !text(&typed).contains("target-not-stuck"),
         "{}",
@@ -1536,6 +1586,67 @@ fn session_type_is_refused_until_an_open_event_names_the_target_session() {
         "the CLI session id names the session: {}",
         text(&by_cli_id)
     );
+
+    // A stuck head whose pane shows an idle, empty composer takes the line: the verb submits it and answers
+    // `submitted`, never `typed`; `--no-enter` leaves it typed and answers `held`.
+    let herdr = idle_herdr_with(&scene, "slot-s6b", true);
+    let head = register_claude_head(&scene, "lead:S6B", "submit-target", "slot-s6b");
+    scene.data(&[
+        "supervisor",
+        "raise",
+        "--kind",
+        "coordination-help",
+        "--ref",
+        &head,
+        "--reason",
+        "stuck with an unsent wake line",
+        "--json",
+    ]);
+    let config_dir = scene.root.join("claude-config");
+    fs::create_dir_all(config_dir.join("sessions")).unwrap();
+    fs::write(
+        config_dir
+            .join("sessions")
+            .join(format!("{}.json", std::process::id())),
+        format!(
+            r#"{{"pid":{},"version":"{}"}}"#,
+            std::process::id(),
+            fgos_agent_protocol::terminal::adapter_for("claude")
+                .unwrap()
+                .pinned_version()
+        ),
+    )
+    .unwrap();
+    let type_to_head = |extra: &[&str]| {
+        let mut args = vec![
+            "session", "type", "lead:S6B", "--text", "continue", "--json",
+        ];
+        args.extend_from_slice(extra);
+        let mut command = scene.command(&args);
+        command.env("CLAUDE_CONFIG_DIR", &config_dir);
+        for (k, v) in &herdr.env {
+            command.env(k, v);
+        }
+        command.output().unwrap()
+    };
+    let submitted = type_to_head(&[]);
+    assert!(submitted.status.success(), "{}", text(&submitted));
+    let answer: Value = serde_json::from_slice(&submitted.stdout).unwrap();
+    assert_eq!(answer["data"]["submitted"], true, "{answer}");
+    assert!(answer["data"].get("typed").is_none(), "{answer}");
+    let sent = fs::read_to_string(scene.root.join("herdr/sent.jsonl")).unwrap();
+    let kinds: Vec<Value> = sent
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    assert_eq!(kinds[0]["text"], "continue", "{sent}");
+    assert_eq!(kinds[1]["keys"][0], "Enter", "{sent}");
+
+    let held = type_to_head(&["--no-enter"]);
+    assert!(held.status.success(), "{}", text(&held));
+    let answer: Value = serde_json::from_slice(&held.stdout).unwrap();
+    assert_eq!(answer["data"]["held"], true, "{answer}");
+    assert!(answer["data"].get("typed").is_none(), "{answer}");
 }
 
 #[test]
