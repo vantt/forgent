@@ -1,0 +1,1 @@
+- Fixed: `fgos session type` now submits the line it types and answers `submitted`, or refuses by name (`dialog-open`, `busy`, `composer-not-empty`, `foreground-not-agent`, `no-cli-profile`, `unknown`, `delivery-unknown`) instead of leaving text unsent under `typed: true`; `--no-enter` types without submitting and answers `held`.
