@@ -710,17 +710,22 @@ thì thấy `~/.cargo` thật chỉ đọc qua `--ro-bind / /`; unit có home ri
 mục này không code nào trên cửa sống truyền toolchain vào home của unit.
 
 Resolver thêm resource `toolchain-cache` **không cần grant** (cùng loại với `launch-program`): nó
-là dữ kiện của host, không phải thứ ai xin. Hai mục:
+là dữ kiện của host, không phải thứ ai xin. Ba mục:
 
 - **cargo home**: `$CARGO_HOME` của tiến trình host khi là đường dẫn tuyệt đối, nếu không
   `<home>/.cargo`.
 - **rustup home**: `$RUSTUP_HOME` của tiến trình host khi là đường dẫn tuyệt đối, nếu không
   `<home>/.rustup`.
+- **ort cache**: `<home>/.cache/ort.pyke.io`, nơi `ort-sys` giải nén sẵn ONNX Runtime; chỉ mount
+  khi có **đúng một** thư mục lib `dfbin/<target-triple>/<hash>`, và biến `ORT_LIB_PATH` trỏ vào
+  đúng thư mục đó (vì sao, xem đoạn "Vì sao phải chỉ `ORT_LIB_PATH`" ngay dưới).
 
 `<home>` là `home_dir` của resolver input, home của user host, không bao giờ là private home của
 một dispatch. Mỗi thư mục chỉ được resolve khi nó tồn tại, là thư mục, và nằm ngoài mọi
 machine-private root (§9.3) lẫn mọi confinement root; không qua phép thử đó thì không có mount và
-không có biến. Host không có Rust thì không nhận gì. Đường dẫn được canonicalize qua cửa real-path
+không có biến. Host không có Rust thì không nhận gì. Không có thư mục ort, hoặc có từ hai thư mục
+lib trở lên (resolver không biết launch build cho target nào), thì không có mount ort và không có
+`ORT_LIB_PATH`. Đường dẫn được canonicalize qua cửa real-path
 sẵn có rồi `--ro-bind` **trên chính đường dẫn của nó**: bind chỉ đọc tường minh, không chỉ dựa vào
 `--ro-bind / /`, để cache vẫn chỉ đọc dưới một grant ghi được mà đường dẫn chứa nó. Resolver
 xếp các resource toolchain-cache sau mọi mount grant và sau các bind-back của launch-program; driver bwrap
@@ -729,7 +734,8 @@ thư mục cha. Nó không thuộc nhóm bind-back bị che.
 
 Biến đi kèm resource, nên host hay golden vector không có hai thư mục giữ argv và env nguyên từng
 byte: cargo home đặt `CARGO_HOME=<path>`, `CARGO_NET_OFFLINE=true` và `GIT_TERMINAL_PROMPT=0`;
-rustup home đặt `RUSTUP_HOME=<path>`. Biến áp cho mọi launch bị confine bất kể `homeEnv`, vì một
+rustup home đặt `RUSTUP_HOME=<path>`; ort cache đặt `ORT_LIB_PATH=<path>` trỏ vào thư mục lib
+`dfbin/<target-triple>/<hash>` của nó. Biến áp cho mọi launch bị confine bất kể `homeEnv`, vì một
 unit giữ `HOME` thật với cargo online và cache chỉ đọc vẫn sẽ đi fetch revision thiếu.
 `CARGO_NET_OFFLINE` và `GIT_TERMINAL_PROMPT` là một phần contract env của worker
 (`packages/run-supervisor/contracts/worker-env-allowlist.v1.json`), như `FGOS_CONFINED`;
@@ -743,6 +749,16 @@ là đủ: lock `.package-cache` và `.global-cache` không cần ghi. Cùng thi
 rỗng: thoát 101 sau 0,04 s với `failed to get pkm-core … unable to update
 https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb … you are in the offline mode (--offline)`.
 
+**Vì sao phải chỉ `ORT_LIB_PATH` (đo 2026-11-28, live check release 460a9af0).** Live check đầu tiên
+biên dịch `pkm-core` offline được và từ chối cache rỗng trong 0,05 s, nhưng
+`cargo test -p fgos-agent-context-engine --locked --no-run` thoát 101: `ort-sys` 2.0.0-rc.15 đọc
+`CARGO_NET_OFFLINE` là "skip download", bỏ qua bước tải, rồi **không link** bản prebuilt nó đã cache
+sẵn dưới `<home>/.cache/ort.pyke.io` (`dfbin/<target-triple>/<hash>/libonnxruntime.a`). Đo tiếp:
+`CARGO_NET_OFFLINE=true` cùng `ORT_LIB_PATH=<đúng thư mục dfbin/<triple>/<hash> đó>` thì link được và
+pass. Vì vậy mục ort của resource bind chỉ đọc cache đó **và** đặt `ORT_LIB_PATH` vào thư mục lib duy
+nhất; `ort-sys` đọc biến này trước nên không phải tự đi tìm. Đây không phải nới lỏng quyết định 3
+(offline, từ chối có tên): cargo vẫn offline, chỉ đường link của ort được chỉ đúng chỗ.
+
 **Thiếu revision trong cache.** Unit thấy đúng lỗi offline của cargo, nêu tên dependency, URL,
 revision và chế độ offline; fgOS không bọc thêm lời nào. Cách khắc phục: người chạy ngoài sandbox
 (chủ máy, hoặc lead:SUPERVISOR) chạy `cargo fetch --locked` trong checkout để làm đầy cache rồi
@@ -752,7 +768,10 @@ chủ máy".
 
 **Lịch sử quyết định:** 2026-11-27, owner order (P0, product mechanism): confined units compile the
 workspace offline from the owner's read-only cargo/rustup cache; no credentials, no vendoring
-(`ds-wfukp6t6mi`, `p-ymhj4xcf6x`).
+(`ds-wfukp6t6mi`, `p-ymhj4xcf6x`). 2026-11-28, owner answer `q-wvelmdqfga` option A: resource
+`toolchain-cache` bind thêm `<home>/.cache/ort.pyke.io` chỉ đọc và đặt `ORT_LIB_PATH` vào thư mục
+`dfbin/<target-triple>/<hash>` duy nhất, vì `ort-sys` đọc `CARGO_NET_OFFLINE` là skip-download nên
+không tự link bản prebuilt đã cache; quyết định 3 (offline, từ chối có tên) giữ nguyên.
 
 **Node twins không mang resource này.** `src/runner/dispatch/confinement/**` là test-only, golden
 vector của chúng dùng đường dẫn cố định không tồn tại nên giữ nguyên từng byte, và plan
@@ -889,5 +908,5 @@ Nguồn duy nhất của grant theo persona là `GRANTS` trong `src/session-host
 - `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại. (retired; last at `85760c6f2`)
 - `src/setup/registrations.mjs`: doctor checks liên quan.
 - `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation confine có account khai thêm `credentialStore` (§13.1).
-- `packages/execution/engine/src/confinement/policy/resolver.rs`: resource `toolchain-cache` — cargo home và rustup home của chủ máy, chỉ đọc, kèm `CARGO_HOME`, `RUSTUP_HOME`, `CARGO_NET_OFFLINE`, `GIT_TERMINAL_PROMPT` (§9.4).
+- `packages/execution/engine/src/confinement/policy/resolver.rs`: resource `toolchain-cache` — cargo home, rustup home và ort cache (`<home>/.cache/ort.pyke.io`) của chủ máy, chỉ đọc, kèm `CARGO_HOME`, `RUSTUP_HOME`, `CARGO_NET_OFFLINE`, `GIT_TERMINAL_PROMPT`, `ORT_LIB_PATH` (§9.4).
 - `docs/platform/runner/contracts/routing-handoff.md`: worktree containment không phải sandbox.

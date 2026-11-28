@@ -431,10 +431,52 @@ fn launch_program_bind_backs(program: Option<&str>, masked: &[String]) -> Vec<St
     }
 }
 
-/// The owner's toolchain cache mounts: the cargo home and the rustup home, each a real existing directory that lies
-/// neither inside a machine-private root nor inside a confinement root. The host's `CARGO_HOME` / `RUSTUP_HOME` wins
-/// when absolute, else `<home>/.cargo` / `<home>/.rustup`. Read-only, so nothing in the sandbox writes the cache; the
-/// cargo mount also forces offline, credential-free fetching so a missing revision fails at once.
+/// A cache directory already on the host and outside every machine-private root and confinement root; `None` when it
+/// is absent (nothing was cached) or hidden (a grant never re-exposes a hidden root).
+fn bindable_cache(
+    real: String,
+    machine_private: &[String],
+    confinement_roots: &[String],
+) -> Option<String> {
+    (!machine_private
+        .iter()
+        .chain(confinement_roots)
+        .any(|root| is_inside_root(&real, root)))
+    .then_some(real)
+}
+
+/// The real subdirectories of `dir`, sorted; an absent or unreadable directory has none.
+fn real_subdirs(dir: &str) -> Vec<String> {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return Vec::new();
+    };
+    let mut out: Vec<String> = entries
+        .flatten()
+        .filter_map(|entry| real_dir(&entry.path().to_string_lossy()))
+        .collect();
+    out.sort();
+    out
+}
+
+/// The one directory `ort-sys` unpacked its prebuilt ONNX Runtime into under a cache: `dfbin/<target-triple>/<hash>`,
+/// the directory holding `libonnxruntime.a`. Only exactly one is usable: with none there is nothing to link, and with
+/// several the resolver cannot tell which target the launch builds for. A link that resolves outside the cache names
+/// a path the cache mount does not carry, so it is not usable either.
+fn single_ort_lib_dir(cache: &str) -> Option<String> {
+    let mut found: Vec<String> = real_subdirs(&join(cache, "dfbin"))
+        .iter()
+        .flat_map(|target| real_subdirs(target))
+        .filter(|lib| is_inside_root(lib, cache))
+        .collect();
+    (found.len() == 1).then(|| found.remove(0))
+}
+
+/// The owner's toolchain cache mounts: the cargo home, the rustup home and ONNX Runtime's prebuilt binary cache, each
+/// a real existing directory that lies neither inside a machine-private root nor inside a confinement root. The host's
+/// `CARGO_HOME` / `RUSTUP_HOME` wins when absolute, else `<home>/.cargo` / `<home>/.rustup`; the ort cache is always
+/// `<home>/.cache/ort.pyke.io`. Read-only, so nothing in the sandbox writes the cache; the cargo mount also forces
+/// offline, credential-free fetching so a missing revision fails at once, and the ort mount names the one prebuilt
+/// library directory because `ort-sys` reads that offline flag as "skip download" and never links its own cache.
 fn toolchain_cache_resources(
     input: &ResolveInput,
     machine_private: &[String],
@@ -446,12 +488,8 @@ fn toolchain_cache_resources(
             .filter(|v| Path::new(v).is_absolute())
             .map(str::to_string)
             .unwrap_or_else(|| join(&input.home_dir, fallback));
-        real_dir(&declared).filter(|real| {
-            !machine_private
-                .iter()
-                .chain(confinement_roots)
-                .any(|root| is_inside_root(real, root))
-        })
+        real_dir(&declared)
+            .and_then(|real| bindable_cache(real, machine_private, confinement_roots))
     };
     let mut out = Vec::new();
     for (name, path) in [
@@ -476,6 +514,21 @@ fn toolchain_cache_resources(
         }
         res.env = Some(env);
         out.push(res);
+    }
+    // The ort cache is one resource with the library directory it names, or none at all: a prebuilt runtime nobody can
+    // point at is no cache, and a variable naming an empty path would only hide the real failure.
+    if let Some(path) = cache(&None, ".cache/ort.pyke.io") {
+        if let Some(lib) = single_ort_lib_dir(&path) {
+            let mut res = mount(
+                "toolchain-cache",
+                "toolchain-cache:ort".to_string(),
+                &path,
+                "none",
+                "read",
+            );
+            res.env = Some(BTreeMap::from([("ORT_LIB_PATH".to_string(), lib)]));
+            out.push(res);
+        }
     }
     out
 }
