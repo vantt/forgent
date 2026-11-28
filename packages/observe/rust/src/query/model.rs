@@ -313,13 +313,50 @@ pub enum Operand {
     },
 }
 
-/// A group filter: the group stays when `lhs op rhs` holds. An operand with no value (no input) fails the test.
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+/// One entry of a `having` list: a group filter `{lhs, op, rhs}`, or `{"any": [[...], ...]}`, which holds when
+/// every entry of at least one branch holds. A branch is itself a `having` list, so `any` nests. An `any` with no
+/// branch, or a branch with no entry, is refused when the query runs. An operand with no value (no input) fails the
+/// test.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[serde(untagged)]
+pub enum Having {
+    Cond { lhs: Operand, op: Cmp, rhs: Operand },
+    Any { any: Vec<Vec<Having>> },
+}
+
+/// The `{lhs, op, rhs}` a `having` entry holds when it is not a group; read only through `Having::deserialize`.
+#[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct Having {
-    pub lhs: Operand,
-    pub op: Cmp,
-    pub rhs: Operand,
+struct HavingCond {
+    lhs: Operand,
+    op: Cmp,
+    rhs: Operand,
+}
+
+impl<'de> Deserialize<'de> for Having {
+    /// An object whose only key is `any` is a group; any other object is read as a group filter, so a malformed
+    /// filter reports its own field error instead of an untagged mismatch.
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        let value = serde_json::Value::deserialize(d)?;
+        match value.as_object() {
+            Some(map) if map.contains_key("any") => {
+                if map.len() != 1 {
+                    return Err(D::Error::custom("an any group takes no key but any"));
+                }
+                serde_json::from_value(map["any"].clone())
+                    .map(|any| Having::Any { any })
+                    .map_err(D::Error::custom)
+            }
+            _ => serde_json::from_value::<HavingCond>(value)
+                .map(|c| Having::Cond {
+                    lhs: c.lhs,
+                    op: c.op,
+                    rhs: c.rhs,
+                })
+                .map_err(D::Error::custom),
+        }
+    }
 }
 
 fn join_alias() -> String {
