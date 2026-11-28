@@ -385,11 +385,11 @@ test('a secretary launches with the paths its grant names; the lineage keeps the
   const request = calls.launch[0];
   assert.equal(request.key, headKeyOf('secretary', 'miu', 2));
   assert.deepEqual(request.grant, grantOf('head:secretary-miu'));
-  assert.deepEqual(request.grant.writes, ['plans', 'plans/backlog.md', 'plans/backlog/*']);
+  assert.deepEqual(request.grant.writes, ['plans', 'plans/backlog/*']);
   assert.equal(request.grant.mailbox, true, 'the secretary sends and receives mail');
-  assert.deepEqual(request.env, { TMPDIR: '/tmp', FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
-  // The supervisor records this head in the session's Identity entry from the envelope's session fields.
-  assert.deepEqual(headOf(request.env), { persona: 'secretary', name: 'miu', gen: 2 });
+  assert.deepEqual(request.env, { TMPDIR: '/tmp', FGOS_HEAD_ROLE: headRoleOf('secretary', 'miu'), FGOS_HEAD_PROJECT_ROOT: path.resolve(projectRoot), FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu', FGOS_HEAD_GEN: '2' });
+  // The envelope's session fields name the head (recorded in Identity by the supervisor) and the project it was started in.
+  assert.deepEqual(headOf(request.env), { persona: 'secretary', name: 'miu', gen: 2, projectRoot: path.resolve(projectRoot) });
   assert.deepEqual(headOf({ FGOS_HEAD_PERSONA: 'secretary', FGOS_HEAD_NAME: 'miu' }), {}, 'no generation, no head fields');
   const kept = JSON.parse(fs.readFileSync(path.join(lineageDirOf(projectRoot, 'secretary', 'miu'), 'placement.json'), 'utf8'));
   assert.equal(kept.placement.key, out.key);

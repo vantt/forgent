@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "A shaper runs in its own worktree and branch: rounds are saved on the branch, the discussion lands on main once"
-status: running
+status: done
 priority: P0
 blockedBy: []
 footprint:
@@ -37,6 +37,12 @@ footprint:
   - docs/platform/supervision/spec.md
   - changelog.d/261125-1557-shaper-runs-in-own-worktree.md
   - src/cli/command-registry.mjs
+  - apps/fgos/src/wiring/session_rotation_hook.rs
+  - packages/agent-start-context/goldens/NOTES.md
+  - packages/run-supervisor/contracts/envelope.v3.json
+  - packages/execution/rust/src/seat_session.rs
+  - packages/execution/engine/tests/transport_round.rs
+  - packages/execution/contracts/transport-round/session-attempt.v1.json
 base: dc49aa88162cbd26bbca308f337b7c1f05387a86
 source:
   - plans/discussions/ds-xb6hplcn2m-shaper-worktree/DISCUSSION.md
@@ -172,7 +178,10 @@ to `ready`, drop the `blockedBy`, and land the plan dir. Nothing else in the pla
 | 4 | [The shaper start creates its worktree](phase-04-shaper-start-worktree.md) | 1, 3 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 2 | done |
 | 5 | [Skill, specs and changelog](phase-05-skill-and-docs.md) | 2, 3, 4 | core/skills/fgos-shaping/SKILL.md, core/agents/shaper.yaml, .agents/skills/fgos-shaping/SKILL.md, plugins/fgOS/skills/fgos-shaping/SKILL.md, .claude/agents/shaper.md, docs/platform/session-host/spec.md, docs/platform/supervision/spec.md, changelog.d/261125-1557-shaper-runs-in-own-worktree.md | 3 | done |
 | 7 | [The shaper worktree works on a fresh project and runs its hooks](phase-07-shaper-worktree-live-fixes.md) | 4 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs | 4 | done |
-| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7 | plans/261125-1557-shaper-worktree/reports | 5 | ready |
+| 8 | [The rotation hook finds the head's lineage from a worktree](phase-08-rotation-hook-project-root.md) | 7 | src/session-host/head-start.mjs, test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_rotation_hook.rs, `packages/agent-start-context/goldens/NOTES.md` | 5 | done |
+| 9 | [A head's requests act on its launch project, not its working checkout](phase-09-request-handler-project-root.md) | 8 | packages/execution/rust/src/seat_session.rs, packages/execution/engine/tests/transport_round.rs, packages/execution/contracts/transport-round/session-attempt.v1.json, packages/run-supervisor/contracts/envelope.v3.json, src/session-host/head-request.mjs, test/session-host/head-request.test.mjs | 6 | done |
+| 10 | [Two test fixes from the suites on main (session fields, save identity)](phase-10-head-of-test-expectation.md) | 9 | test/session-host/head-start.test.mjs, apps/fgos/src/wiring/session_write_publish.rs | 7 | done |
+| 6 | [Integration and live proof](phase-06-integration.md) | 1, 2, 3, 4, 5, 7, 8, 9, 10 | plans/261125-1557-shaper-worktree/reports | 8 | done |
 
 Phase 7 was opened on 2026-11-27 by the phase 6 live proof (`reports/live-proof.md`): defect A (a fresh project has no
 `<project>-worktrees/`, so the first shaper start fails) and defect B (the project hooks look for
@@ -183,6 +192,22 @@ the installation in the worktree door's provisioning (it would turn hooks on in 
 (a branch land is a merge, so round commits are reachable from main) is not a blocker: criterion 6 counts main's
 first-parent line, which gained one commit, and the land shape is a non-goal; the `land --help` wording is reported
 to the supervisor as a separate item. Phase 6 runs again after phase 7.
+
+Phase 8 was opened on 2026-11-27 by the live proof rerun (defect D): the session-rotation hook resolves `.fgos` from
+the shaper's worktree, which has a `.fgos` of its own, so the successor never finds its rotation record and the
+rotation ends `no-answer`. The head launch now carries its project root and the hook prefers it; resolving the main
+checkout behind a worktree was rejected because a head may be started with a linked worktree as its project root.
+Deferred to worktree reaping (p-6sd4fslxv7): the `.fgos/installation` link shows as untracked in the worktree.
+The phase 5 shaper goldens under `packages/agent-start-context/goldens/` still hold the old shaper description
+(`project-agents.test.mjs:183` fails); they are recaptured as a phase 5 fix once its widen lands.
+
+Phase 9 was opened on 2026-11-27 by live proof run 3 (defect E): the phase 8 fix works, but the head request
+handler takes the attempt cwd (the shaper's worktree) as the project, so `session answered` is refused
+`no-rotation-pending`, the role never moves and every save is refused `role-pending-rotation`. The envelope's
+`session` now carries the launch project root (from `FGOS_HEAD_PROJECT_ROOT`, through `head_of`), and the handler
+prefers it; writes and saves stay on the worktree. Still deferred to p-6sd4fslxv7 or reported to the supervisor as
+separate items: C (branch land is a merge), the untracked `.fgos/installation` link, `fgos land status` parsed as a
+branch name, and one successor bind refused `busy`.
 
 Hot files: `apps/fgos/src/wiring/session_write_publish.rs`, `bin/fgos.mjs` and the command manifest belong to
 phase 2 alone; the generated skill and agent copies belong to phase 5 alone and are regenerated with

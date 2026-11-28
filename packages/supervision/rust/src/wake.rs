@@ -88,6 +88,8 @@ pub struct Capacity {
 
 pub trait Admission {
     fn capacity(&self) -> Result<Capacity, String>;
+    /// This machine's Identity id (never a hostname); a plan's `host` is compared with it.
+    fn machine(&self) -> Result<String, String>;
     /// Publish running status and the lead role through the existing paths land door. A stale
     /// plan or failed publication refuses; the wake never starts a lead before this succeeds.
     fn admit(&self, plan: &Plan, role: &str) -> Result<(), String>;
@@ -489,12 +491,13 @@ fn admit_ready(
         // Publication can wait on the land door. Re-read machine facts before every admission,
         // retaining this wake's reservations until the newly started heads acquire Identity roles.
         let facts = ports.admission.capacity().and_then(|capacity| {
+            let machine = ports.admission.machine()?;
             ports
                 .identity
                 .lead_roles(&project.id)
-                .map(|roles| (capacity, roles))
+                .map(|roles| (capacity, roles, machine))
         });
-        let (capacity, roles) = match facts {
+        let (capacity, roles, machine) = match facts {
             Ok(facts) => facts,
             Err(code) => {
                 ports.telemetry.emit(&WakeSpan {
@@ -520,14 +523,15 @@ fn admit_ready(
                 }
             },
             ports.questions,
+            &machine,
         );
         let mut outcome = "nothing-admissible";
         let mut publication_failed = false;
-        let reason = if let Some(reason) = admission_hold(&plans[i], done) {
-            if reason != "held-blocked" {
+        let reason = if let Some(reason) = admission_hold(&plans[i], done, &machine) {
+            if reason != "held-blocked" && !reason.starts_with("held-other-machine:") {
                 judgement = true;
             }
-            reason.to_owned()
+            reason
         } else if leads >= capacity.max_leads {
             "held-max-leads".to_owned()
         } else if capacity.free_lanes <= reserved_lanes {

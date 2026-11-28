@@ -1,7 +1,7 @@
 ---
 id: p-6htu2ae64o
 title: "Head run supervisors started by the watcher live in the watcher unit's cgroup, so one OOM kill takes down several heads' request sockets (session-host, priority high; source: lead:SUPERVISOR, 2026-11-23)"
-status: done
+status: in-flight
 priority: P1
 area: session-host
 created: 2026-11-23

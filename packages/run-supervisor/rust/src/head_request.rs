@@ -88,6 +88,10 @@ pub const CAN_I_VERB: &str = "can-i";
 /// The policy verb that runs the project's release recipe (`fgos_session_host::release`), answered by the supervisor
 /// itself: it answers at once with a ticket and runs the steps detached; `request result` reads the outcome.
 pub const RELEASE_VERB: &str = "release run";
+/// The policy verb that runs only the project's `release.checks` in one linked worktree of the project
+/// (`fgos_session_host::release::run_checks_in`), unconfined and with no release step: `args` is `{worktree: path}`.
+/// Answered like [`RELEASE_VERB`], with a ticket.
+pub const RELEASE_CHECK_VERB: &str = "release check";
 
 /// Verbs of a session that does not (yet) hold its role: the role check is "registered", and after the route reports
 /// done the supervisor registers the role for the attempt's session. The flag is Identity's `take`.
@@ -1495,6 +1499,9 @@ fn decide(cfg: &Arc<Config>, busy: &AtomicBool, request: &Request, peer: Option<
     if request.verb == RELEASE_VERB {
         return release_run(cfg, request);
     }
+    if request.verb == RELEASE_CHECK_VERB {
+        return release_check(cfg, request);
+    }
     let outcome = route_request(cfg, request);
     if let (Some(take), Outcome::Done(_)) = (moves, &outcome) {
         if let Err(why) = (cfg.take_role)(take) {
@@ -1914,6 +1921,103 @@ impl HostRelease {
     }
 }
 
+/// The one check checkout both doors use.
+impl fgos_session_host::release::CheckoutPorts for HostRelease {
+    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`
+    /// (`release-check-chk-<id>` for the check-only door, so a lead's check and a supervisor's release run that
+    /// share a client-chosen id never share a path), made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
+    /// step failed is removed again.
+    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
+        let name = self
+            .cfg
+            .cwd
+            .file_name()
+            .ok_or_else(|| "the project root has no directory name".to_string())?
+            .to_string_lossy()
+            .into_owned();
+        let parent = self
+            .cfg
+            .cwd
+            .parent()
+            .ok_or_else(|| "the project root has no parent directory".to_string())?;
+        let tag = if self.request.verb == RELEASE_CHECK_VERB {
+            "chk-"
+        } else {
+            ""
+        };
+        let path = parent
+            .join(format!("{name}-worktrees"))
+            .join(format!("release-check-{tag}{}", self.request.id));
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree", "create", &text, "--detach", "--base", tip, "--json",
+        ])
+        .map_err(|why| format!("fgos worktree create: {why}"))?;
+        let materialized = (|| {
+            let (driver, repo) = fgos_git::GitDriver::open_at(&path)
+                .map_err(|e| format!("git did not run: {e:?}"))?
+                .ok_or_else(|| "the check checkout is not a git repository".to_string())?;
+            driver
+                .materialize_committed_state(&repo, vec![], tip)
+                .map_err(|e| format!("the committed .fgos was not written: {e:?}"))
+        })();
+        if let Err(why) = materialized {
+            if let Err(removed) = self.remove_check_checkout(&path, tip) {
+                fgos_session_host::release::ReleasePorts::log(
+                    self,
+                    &format!(
+                        "the release check checkout at {} was not removed: {removed}",
+                        path.display()
+                    ),
+                );
+            }
+            return Err(why);
+        }
+        Ok(path)
+    }
+
+    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
+        let text = path.to_string_lossy().into_owned();
+        self.host_json(&[
+            "worktree",
+            "remove",
+            &text,
+            "--delivered-to",
+            tip,
+            "--discard-ignored",
+            "--json",
+        ])
+        .map(|_| ())
+        .map_err(|why| format!("fgos worktree remove: {why}"))
+    }
+}
+
+/// The checks-only door resolves the worktree's committed tip, then reads the recipe and runs an argv in the check
+/// checkout the same way a release run does, and nothing more.
+impl fgos_session_host::release::CheckPorts for HostRelease {
+    fn head_tip(&self, worktree: &Path) -> Result<String, String> {
+        use fgos_git::{HeadFact, Inspect};
+        let (driver, repo) = fgos_git::GitDriver::open_at(worktree)
+            .map_err(|e| format!("git did not run: {e:?}"))?
+            .ok_or_else(|| "the worktree is not a git repository".to_string())?;
+        match driver.resolve_head(&repo) {
+            Ok(HeadFact::Attached { commit, .. } | HeadFact::Detached { commit }) => {
+                Ok(commit.as_str().to_string())
+            }
+            Ok(HeadFact::Unborn { .. }) => Err("the worktree has no commit".to_string()),
+            Err(e) => Err(format!("the worktree HEAD was not resolved: {e:?}")),
+        }
+    }
+
+    fn recipe(&self) -> Result<Value, String> {
+        fgos_session_host::release::ReleasePorts::recipe(self)
+    }
+
+    fn run(&self, argv: &[String], dir: &Path) -> Result<i32, String> {
+        fgos_session_host::release::ReleasePorts::run(self, argv, Some(dir))
+    }
+}
+
 impl fgos_session_host::release::ReleasePorts for HostRelease {
     fn recipe(&self) -> Result<Value, String> {
         self.host_json(&["config", "show", "--path", "release", "--json"])
@@ -1966,65 +2070,6 @@ impl fgos_session_host::release::ReleasePorts for HostRelease {
     fn land_in_progress(&self) -> Result<Option<String>, String> {
         self.host_json(&["lock-status", "--json"])
             .map(|report| fgos_session_host::release::merge_slot_hold(&report))
-    }
-
-    /// A detached checkout of `tip` at `<parent of the project root>/<project name>-worktrees/release-check-<id>`,
-    /// made through the worktree door, then given the tip's committed `.fgos` bytes. A checkout made before a later
-    /// step failed is removed again.
-    fn make_check_checkout(&self, tip: &str) -> Result<PathBuf, String> {
-        let name = self
-            .cfg
-            .cwd
-            .file_name()
-            .ok_or_else(|| "the project root has no directory name".to_string())?
-            .to_string_lossy()
-            .into_owned();
-        let parent = self
-            .cfg
-            .cwd
-            .parent()
-            .ok_or_else(|| "the project root has no parent directory".to_string())?;
-        let path = parent
-            .join(format!("{name}-worktrees"))
-            .join(format!("release-check-{}", self.request.id));
-        let text = path.to_string_lossy().into_owned();
-        self.host_json(&[
-            "worktree", "create", &text, "--detach", "--base", tip, "--json",
-        ])
-        .map_err(|why| format!("fgos worktree create: {why}"))?;
-        let materialized = (|| {
-            let (driver, repo) = fgos_git::GitDriver::open_at(&path)
-                .map_err(|e| format!("git did not run: {e:?}"))?
-                .ok_or_else(|| "the check checkout is not a git repository".to_string())?;
-            driver
-                .materialize_committed_state(&repo, vec![], tip)
-                .map_err(|e| format!("the committed .fgos was not written: {e:?}"))
-        })();
-        if let Err(why) = materialized {
-            if let Err(removed) = self.remove_check_checkout(&path, tip) {
-                self.log(&format!(
-                    "the release check checkout at {} was not removed: {removed}",
-                    path.display()
-                ));
-            }
-            return Err(why);
-        }
-        Ok(path)
-    }
-
-    fn remove_check_checkout(&self, path: &Path, tip: &str) -> Result<(), String> {
-        let text = path.to_string_lossy().into_owned();
-        self.host_json(&[
-            "worktree",
-            "remove",
-            &text,
-            "--delivered-to",
-            tip,
-            "--discard-ignored",
-            "--json",
-        ])
-        .map(|_| ())
-        .map_err(|why| format!("fgos worktree remove: {why}"))
     }
 
     fn run(&self, argv: &[String], dir: Option<&Path>) -> Result<i32, String> {
@@ -2175,17 +2220,10 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
             }
         }
     };
-    let name = cfg.role.strip_prefix("head:").unwrap_or_default();
-    if name.is_empty()
-        || !name
-            .chars()
-            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
-    {
-        return Outcome::Refused {
-            code: "verb-failed",
-            detail: Some("the role is not a head role".to_string()),
-        };
-    }
+    let name = match head_role_name(cfg) {
+        Ok(name) => name,
+        Err(refusal) => return refusal,
+    };
     // This process is the runner: its identity is on the ticket, so a supervisor that ends mid-run reads
     // `runner-gone`; the kernel frees the release lock with it.
     let Some(runner) = fgos_process::facts::self_identity().map(|t| t.to_record().to_json()) else {
@@ -2272,6 +2310,160 @@ fn release_run(cfg: &Arc<Config>, request: &Request) -> Outcome {
         return Outcome::Refused {
             code: "verb-failed",
             detail: Some(format!("the release did not start: {e}")),
+        };
+    }
+    Outcome::Done(json!({"ticket": request.id, "state": "running"}))
+}
+
+/// The name of the head the socket serves (the folder of its tickets), or the refusal when the role is not one.
+fn head_role_name(cfg: &Config) -> Result<&str, Outcome> {
+    let name = cfg.role.strip_prefix("head:").unwrap_or_default();
+    if name.is_empty()
+        || !name
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    {
+        return Err(Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the role is not a head role".to_string()),
+        });
+    }
+    Ok(name)
+}
+
+/// The directory of a linked worktree of this project that `asked` names: absolute, and listed by
+/// `git worktree list` of the project root after its first entry (the main checkout). `None` for anything else.
+fn registered_linked_worktree(root: &Path, asked: &str) -> Option<PathBuf> {
+    let asked = Path::new(asked);
+    if !asked.is_absolute() {
+        return None;
+    }
+    let asked = asked.canonicalize().ok()?;
+    use std::os::unix::ffi::OsStrExt;
+    let (driver, repo) = fgos_git::GitDriver::open_at(root).ok()??;
+    let mut cursor = None;
+    let mut index = 0usize;
+    loop {
+        let page = driver.list_worktrees(&repo, cursor, 4096).ok()?;
+        for fact in &page.entries {
+            // The first entry is the main checkout; only linked worktrees count.
+            let first = index == 0;
+            index += 1;
+            if first {
+                continue;
+            }
+            let listed = PathBuf::from(std::ffi::OsStr::from_bytes(&fact.path));
+            if listed.canonicalize().is_ok_and(|p| p == asked) {
+                return Some(asked);
+            }
+        }
+        cursor = page.next_cursor;
+        cursor.as_ref()?;
+    }
+}
+
+/// [`RELEASE_CHECK_VERB`]: the project's `release.checks` run in the named linked worktree, unconfined, and nothing
+/// else (the release rule, its record and its lock are not reached). Answers at once with a ticket; the detached
+/// thread rewrites it `done` with `{green, checks}` as its result, a red check being an answer, not a failure.
+fn release_check(cfg: &Arc<Config>, request: &Request) -> Outcome {
+    let worktree = match request.args.as_object() {
+        Some(map) if map.len() == 1 => map.get("worktree").and_then(Value::as_str),
+        _ => None,
+    };
+    let Some(worktree) = worktree else {
+        return Outcome::Refused {
+            code: "bad-args",
+            detail: Some("args is {worktree: absolute path} and nothing else".to_string()),
+        };
+    };
+    let name = match head_role_name(cfg) {
+        Ok(name) => name,
+        Err(refusal) => return refusal,
+    };
+    let Some(worktree) = registered_linked_worktree(&cfg.cwd, worktree) else {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some(
+                "worktree-not-registered: the path is not a linked worktree of this project"
+                    .to_string(),
+            ),
+        };
+    };
+    let Some(runner) = fgos_process::facts::self_identity().map(|t| t.to_record().to_json()) else {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some("the supervisor's own process identity is not readable".to_string()),
+        };
+    };
+    let dir = cfg.cwd.join(".fgos/runtime/head-tickets").join(name);
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some(format!("the ticket directory is not writable: {e}")),
+        };
+    }
+    let file = dir.join(format!("{}.json", request.id));
+    let mut ticket = json!({
+        "id": request.id, "verb": RELEASE_CHECK_VERB, "state": "running", "runner": runner,
+        "startedAt": utc_now_iso(), "cwd": worktree,
+    });
+    if let Err(e) = write_ticket(&file, &ticket, true) {
+        return if e.kind() == io::ErrorKind::AlreadyExists {
+            refused("ticket-used")
+        } else {
+            Outcome::Refused {
+                code: "verb-failed",
+                detail: Some(format!("the ticket was not written: {e}")),
+            }
+        };
+    }
+    let ports = HostRelease {
+        cfg: cfg.clone(),
+        request: Request {
+            id: request.id.clone(),
+            verb: request.verb.clone(),
+            args: json!({}),
+        },
+        log_file: dir.join(format!("{}.log", request.id)),
+    };
+    let log = cfg.clone();
+    let id = request.id.clone();
+    let spawned = std::thread::Builder::new()
+        .name("release-check".to_string())
+        .spawn(move || {
+            match fgos_session_host::release::run_checks_in(&ports, &worktree) {
+                Ok(report) => {
+                    ticket["state"] = json!("done");
+                    ticket["result"] = report.to_value();
+                    // Red is still an answer (state done, result carried), but the ticket's exit is the first
+                    // red check's own non-zero exit, or 1 when that check could not be run.
+                    if !report.green {
+                        let first_red = report.checks.iter().find(|c| c.exit != Some(0));
+                        ticket["exit"] = json!(first_red
+                            .and_then(|c| c.exit)
+                            .filter(|code| *code != 0)
+                            .unwrap_or(1));
+                    }
+                }
+                Err(why) => {
+                    ticket["state"] = json!("failed");
+                    ticket["code"] = json!(if why.starts_with("check-checkout-failed") {
+                        "check-checkout-failed"
+                    } else {
+                        "recipe-invalid"
+                    });
+                    ticket["message"] = json!(loggable_detail(&why));
+                }
+            }
+            ticket["endedAt"] = json!(utc_now_iso());
+            if let Err(e) = write_ticket(&file, &ticket, false) {
+                (log.log)(&format!("head-request {id} release check ticket: {e}"));
+            }
+        });
+    if let Err(e) = spawned {
+        return Outcome::Refused {
+            code: "verb-failed",
+            detail: Some(format!("the release check did not start: {e}")),
         };
     }
     Outcome::Done(json!({"ticket": request.id, "state": "running"}))

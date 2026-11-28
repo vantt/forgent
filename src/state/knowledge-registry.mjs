@@ -237,28 +237,72 @@ function assertNonEmptyText(value, message) {
  * and `places` a search may return, kept as given. An empty candidate list
  * is valid: the query itself is the record that nothing was found.
  */
-function normalizeHandoffLocate(locate) {
+function normalizeLocate(locate, eventName, { grown } = {}) {
   if (!locate || typeof locate !== 'object' || Array.isArray(locate)) {
-    throw new KnowledgeValidationError('capture.handoff requires locate.query');
+    throw new KnowledgeValidationError(`${eventName} requires locate.query`);
   }
-  assertNonEmptyText(locate.query, 'capture.handoff requires locate.query');
+  assertNonEmptyText(locate.query, `${eventName} requires locate.query`);
   const candidates = locate.candidates ?? [];
   if (!Array.isArray(candidates)) {
-    throw new KnowledgeValidationError('capture.handoff: locate.candidates must be an array');
+    throw new KnowledgeValidationError(`${eventName}: locate.candidates must be an array`);
   }
   const kept = candidates.map((candidate, index) => {
     if (!candidate || typeof candidate !== 'object' || Array.isArray(candidate)) {
-      throw new KnowledgeValidationError(`capture.handoff: locate.candidates[${index}] must be an object`);
+      throw new KnowledgeValidationError(`${eventName}: locate.candidates[${index}] must be an object`);
     }
-    assertNonEmptyText(candidate.path, `capture.handoff: locate.candidates[${index}] requires path`);
-    assertNonEmptyText(candidate.why_not, `capture.handoff: locate.candidates[${index}] requires why_not`);
+    assertNonEmptyText(candidate.path, `${eventName}: locate.candidates[${index}] requires path`);
+    // The grown candidate (attest only) is the attested document itself.
+    if (!(grown !== undefined && candidate.path === grown && candidate.why_not === undefined)) {
+      assertNonEmptyText(candidate.why_not, `${eventName}: locate.candidates[${index}] requires why_not`);
+    }
     return {
       path: candidate.path,
       ...(candidate.section === undefined ? {} : { section: candidate.section }),
-      why_not: candidate.why_not,
+      ...(candidate.why_not === undefined ? {} : { why_not: candidate.why_not }),
     };
   });
-  return { query: locate.query, candidates: kept, ...(locate.places === undefined ? {} : { places: locate.places }) };
+  const mentions = locate.mentions === undefined ? undefined : normalizeMentions(locate.mentions, eventName);
+  return {
+    query: locate.query,
+    candidates: kept,
+    ...(locate.places === undefined ? {} : { places: locate.places }),
+    ...(mentions === undefined ? {} : { mentions }),
+  };
+}
+
+const MENTION_HANDLING = ['updated', 'unaffected', 'too-common'];
+
+// Mentions are the writer's record of how each literal hit was handled. The
+// verbs cannot check the list against the locate answer: completeness is the
+// writer's claim.
+function normalizeMentions(mentions, eventName) {
+  if (!Array.isArray(mentions)) {
+    throw new KnowledgeValidationError(`${eventName}: locate.mentions must be an array`);
+  }
+  return mentions.map((mention, index) => {
+    if (!mention || typeof mention !== 'object' || Array.isArray(mention)) {
+      throw new KnowledgeValidationError(`${eventName}: locate.mentions[${index}] must be an object`);
+    }
+    assertNonEmptyText(mention.path, `${eventName}: locate.mentions[${index}] requires path`);
+    if (typeof mention.missedBySearch !== 'boolean') {
+      throw new KnowledgeValidationError(`${eventName}: locate.mentions[${index}] (${mention.path}) requires boolean missedBySearch`);
+    }
+    if (!MENTION_HANDLING.includes(mention.handling)) {
+      throw new KnowledgeValidationError(
+        `${eventName}: locate.mentions[${index}] (${mention.path}) requires handling, one of ${MENTION_HANDLING.join(', ')}`,
+      );
+    }
+    if (mention.handling === 'too-common') {
+      assertNonEmptyText(mention.note, `${eventName}: locate.mentions[${index}] (${mention.path}) handling too-common requires note`);
+    }
+    return {
+      path: mention.path,
+      ...(mention.section === undefined ? {} : { section: mention.section }),
+      missedBySearch: mention.missedBySearch,
+      handling: mention.handling,
+      ...(mention.note === undefined ? {} : { note: mention.note }),
+    };
+  });
 }
 
 /**
@@ -775,7 +819,7 @@ export function applyKnowledgeEvent(view, event) {
     // justified this doc's content, never overwritten, mirroring
     // an accumulate-never-replace fold rule.
     case 'doc.attest': {
-      const { docId, topicId, role, captureId } = payload;
+      const { docId, topicId, role, captureId, locate } = payload;
       const id = resolveDocId(view, { docId, topicId, role });
       const doc = view.docs[id];
       if (!doc) {
@@ -801,6 +845,20 @@ export function applyKnowledgeEvent(view, event) {
       if (!doc.sourceCaptureIds.includes(captureId)) {
         doc.sourceCaptureIds.push(captureId);
       }
+      // The writer's locate decision (grow), kept per capture; an event
+      // without `locate` replays exactly as before.
+      if (locate !== undefined) {
+        if (!view.attestsByCapture) view.attestsByCapture = {};
+        view.attestsByCapture[captureId] = [
+          ...(view.attestsByCapture[captureId] ?? []),
+          {
+            docId: id,
+            decision: 'grow',
+            locate: normalizeLocate(locate, 'doc.attest', { grown: doc.currentPath }),
+            ts: event.ts ?? Date.now(),
+          },
+        ];
+      }
       doc.updatedAt = event.ts ?? Date.now();
       break;
     }
@@ -812,14 +870,17 @@ export function applyKnowledgeEvent(view, event) {
     // view keeps every handoff per capture, because one item may hand off
     // several claims.
     case 'capture.handoff': {
-      const { captureId, requestId, claim, material, locate } = payload;
+      const { captureId, requestId, claim, material, locate, decision = 'create' } = payload;
       for (const [label, value] of [['captureId', captureId], ['requestId', requestId], ['claim', claim], ['material', material]]) {
         assertNonEmptyText(value, `capture.handoff requires ${label}`);
       }
       if (!view.work?.[requestId]) {
         throw new KnowledgeValidationError(`capture.handoff: request item '${requestId}' is not an existing work item`);
       }
-      const record = { requestId, claim, material, locate: normalizeHandoffLocate(locate), ts: event.ts ?? Date.now() };
+      if (decision !== 'create' && decision !== 'no-place') {
+        throw new KnowledgeValidationError(`capture.handoff: decision must be create or no-place, got '${decision}'`);
+      }
+      const record = { requestId, claim, material, decision, locate: normalizeLocate(locate, 'capture.handoff'), ts: event.ts ?? Date.now() };
       if (!view.handoffsByCapture) view.handoffsByCapture = {};
       view.handoffsByCapture[captureId] = [...(view.handoffsByCapture[captureId] ?? []), record];
       break;

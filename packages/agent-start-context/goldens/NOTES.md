@@ -39,3 +39,6 @@ Any other difference is a regression. A golden regenerated for one of these thre
   `core/agents/{secretary,supervisor,shaper}.yaml` replaced the decision boundary "Anything outside the approved frame
   (scope and budget set at approval)" with "A change to an approved goal: outcome, acceptance, a standing constraint, or
   an owner order" (the when-to-ask rule in `core/skills/_shared/decision-question.md`). Only that line differs.
+- 2026-11-27: the shaper agent file and its five openings (6 goldens), because `core/agents/shaper.yaml`'s
+  description now says the shaper saves each round on its own discussion branch in its own worktree and lands that
+  branch once (plan 261125-1557-shaper-worktree, phase 5). Only the description text differs.

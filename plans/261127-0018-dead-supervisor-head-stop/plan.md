@@ -7,7 +7,8 @@ blockedBy:
   - 261127-0016-head-run-own-failure-domain
   - 261122-0056-orchestration-skeleton
   - 261126-2324-changelog-fragments-and-skill-surface-regeneration
-base: 1336e7091f29ece1a9b1a7cf8723cea04e7e41ac
+  - 261125-1557-shaper-worktree
+base: 936130c13cb166e22439b7f0edf03e1c680f7cbc
 footprint:
   - plans/261127-0018-dead-supervisor-head-stop/**
   - src/session-host/head-stop.mjs
@@ -15,12 +16,14 @@ footprint:
   - docs/platform/session-host/spec.md
   - packages/supervision/rust/tests/definitions.rs
   - changelog.d/261127-0018-dead-supervisor-head-stop.md
+  - apps/fgos/observe-kinds.json
 source:
   - plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md
   - p-6htu2ae64o
   - plans/261127-0016-head-run-own-failure-domain/plan.md
 created: 2026-11-27
 lead: head:lead-forgent-261127-0018-dead-s-6acc8
+host: fg-server2-jdp2bv
 ---
 
 # Session stop ends a head whose supervisor is dead
@@ -65,7 +68,7 @@ Re-attaching a supervisor to a running agent; automatic restart; anything alread
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/** | 1 | ready |
+| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/**, `apps/fgos/observe-kinds.json` | 1 | ready |
 
 ## Owner questions
 

@@ -1,0 +1,116 @@
+# Live check rerun — acceptance criterion 4 (phase 03, step 4), after owner answer q-wvelmdqfga
+# Date: 2026-11-28
+# Rerun on the release built from main 9840b971a4 (the toolchain-cache resource now also
+# binds <home>/.cache/ort.pyke.io read-only and sets ORT_LIB_PATH).
+# Confined unit under an invocation with homeEnv: HOME, worktree
+# /home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03
+# Commands are recorded verbatim, in the order they were run. Nothing was edited.
+
+## Step 1
+$ echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT ORT_LIB_PATH=$ORT_LIB_PATH FGOS_CONFINED=$FGOS_CONFINED"; ls "$ORT_LIB_PATH"; touch "$CARGO_HOME/.probe-write" 2>&1; echo "write-probe-exit=$?"
+HOME=/home/vantt CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0 ORT_LIB_PATH=/home/vantt/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/02aac0d3b4927026292088986d7a377c657c88761b1c068be217a67b35447678 FGOS_CONFINED=1
+libonnxruntime.a
+touch: cannot touch '/home/vantt/.cargo/.probe-write': Read-only file system
+write-probe-exit=1
+
+## Step 2
+$ export CARGO_TARGET_DIR=$(mktemp -d); s=$(date +%s.%N); timeout 1200 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -40; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+   Compiling rand_chacha v0.9.0
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/yaml-doc/rust)
+   Compiling rand v0.9.5
+   Compiling monostate-impl v0.1.18
+   Compiling tempfile v3.27.0
+   Compiling monostate v0.1.18
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.14.0
+   Compiling globset v0.4.22
+   Compiling spm_precompiled v0.1.4
+   Compiling compact_str v0.9.1
+   Compiling dary_heap v0.3.9
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/canonical-json/rust)
+   Compiling rustls-webpki v0.103.17
+   Compiling ignore v0.4.35
+   Compiling darling_macro v0.20.11
+   Compiling pkm-lang v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling darling v0.20.11
+   Compiling derive_builder_core v0.20.2
+   Compiling pkm-vault v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling derive_builder_macro v0.20.2
+   Compiling derive_builder v0.20.2
+   Compiling tokenizers v0.22.2
+   Compiling ureq v3.5.2
+   Compiling rusqlite v0.41.1
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.97s
+  Executable unittests src/lib.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/fgos_agent_context_engine-08f73b4e57e55cb6)
+  Executable tests/check.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/check-6bc47e5f4cad6cad)
+  Executable tests/compose.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/compose-f255d6e026e79024)
+  Executable tests/repository_units.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/repository_units-b1904805e74cdb4f)
+  Executable tests/rule_unit.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/rule_unit-a4a70e4087a3717a)
+  Executable tests/set.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/set-6db0e0a26ff08e8e)
+  Executable tests/store.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/store-811b778081902330)
+  Executable tests/vectors.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/vectors-dc5dee7ba25b0e34)
+exit=0 elapsed=15.017243143s
+
+## Step 3
+$ s=$(date +%s.%N); CARGO_HOME=$(mktemp -d) timeout 120 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -20; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+error: failed to get `pkm-core` as a dependency of package `fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)`
+
+Caused by:
+  failed to load source for dependency `pkm-core`
+
+Caused by:
+  unable to update https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb
+
+Caused by:
+  can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
+exit=101 elapsed=.313706009s
+
+## Private-HOME rerun (homeEnv: HOME condition emulated with HOME=$(mktemp -d))
+
+# Same confined unit as above, run on 2026-11-28. Each step ran in its own shell, so
+# the exported HOME never leaked between steps. Nothing was edited.
+
+### Step 4
+$ export HOME=$(mktemp -d); echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT ORT_LIB_PATH=$ORT_LIB_PATH"; ls -A "$HOME"
+HOME=/tmp/tmp.bwewtcoOgm CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0 ORT_LIB_PATH=/home/vantt/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/02aac0d3b4927026292088986d7a377c657c88761b1c068be217a67b35447678
+# (ls -A printed nothing: the private HOME starts empty)
+exit=0
+
+### Step 5
+$ export HOME=$(mktemp -d); export CARGO_TARGET_DIR=$(mktemp -d); s=$(date +%s.%N); timeout 600 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -15; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.30s
+  Executable unittests src/lib.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/fgos_agent_context_engine-08f73b4e57e55cb6)
+  Executable tests/check.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/check-6bc47e5f4cad6cad)
+  Executable tests/compose.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/compose-f255d6e026e79024)
+  Executable tests/repository_units.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/repository_units-b1904805e74cdb4f)
+  Executable tests/rule_unit.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/rule_unit-a4a70e4087a3717a)
+  Executable tests/set.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/set-6db0e0a26ff08e8e)
+  Executable tests/store.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/store-811b778081902330)
+  Executable tests/vectors.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/vectors-dc5dee7ba25b0e34)
+exit=0 elapsed=14.335838305s
+
+### Step 6
+$ export HOME=$(mktemp -d); s=$(date +%s.%N); CARGO_HOME=$(mktemp -d) timeout 120 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -12; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+error: failed to get `pkm-core` as a dependency of package `fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)`
+
+Caused by:
+  failed to load source for dependency `pkm-core`
+
+Caused by:
+  unable to update https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb
+
+Caused by:
+  can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
+exit=101 elapsed=.059629804s

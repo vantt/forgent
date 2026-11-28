@@ -47,8 +47,9 @@ owner questions keep the existing slot exemption; unknown Identity never means a
 (`lane-freed`, `plan-priority-changed`) and `plan-became-ready` are handled in code when no judgement is needed. Never repeat admission or bypass a hold here.
 
 `fgos supervisor plans --json` is the read view (`admissible`, `headName`, `leadLive` or `leadUnnamed`, `leadsLive`,
-`leadsWaiting`, `maxLeads`). Use it to judge what the keeper cannot classify: ties, an invalid plan,
-a role collision or a failed start. Apply the owner/secretary priority order; correct a portfolio decision through
+`leadsWaiting`, `maxLeads`, `overlaps`). The read view lists `overlaps` as advice; the supervisor admits regardless
+and may mention the overlap to the lead of the newly admitted plan. Use it to judge what the keeper cannot classify:
+ties, an invalid plan, a role collision or a failed start. Apply the owner/secretary priority order; correct a portfolio decision through
 `fgos land --paths`, or ask the owner if intent is missing. A failed start leaves its plan running with the named
 lead: use the running-plan recovery below, never admit it a second time. A failed publication records
 `publish-failed:<code>`, leaves the plan ready and stops further admissions for that wake. It is not a failed
@@ -97,7 +98,7 @@ whole answer to `plan-no-progress`.
 ## Done plans
 
 Close a `done` plan with one board line (plan program board rules in AGENTS.md) and a backlog update, landed with
-`fgos land --paths` (write `plans/backlog.md` with `fgos session write plans/backlog.md < new`; it is a read-only file grant). The wake close step already stops an idle lead of a `done` plan, under either role shape (`head:lead-*` or `lead:<LANE>`); it leaves a busy or unknown lead and a lane session that still leads another plan. Stop by hand only what it left: a lead that was busy at the wake (`fgos session stop lead --name <headName> --reason "plan done"`). A lead started by hand has no run supervisor, so `session stop --role lead:<LANE>` answers `no-supervisor` (the wake records `stop-failed`); close that one by hand.
+`fgos land --paths` (write a row with `fgos session write <path> < row.md`, the path from `fgos convention path --kind backlog-item --slug <id>-<slug>`, the row carrying the backlog item frontmatter or refused `write-item-invalid`; the land door regenerates `plans/backlog.md`, never edit the index). The wake close step already stops an idle lead of a `done` plan, under either role shape (`head:lead-*` or `lead:<LANE>`); it leaves a busy or unknown lead and a lane session that still leads another plan. Stop by hand only what it left: a lead that was busy at the wake (`fgos session stop lead --name <headName> --reason "plan done"`). A lead started by hand has no run supervisor, so `session stop --role lead:<LANE>` answers `no-supervisor` (the wake records `stop-failed`); close that one by hand.
 
 ## Release
 
@@ -159,7 +160,7 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 - `fgos supervisor raise` puts a coordination event on the queue; `fgos metrics record` records coordination evidence
   and `fgos metrics prune` clears settled evidence.
 - `fgos run` is for one urgent chore only, never plan work (a lead's).
-- Reach a session by mailbox, SendMessage (peers), or, for a stuck one, the pane.
+- Reach a session by mailbox (`../_shared/head-mail.md`), SendMessage (peers), or, for a stuck one, the pane.
 - Work your confinement refuses (an account probe, a full-suite run, a host build, a read of a private store) goes to
   the unconfined `lead:SUPERVISOR` session on the same machine: find it with `fgos identity resolve lead:SUPERVISOR`
   and send one SendMessage naming the event, the exact command and where to put the result; record that in your report

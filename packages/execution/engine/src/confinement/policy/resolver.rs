@@ -103,6 +103,10 @@ pub struct ResolveInput {
     /// The holder-lock registry's path of the `mailbox` lock for this project's `.fgos`.
     pub mailbox_lock_path: String,
     pub uid: Option<u32>,
+    /// The host process's `CARGO_HOME`; used only when absolute.
+    pub cargo_home: Option<String>,
+    /// The host process's `RUSTUP_HOME`; used only when absolute.
+    pub rustup_home: Option<String>,
 }
 
 fn root_of(context: &ResolveContext) -> Option<&str> {
@@ -427,6 +431,108 @@ fn launch_program_bind_backs(program: Option<&str>, masked: &[String]) -> Vec<St
     }
 }
 
+/// A cache directory already on the host and outside every machine-private root and confinement root; `None` when it
+/// is absent (nothing was cached) or hidden (a grant never re-exposes a hidden root).
+fn bindable_cache(
+    real: String,
+    machine_private: &[String],
+    confinement_roots: &[String],
+) -> Option<String> {
+    (!machine_private
+        .iter()
+        .chain(confinement_roots)
+        .any(|root| is_inside_root(&real, root)))
+    .then_some(real)
+}
+
+/// The real subdirectories of `dir`, sorted; an absent or unreadable directory has none.
+fn real_subdirs(dir: &str) -> Vec<String> {
+    let Ok(entries) = fs::read_dir(dir) else {
+        return Vec::new();
+    };
+    let mut out: Vec<String> = entries
+        .flatten()
+        .filter_map(|entry| real_dir(&entry.path().to_string_lossy()))
+        .collect();
+    out.sort();
+    out
+}
+
+/// The one directory `ort-sys` unpacked its prebuilt ONNX Runtime into under a cache: `dfbin/<target-triple>/<hash>`,
+/// the directory holding `libonnxruntime.a`. Only exactly one is usable: with none there is nothing to link, and with
+/// several the resolver cannot tell which target the launch builds for. A link that resolves outside the cache names
+/// a path the cache mount does not carry, so it is not usable either.
+fn single_ort_lib_dir(cache: &str) -> Option<String> {
+    let mut found: Vec<String> = real_subdirs(&join(cache, "dfbin"))
+        .iter()
+        .flat_map(|target| real_subdirs(target))
+        .filter(|lib| is_inside_root(lib, cache))
+        .collect();
+    (found.len() == 1).then(|| found.remove(0))
+}
+
+/// The owner's toolchain cache mounts: the cargo home, the rustup home and ONNX Runtime's prebuilt binary cache, each
+/// a real existing directory that lies neither inside a machine-private root nor inside a confinement root. The host's
+/// `CARGO_HOME` / `RUSTUP_HOME` wins when absolute, else `<home>/.cargo` / `<home>/.rustup`; the ort cache is always
+/// `<home>/.cache/ort.pyke.io`. Read-only, so nothing in the sandbox writes the cache; the cargo mount also forces
+/// offline, credential-free fetching so a missing revision fails at once, and the ort mount names the one prebuilt
+/// library directory because `ort-sys` reads that offline flag as "skip download" and never links its own cache.
+fn toolchain_cache_resources(
+    input: &ResolveInput,
+    machine_private: &[String],
+    confinement_roots: &[String],
+) -> Vec<ResolvedResource> {
+    let cache = |env_value: &Option<String>, fallback: &str| {
+        let declared = env_value
+            .as_deref()
+            .filter(|v| Path::new(v).is_absolute())
+            .map(str::to_string)
+            .unwrap_or_else(|| join(&input.home_dir, fallback));
+        real_dir(&declared)
+            .and_then(|real| bindable_cache(real, machine_private, confinement_roots))
+    };
+    let mut out = Vec::new();
+    for (name, path) in [
+        ("cargo", cache(&input.cargo_home, ".cargo")),
+        ("rustup", cache(&input.rustup_home, ".rustup")),
+    ] {
+        let Some(path) = path else { continue };
+        let mut res = mount(
+            "toolchain-cache",
+            format!("toolchain-cache:{name}"),
+            &path,
+            "none",
+            "read",
+        );
+        let mut env = BTreeMap::new();
+        if name == "cargo" {
+            env.insert("CARGO_HOME".to_string(), path.clone());
+            env.insert("CARGO_NET_OFFLINE".to_string(), "true".to_string());
+            env.insert("GIT_TERMINAL_PROMPT".to_string(), "0".to_string());
+        } else {
+            env.insert("RUSTUP_HOME".to_string(), path.clone());
+        }
+        res.env = Some(env);
+        out.push(res);
+    }
+    // The ort cache is one resource with the library directory it names, or none at all: a prebuilt runtime nobody can
+    // point at is no cache, and a variable naming an empty path would only hide the real failure.
+    if let Some(path) = cache(&None, ".cache/ort.pyke.io") {
+        if let Some(lib) = single_ort_lib_dir(&path) {
+            let mut res = mount(
+                "toolchain-cache",
+                "toolchain-cache:ort".to_string(),
+                &path,
+                "none",
+                "read",
+            );
+            res.env = Some(BTreeMap::from([("ORT_LIB_PATH".to_string(), lib)]));
+            out.push(res);
+        }
+    }
+    out
+}
+
 fn grant_of<'a>(grants: &'a [Grant], resource: &str) -> Option<&'a Grant> {
     grants.iter().rev().find(|g| g.resource == resource)
 }
@@ -710,6 +816,12 @@ pub fn resolve_confinement_resources(input: &ResolveInput) -> Resolved<Vec<Resol
         bound.host_target = real_or_null(&target);
         resolved.push(bound);
     }
+    // After every grant mount, so a writable grant over a parent cannot make the cache writable.
+    resolved.extend(toolchain_cache_resources(
+        input,
+        &machine_private,
+        &real_confinement_roots,
+    ));
 
     // 7. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
     if input.blind {

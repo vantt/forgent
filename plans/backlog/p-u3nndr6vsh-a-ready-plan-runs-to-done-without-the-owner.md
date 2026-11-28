@@ -1,7 +1,7 @@
 ---
 id: p-u3nndr6vsh
 title: "A ready plan runs to done without the owner: the standing rule as rule units, an Unattended run section the contract check enforces, and a full-gate door the lead calls (plan contract, priority P1; source: discussion ds-que32ftgg6, owner order 2026-11-27 via lead:SUPERVISOR)"
-status: in-flight
+status: done
 priority: P1
 area: plan-contract
 created: 2026-11-27

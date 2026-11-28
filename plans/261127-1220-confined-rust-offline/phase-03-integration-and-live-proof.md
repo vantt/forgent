@@ -29,6 +29,23 @@ Capability: `code:test`.
 6. After the live check passes, the lead marks backlog row p-ymhj4xcf6x done, and leads stop sending cargo
    gates to lead:SUPERVISOR.
 
+## Owner answer q-wvelmdqfga (2026-11-28): option A
+
+The first live check (release 460a9af0) compiled `pkm-core` offline and refused an empty cache in 0.05 s, but
+`cargo test -p fgos-agent-context-engine --locked --no-run` exited 101: ort-sys 2.0.0-rc.15 reads
+`CARGO_NET_OFFLINE` as "skip download" and then does not link the prebuilt binary it already cached in
+`~/.cache/ort.pyke.io`. The owner chose option A:
+
+- The `toolchain-cache` resource also binds the owner's `<home>/.cache/ort.pyke.io` read-only and sets
+  `ORT_LIB_PATH` to its single `dfbin/<target>/<hash>` lib directory, only when exactly one exists (same
+  private-root and confinement-root exclusions as the cargo and rustup homes). No directory, or more than one,
+  gives no mount and no variable.
+- The owning test in `confinement_policy.rs` and spec §9.4 are extended for it. Decision 3 (offline, named
+  refusal) stays.
+- Allowed: changes to the confinement resolver, its test and spec §9.4 only. Forbidden: anything else,
+  vendoring ort, or changing `Cargo.toml` features.
+- One fix unit runs in this phase's worktree, then the gates and the live check of step 4 run again.
+
 ## Verify
 
 Pass: `reports/gates.md` shows all three gates green. `reports/live-check.md` shows the compile finished with

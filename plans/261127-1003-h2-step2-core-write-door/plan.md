@@ -45,6 +45,8 @@ footprint:
   - plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md
   - plans/backlog.md
   - changelog.d/261127-1003-h2-step2-core-write-door.md
+  - test/cli/knowledge-attest-gate.test.mjs
+  - src/state/store.mjs
 lead: head:lead-forgent-261127-1003-h2-ste-f47e4
 ---
 
@@ -172,8 +174,9 @@ it. Phase 6 measures the first two that can be measured now.
    `fgos internal context-engine compile --protocol 1`, contains the rule `documentation-door`.
 4. `rg -n "future area|instruction registry renders" docs/platform/documentation` returns nothing;
    `node scripts/doc-health.mjs` passes on `docs/platform/**`.
-5. The build order table in documentation spec section 4 has a plan column; the proposal (section 0 and 9.2), the
-   H1 plan (12.1), `docs/reading-map.md` and ledger row PF-I006 each link to it.
+5. The build order table in documentation spec section 4 has a plan column; the proposal (section 0 and 9.2),
+   `docs/reading-map.md` and ledger row PF-I006 each link to it. (The H1 plan is left out: its documentation work
+   finished long ago; owner, q-fzcovlnz5u, 2026-11-28.)
 6. A report at `fgos convention path --kind report --slug h2-step2-topics-per-retrospective-item` gives the
    baseline and the after count of new topics per retrospective item, with the queries used.
 7. `npm test` and `cargo test --workspace` are green on the merged tree, apart from tests that fail the same way on
@@ -212,12 +215,12 @@ it. Phase 6 measures the first two that can be measured now.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Attest records the locate result, mentions and the grow decision](phase-01-attest-records-locate-and-decision.md) | - | src/state/knowledge-registry.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, test/state/knowledge-registry.test.mjs, docs/platform/work-state/contracts/knowledge-registry.md, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json | 1 | ready |
-| 2 | [Pointer rule unit through the context engine](phase-02-pointer-rule-unit.md) | - | core/instructions/documentation-door.md, .fgos/instructions/effective/** | 1 | ready |
-| 3 | [Specs after the context engine, and links to the build order](phase-03-spec-corrections-and-links.md) | - | docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/intent-preservation-ledger.md, docs/reading-map.md, plans/260925-documentation-authority-unification/plan.md | 1 | ready |
-| 7 | [Locate returns exact mentions beside the ranked candidates](phase-07-locate-returns-exact-mentions.md) | - | packages/documentation/rust/src/**, packages/documentation/rust/tests/**, packages/documentation/rust/observe-kinds.json, apps/fgos/src/wiring/doc_locate.rs | 1 | ready |
-| 4 | [Shared write-door procedure; the knowledge skill calls it](phase-04-shared-procedure-and-knowledge-skill.md) | 1, 7 | core/skills/_shared/write-door.md, domains/coding/skills/fgos-coding-knowledge/SKILL.md, .agents/skills/_shared/write-door.md, .agents/skills/fgos-coding-knowledge/SKILL.md, .claude/skills/fgos-coding-knowledge/SKILL.md, plugins/fgOS/skills/_shared/write-door.md, plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md, docs/platform/documentation/operations/how-a-document-is-written.md | 2 | ready |
-| 5 | [Integrate, land, retire the draft plan](phase-05-integrate-and-land.md) | 1, 2, 3, 4, 7 | changelog.d/261127-1003-h2-step2-core-write-door.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, plans/261113-0124-docos-retrospective-claim-units/plan.md, plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md, plans/backlog.md | 3 | ready |
+| 1 | [Attest records the locate result, mentions and the grow decision](phase-01-attest-records-locate-and-decision.md) | - | src/state/knowledge-registry.mjs, bin/fgos.mjs, src/cli/command-registry.mjs, test/state/knowledge-registry.test.mjs, docs/platform/work-state/contracts/knowledge-registry.md, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-routes.json, `test/cli/knowledge-attest-gate.test.mjs`, `src/state/store.mjs` | 1 | done |
+| 2 | [Pointer rule unit through the context engine](phase-02-pointer-rule-unit.md) | - | core/instructions/documentation-door.md, .fgos/instructions/effective/** | 1 | done |
+| 3 | [Specs after the context engine, and links to the build order](phase-03-spec-corrections-and-links.md) | - | docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, docs/platform/proposals/documentation-system-unification.md, docs/platform/intent-preservation-ledger.md, docs/reading-map.md, plans/260925-documentation-authority-unification/plan.md | 1 | done |
+| 7 | [Locate returns exact mentions beside the ranked candidates](phase-07-locate-returns-exact-mentions.md) | - | packages/documentation/rust/src/**, packages/documentation/rust/tests/**, packages/documentation/rust/observe-kinds.json, apps/fgos/src/wiring/doc_locate.rs | 1 | done |
+| 4 | [Shared write-door procedure; the knowledge skill calls it](phase-04-shared-procedure-and-knowledge-skill.md) | 1, 7 | core/skills/_shared/write-door.md, domains/coding/skills/fgos-coding-knowledge/SKILL.md, .agents/skills/_shared/write-door.md, .agents/skills/fgos-coding-knowledge/SKILL.md, .claude/skills/fgos-coding-knowledge/SKILL.md, plugins/fgOS/skills/_shared/write-door.md, plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md, docs/platform/documentation/operations/how-a-document-is-written.md | 2 | done |
+| 5 | [Integrate, land, retire the draft plan](phase-05-integrate-and-land.md) | 1, 2, 3, 4, 7 | changelog.d/261127-1003-h2-step2-core-write-door.md, docs/platform/documentation/spec.md, docs/platform/documentation/subcomponents/write-door/spec.md, docs/platform/documentation/subcomponents/document-identity/spec.md, plans/261113-0124-docos-retrospective-claim-units/plan.md, plans/backlog/p-ixrbglli5o-the-retrospective-writer-opens-a-new-topic-for.md, plans/backlog.md | 3 | done |
 | 6 | [Measure topics per retrospective item](phase-06-measure-topics-per-item.md) | 5 | plans/261127-1003-h2-step2-core-write-door/reports/**, docs/platform/documentation/subcomponents/document-identity/spec.md | 4 | ready |
 
 Phases 1, 2, 3 and 7 share no file and run at once; phase 1 owns every `command-registry.mjs` edit, `--exact` on
@@ -248,7 +251,11 @@ Capability: phases 1, 2, 4 and 7 are `code:implement`; phase 3 is `code:implemen
 
 ## Owner questions
 
-None open. The owner set the plan going on 2026-11-27 without waiting for the plans that share files (see the
+Open: q-iwoehdmzfj (withdrawing the draft plan, phase 5 step 4); the pre-commit gate refuses any staged legacy plan
+without a `contract: plan-v1` marker. Answered 2026-11-28: q-fzcovlnz5u = A, the H1 plan's 12.1 link is dropped from
+criterion 5, which q-lb3rw5lo4u also asked about; the p03x edit is not needed.
+
+Earlier: none open. The owner set the plan going on 2026-11-27 without waiting for the plans that share files (see the
 footprint check). Validating proof point, run on `ac171967a`: `fgos doc locate` on a real retrospective-style draft
 answered `state: starting` with no candidates on the first call (the case D7's disk scan covers), then, text only
 while vectors were computed, ranked the knowledge-registry contract section 7.5, write-door spec 12 and

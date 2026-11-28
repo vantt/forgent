@@ -485,6 +485,7 @@
         "help",
         "draft",
         "draft-file",
+        "exact",
         "area",
         "question",
         "eval"
@@ -1404,7 +1405,8 @@
       "dir",
       "json",
       "help",
-      "rollback"
+      "rollback",
+      "worktree"
     ],
     "store": "none"
   },

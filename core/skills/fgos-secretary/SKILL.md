@@ -19,6 +19,8 @@ talks with the owner, clarifies and orders goals, and leaves routine operations 
 is alive or able to act, or a help request waits past the threshold, she runs the operation herself and wakes the machinery until it
 runs again.
 
+She may set or change `host` (the Identity machine that runs a plan) on a `ready` plan through her portfolio land, when the owner names a machine; never on a `running` plan, where the land door refuses `host-change-refused`.
+
 Who wins when orders meet, and which sessions the supervisor may stop: `core/agents/secretary.yaml` and
 `core/agents/supervisor.yaml`.
 
@@ -49,14 +51,9 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
 
 1. **Clarify the domain.** Call `fgos-clarifying` (verdict only, no Work item, never `fgos submit`). If the verdict is
    unsure (`domainUnsure`), ask the owner one line and wait; park nothing else behind it.
-2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and add one row to `plans/backlog.md`. Discussions and plans carry that id. Your sandbox keeps `docs/`
-   read-only, the backlog included, so never edit it in place: copy it to a scratch file
-   (`cp plans/backlog.md "${TMPDIR:-/tmp}/backlog.md"`), take the id of that copy right away
-   (`oid=$(git hash-object --no-filters "${TMPDIR:-/tmp}/backlog.md")`), edit the copy, then hand the whole copy to your
-   supervisor with `fgos session write plans/backlog.md --base "$oid" < "${TMPDIR:-/tmp}/backlog.md"`, which replaces the
-   file atomically. `--base` is what protects newer rows: if the file moved
-   since (a pull, another writer), the write is refused `write-base-stale` and writes nothing, so a row the host added
-   since is never lost. On `write-base-stale`, copy the file again, redo the edit on the fresh copy and write again. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `plans/discussions/` stay writable directly.
+2. **Backlog row.** For an actionable request, mint an id with `fgos identity mint backlog` (Rule: id-minting, in AGENTS.md; set in .fgos/instructions/effective/rules.json) and write one row file at the path `fgos convention path --kind backlog-item --slug <id>-<slug>` prints, with
+   `fgos session write <that path> < row.md` (the row carries the backlog item frontmatter; a file missing a required key is refused `write-item-invalid`) (a new file, so there is nothing to copy or hash). Discussions and plans carry that id.
+   The land door regenerates `plans/backlog.md` in the same commit; never edit the index. On `write-busy` (a live Git operation of the host held the checkout through the host's own retries; nothing was written), wait a little and write again unchanged. `plans/` and `plans/discussions/` stay writable directly.
 3. **Route.**
 
    | State of the topic | Route |
@@ -71,8 +68,8 @@ help queue has nothing past the threshold; then the supervisor owns the queue ag
    Message a peer session only when a decision is needed from it, never for progress. A Claude session on this
    machine: SendMessage to it (ListAgents names who is alive); your sandbox reaches the peers' session sockets
    read-only, so you can send but peers cannot SendMessage you back. Another machine, a non-Claude agent, or mail
-   that must be signed or kept: `fgos mailbox send --to <role or handle>` (for example `--to lead:OPC`). Replies and
-   mail sent to you arrive through the mailbox hook.
+   that must be signed or kept: mail it as `../_shared/head-mail.md` says. Replies and mail sent to you arrive
+   through the mailbox hook.
 4. **Order.** Order the topics by the product priority (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json). A real tie goes to the owner as a question.
 
 A release the supervisor started and did not come back from is the secretary's to undo. You cannot read the
@@ -116,7 +113,7 @@ Local verbs, run in your own sandbox without the socket (the host routes only th
 |---|---|
 | `fgos identity mint backlog` | OK |
 | `fgos questions show <id>` | OK, but warns `questions.json: durable install failed ... Read-only file system` (the answer is complete; the warning is the view refresh failing, safe to ignore) |
-| `fgos mailbox send --to <role or handle>`, `fgos convention path ...` | not audited live |
+| `fgos mailbox send` (see `../_shared/head-mail.md`), `fgos convention path ...` | not audited live |
 
 `TMPDIR=/tmp` is writable (OK).
 

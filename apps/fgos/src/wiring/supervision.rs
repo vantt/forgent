@@ -822,6 +822,9 @@ struct HostAdmission {
 }
 
 impl wake::Admission for HostAdmission {
+    fn machine(&self) -> Result<String, String> {
+        machine_id()
+    }
     fn capacity(&self) -> Result<wake::Capacity, String> {
         let max_leads = required_capacity(&self.root, "supervisor.maxLeads")?;
         let ceiling = required_capacity(&self.root, "workerSlots.ceiling")?;
@@ -2157,6 +2160,7 @@ impl sources::Resolver for KeeperPlayers<'_> {
                 &StoreOpenQuestions {
                     root: self.root.clone(),
                 },
+                &machine_id()?,
             );
             return Ok(self.claim_lead_slot(counts.0, max));
         }
@@ -2248,7 +2252,18 @@ impl keeper::Snapshot for KeeperSnapshot<'_> {
             root: self.root.clone(),
         }
         .read();
-        let plan_source = plans.as_ref().ok().map(|plans| sources::Plans {
+        // Plans running on another machine are not this keeper's; a no-host plan whose lead is gone
+        // here is raised for judgement, never restarted.
+        // Without a machine id the plans source is unavailable, as an unreadable portfolio is.
+        let watched = machine_id()
+            .ok()
+            .zip(plans.as_ref().ok())
+            .map(|(machine, plans)| {
+                portfolio::keeper_plans(plans, &machine, &|role| {
+                    sources::Heads::state(&players, role) == keeper::ActorState::NotLive
+                })
+            });
+        let plan_source = watched.as_deref().map(|plans| sources::Plans {
             plans,
             heads: &players,
         });
@@ -2724,8 +2739,9 @@ fn run_land(root: &Path, command: &LandCommand) -> Result<Value, CategorisedRefu
     let writer = writer();
     let next = || operation_id("land");
     let log_dir = state_dir(&main, "land");
-    let index =
-        |root: &Path, committing: &[String]| backlog_index(&driver, &repo, root, committing);
+    let index = |root: &Path, committing: &[String]| {
+        super::portfolio::backlog_index(&driver, &repo, root, committing)
+    };
     let remove_worktree = |path: &Path, target: &str| -> Result<(), String> {
         let request = super::worktree::WorktreeRequest::Remove {
             cwd: main.clone(),
@@ -2893,24 +2909,6 @@ fn run_widen(root: &Path, command: &WidenCommand) -> Result<Value, CategorisedRe
         "overlaps": overlaps_json,
         "commit": commit.map(Value::String).unwrap_or(Value::Null),
     }))
-}
-
-/// The backlog index a land commits: the one generator every index write uses, over the items Git
-/// tracks plus the paths being committed, refusing on errors.
-fn backlog_index(
-    driver: &GitDriver,
-    repo: &RepoHandle,
-    root: &Path,
-    committing: &[String],
-) -> Result<String, String> {
-    use super::portfolio::{
-        generate_backlog_index_for_commit, tracked_item_paths, CommitIndexError,
-    };
-    let tracked = tracked_item_paths(driver, repo)
-        .map_err(|cause| format!("write-status-unreadable: {cause}"))?;
-    generate_backlog_index_for_commit(root, &tracked, committing).map_err(|why| match why {
-        CommitIndexError::Unreadable(why) | CommitIndexError::Invalid(why) => why,
-    })
 }
 
 /// `land.gates` and `land.regenerate`, read once as the one config value `land`.
@@ -3086,17 +3084,12 @@ fn session_of(target: &str) -> Result<fgos_identity::directory::Listed, Categori
 /// What the terminal driver takes to find the session's pane: its slot key when it has one, else its pane id, both
 /// as Identity recorded them.
 fn pane_of(session: &fgos_identity::directory::Listed) -> Result<String, CategorisedRefusal> {
-    session
-        .ids
-        .as_ref()
-        .and_then(|ids| ids.terminal.as_ref())
-        .map(|t| t.key.clone().unwrap_or_else(|| t.pane_id.clone()))
-        .ok_or_else(|| {
-            refused(
-                "session-has-no-pane",
-                format!("{} has no terminal pane in Identity", session.handle),
-            )
-        })
+    session.terminal_key().ok_or_else(|| {
+        refused(
+            "session-has-no-pane",
+            format!("{} has no terminal pane in Identity", session.handle),
+        )
+    })
 }
 
 fn terminal_refusal(refusal: fgos_terminal_control::port::Refusal) -> CategorisedRefusal {
@@ -3341,6 +3334,8 @@ pub fn answer(
             })?;
             let max_leads = required_capacity(root, "supervisor.maxLeads")
                 .map_err(|e| refused("supervisor-config-invalid", e))?;
+            let machine = machine_id()
+                .map_err(|code| refused(&code, "this machine has no readable Identity id"))?;
             let view = supervisor::plans(
                 &plans,
                 &HostPortfolio::done(&plans),
@@ -3358,6 +3353,7 @@ pub fn answer(
                 &StoreOpenQuestions {
                     root: root.to_path_buf(),
                 },
+                &machine,
             );
             let unreadable_count = unreadable.len();
             let unreadable = shown_unreadable(unreadable);
@@ -3670,6 +3666,7 @@ mod tests {
                 footprint: vec![],
                 source: vec![],
                 lead: None,
+                host: None,
                 phases: vec![],
             }
         }

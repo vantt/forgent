@@ -6,8 +6,8 @@ Capability: `code:implement`.
 
 - Landed plan `plans/261125-2313-head-communication-agent-to-agent/` (its `reports/integration.md` and the send
   answer values in `packages/mailbox/contracts/frame.v1.txt`).
-- `core/skills/fgos-secretary/SKILL.md` (mail lines near 32, 76, 122), `core/skills/fgos-supervisor/SKILL.md` (line
-  near 159), `core/skills/fgos-lead/SKILL.md` (line 15 "You have no mailbox").
+- `core/skills/fgos-secretary/SKILL.md` (mail lines near 33, 71, 116), `core/skills/fgos-supervisor/SKILL.md` (line
+  near 162), `core/skills/fgos-lead/SKILL.md` (line 15 "You have no mailbox").
 - `core/skills/_shared/` for fragment style; `docs/platform/session-host/spec.md` permission section.
 - `apps/fgos/src/wiring/supervision.rs` `pane_of`; `packages/identity/rust/src/directory.rs` `terminal_key()`.
 
@@ -16,7 +16,7 @@ Capability: `code:implement`.
 `core/skills/_shared/head-mail.md`, `core/skills/fgos-secretary/SKILL.md`, `core/skills/fgos-supervisor/SKILL.md`,
 `core/skills/fgos-lead/SKILL.md`, `.agents/skills/**`, `plugins/fgOS/skills/**`, `.claude/skills/**` (regenerated,
 never hand-edited), `docs/platform/session-host/spec.md`, `apps/fgos/src/wiring/supervision.rs`,
-`apps/fgos/tests/supervision_verbs.rs`, `CHANGELOG.md`.
+`apps/fgos/tests/supervision_verbs.rs`, `changelog.d/261128-0541-heads-mail-each-other-from-inside-the-cage.md`.
 
 ## Steps
 
@@ -27,7 +27,8 @@ never hand-edited), `docs/platform/session-host/spec.md`, `apps/fgos/src/wiring/
 3. `npm run build:skills`.
 4. Session-host spec: add the base `head` `mailbox inbox` row to the permission section.
 5. `supervision.rs`: make `pane_of` call `Listed::terminal_key()`; keep its refusal code `session-has-no-pane`.
-6. `CHANGELOG.md` `[Unreleased]`: one line for the head-to-head mail change of both plans.
+6. `changelog.d/261128-0541-heads-mail-each-other-from-inside-the-cage.md`: one `- Changed:` bullet for the
+   head-to-head mail change of both plans (scheme: `changelog.d/README.md`).
 
 ## Verify
 

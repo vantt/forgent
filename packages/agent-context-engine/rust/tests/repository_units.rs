@@ -61,8 +61,13 @@ fn the_repositorys_own_rule_units_pass_every_check_of_the_crate_and_compose_with
             embedder: EmbedderChoice::Model,
         },
     };
-    let checked =
-        check_repository(&paths, "2026-11-26", &owners, &NoLiveValues, Nearest::Skip).unwrap();
+    // Check as of the newest start date, so every unit has started and none falls out of force.
+    let as_of = corpus
+        .iter()
+        .map(|f| f.unit.valid_from.clone())
+        .max()
+        .unwrap();
+    let checked = check_repository(&paths, &as_of, &owners, &NoLiveValues, Nearest::Skip).unwrap();
     assert_eq!(checked.refusals, []);
     assert_eq!(checked.in_force.len(), expected);
 }

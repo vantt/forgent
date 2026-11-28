@@ -1,7 +1,7 @@
 ---
 id: p-o4iniqvitl
 title: "plans/backlog.md becomes a generated index, never hand-edited (backlog, priority P1; owner choice A, 2026-11-25 15:20, via the manual supervisor and confirmed to the secretary 15:50)"
-status: proposed
+status: done
 priority: P1
 area: backlog
 created: 2026-11-25

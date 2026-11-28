@@ -96,6 +96,10 @@ peers heads with only the head's own registration files writable; deletion of th
 Checked before writing: 0004 phases 4 and 5 planned these fixes in Node in place; the split moves them to the Rust
 twin, which is the code the head launch runs today (`src/session-host/head-start.mjs` calls `launchSessionInHost`).
 
+Since this draft: plan 261127-1220 landed a toolchain-cache resource in
+`packages/execution/engine/src/confinement/policy/resolver.rs` (`2fea3d10d6`, agent-confinement spec §9.4). Rebase on
+it and keep the resource when moving the resolver.
+
 ## Authority map
 
 | New thing | Model row | Note |

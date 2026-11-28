@@ -265,9 +265,11 @@ pub struct LandPorts<'a> {
     pub log_dir: &'a Path,
     /// Bound on waiting for the merge slot and the main checkout.
     pub wait_ms: u64,
-    /// With the port, a paths land that commits a plan turning `done` also marks the backlog items the
-    /// plan cites as done and regenerates the index, in the same commit. Without it the land never
-    /// touches an item.
+    /// With the port, every land that commits a path the index is built from (a row file, a plan, a
+    /// discussion, or the index itself) writes the generated `plans/backlog.md` in the same commit, a
+    /// paths land into the main checkout and a branch land into the merge result; a paths land that
+    /// commits a plan turning `done` also marks the backlog items the plan cites as done. Without it
+    /// the land never touches an item or the index.
     pub backlog_index: Option<BacklogPort<'a>>,
     /// With the port, after a successful branch land, the land door removes the worktree that has the
     /// landed branch checked out through this function, passing the worktree path and the landed target ref.
@@ -292,8 +294,9 @@ pub enum BacklogRef {
     NotBacklog,
 }
 
-/// What the composition root supplies to a land that closes cited backlog items: the id classifier and the
-/// index generator, both owned by the portfolio code so the door copies neither.
+/// What the composition root supplies to a land that feeds the backlog index: the id classifier and the
+/// index generator, both owned by the portfolio code so the door copies neither. The door regenerates the
+/// index on every feeding land and closes the items a plan turning done cites.
 /// Regenerates the backlog index text for a checkout from the concrete paths a land commits.
 pub type BacklogIndexFn<'a> = dyn Fn(&Path, &[String]) -> Result<String, String> + 'a;
 
@@ -310,6 +313,13 @@ pub struct BacklogPort<'a> {
 /// `backlog-index` kinds).
 const BACKLOG_ROOT: &str = "plans/backlog";
 const BACKLOG_INDEX: &str = "plans/backlog.md";
+/// The paths the index is built from: a row file, a plan, a discussion. A land that commits one of them
+/// (or the index itself) commits the index the generator writes, never a caller's bytes.
+const INDEX_FEEDERS: [&str; 3] = [
+    "plans/backlog/*.md",
+    "plans/*/plan.md",
+    "plans/discussions/*/DISCUSSION.md",
+];
 
 pub fn land(
     command: &LandCommand,
@@ -490,6 +500,15 @@ fn string_list(
 /// The frontmatter `status` of a markdown file; `None` when it has none or cannot be read.
 fn status_in(file: &str, bytes: &[u8]) -> Option<String> {
     string_key_in(file, bytes, "status")
+}
+
+/// Whether `path` is `plans/<name>/plan.md`.
+fn is_plan_file(path: &str) -> bool {
+    let mut parts = path.split('/');
+    matches!(
+        (parts.next(), parts.next(), parts.next(), parts.next()),
+        (Some("plans"), Some(name), Some("plan.md"), None) if !name.is_empty()
+    )
 }
 
 /// The string value of the top-level frontmatter `key` of `file` with these bytes.
@@ -942,13 +961,7 @@ impl Lander<'_> {
     /// compares the `footprint` in the commit with the one at the trunk tip the commit was made on. A deletion,
     /// a difference or a read failure refuses; the caller pushes nothing.
     fn require_footprint_unchanged(&self, tip: &Oid, commit: &Oid) -> Result<(), LandRefusal> {
-        let is_plan = |path: &str| {
-            let mut parts = path.split('/');
-            matches!(
-                (parts.next(), parts.next(), parts.next(), parts.next()),
-                (Some("plans"), Some(name), Some("plan.md"), None) if !name.is_empty()
-            )
-        };
+        let is_plan = is_plan_file;
         let refused = |why: String| refuse("footprint-change-refused", why);
         for file in self
             .changed_paths(tip, commit)?
@@ -980,6 +993,37 @@ impl Lander<'_> {
                         "{file} changes the footprint of its own plan"
                     )))
                 }
+            }
+        }
+        Ok(())
+    }
+
+    /// Any paths land: a `plans/<name>/plan.md` that is `running` at the trunk tip keeps its `host`. The
+    /// admission commit (tip status `ready`) passes. A difference refuses; the caller pushes nothing.
+    fn require_host_unchanged(&self, tip: &Oid, commit: &Oid) -> Result<(), LandRefusal> {
+        for file in self
+            .changed_paths(tip, commit)?
+            .into_iter()
+            .filter(|path| is_plan_file(path))
+        {
+            let refused = |why: String| refuse("host-change-refused", why);
+            let read = |id: &Oid| {
+                self.blob_at(id.as_str(), &file)
+                    .map_err(|e| refused(format!("{file} cannot be read: {}", e.detail)))
+            };
+            let Some(trunk) = read(tip)? else { continue };
+            if status_in(&file, &trunk).as_deref() != Some("running") {
+                continue;
+            }
+            // A deletion is the footprint guard's business, not a host change.
+            let Some(committed) = read(commit)? else {
+                continue;
+            };
+            let host = |bytes: &[u8]| string_key_in(&file, bytes, "host");
+            if host(&committed) != host(&trunk) {
+                return Err(refused(format!(
+                    "{file} changes the host of a running plan"
+                )));
             }
         }
         Ok(())
@@ -1262,6 +1306,9 @@ impl Lander<'_> {
             let outside: Vec<String> = self
                 .changed_paths(&base, &source)?
                 .into_iter()
+                // With the backlog port the door writes the index itself, so the branch's own bytes for
+                // it are never what lands and are not judged.
+                .filter(|path| self.ports.backlog_index.is_none() || path != BACKLOG_INDEX)
                 .map(|path| self.matches_any(&path, footprint).map(|ok| (ok, path)))
                 .collect::<Result<Vec<_>, _>>()?
                 .into_iter()
@@ -1281,7 +1328,9 @@ impl Lander<'_> {
         for c in &conflicted {
             let matched = fgos_write_scope::matches(c.as_bytes(), &self.regen_files)
                 .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?;
-            if !matched {
+            // The index is the door's to write: a conflict in it is settled by the generator below.
+            let door_index = self.ports.backlog_index.is_some() && c == BACKLOG_INDEX;
+            if !matched && !door_index {
                 undeclared.push(c.as_str());
             }
         }
@@ -1296,7 +1345,7 @@ impl Lander<'_> {
             });
         }
 
-        let prepared = match self.prepare(command, &source, &target, &dest, files) {
+        let prepared = match self.prepare(command, &source, &target, &dest, files.clone()) {
             Ok(prepared) => prepared,
             // Another land took the slot first and moved the target: start over from a fresh fetch.
             Err(refusal) if refusal.code == "land-target-changed" => {
@@ -1308,6 +1357,7 @@ impl Lander<'_> {
         let attempt = self.drive(
             command,
             (&source, &target, &dest, target_branch),
+            files,
             &mut live,
             retries,
             gated,
@@ -1354,6 +1404,7 @@ impl Lander<'_> {
         &self,
         command: &LandCommand,
         (source, target, dest, target_branch): (&Oid, &Oid, &str, &str),
+        mut files: Vec<LandFile>,
         live: &mut Option<(fgos_git::LandSession, String)>,
         retries: u32,
         gated: Option<&Gated>,
@@ -1365,6 +1416,30 @@ impl Lander<'_> {
                 "no candidate; run `fgos git recover`",
             )
         };
+        // The merge result carries the index the generator writes from its own rows, plans and
+        // discussions whenever the merged change touches one of them.
+        let candidate = live
+            .as_ref()
+            .and_then(|(session, _)| session.candidate().cloned())
+            .ok_or_else(no_candidate)?;
+        let door_files = self.candidate_door_files(&candidate, target)?;
+        if door_files.is_none() && self.ports.backlog_index.is_some() {
+            self.judge_unwritten_index(command, (source, target), &files)?;
+        }
+        let door_files = door_files.unwrap_or_default();
+        if !door_files.is_empty() {
+            files.retain(|f| !door_files.iter().any(|d| d.path == f.path));
+            files.extend(door_files);
+            let (session, id) = live.take().ok_or_else(no_candidate)?;
+            self.abandon(session, &id)?;
+            *live = match self.prepare(command, source, target, dest, files.clone()) {
+                Ok(prepared) => Some(prepared),
+                Err(refusal) if refusal.code == "land-target-changed" => {
+                    return Ok(Attempt::RemoteMoved(None))
+                }
+                Err(refusal) => return Err(refusal),
+            };
+        }
         let reused = self.reusable(gated, target)?;
         let regenerates = match &self.config.regenerate {
             _ if reused.is_some() => false,
@@ -1383,7 +1458,9 @@ impl Lander<'_> {
                 return Err(no_candidate());
             }
             let first = self.regenerate(session, regen, id)?;
-            if let Some(files) = first {
+            if let Some(regenerated) = first {
+                files.retain(|f| !regenerated.iter().any(|r| r.path == f.path));
+                files.extend(regenerated);
                 let (session, id) = live.take().ok_or_else(no_candidate)?;
                 self.abandon(session, &id)?;
                 *live = Some(self.prepare(command, source, target, dest, files)?);
@@ -2141,20 +2218,41 @@ impl Lander<'_> {
         let tip = self
             .resolve(dest)?
             .ok_or_else(|| refuse("land-target-unknown", format!("{dest} is absent")))?;
-        // The backlog items a plan turning done closes are written by the door, in this commit. They are
-        // not the caller's paths, so the footprint check (plan files only) never sees them.
-        let committed = if self.may_close_items(paths)? {
+        // The door writes the backlog items a plan turning done closes, and the regenerated index on every
+        // feeding land, into this commit. They are not the caller's paths, so the footprint check (plan
+        // files only) never sees them.
+        let committed = if self.may_feed_index(paths)? {
             self.concrete_paths(paths, held)?
         } else {
             Vec::new()
         };
         let mut door = DoorWrites::new(p.repo.trusted_main_root());
-        let extra = match self.close_cited_items(paths, &committed, &tip, &mut door) {
+        let extra = match self
+            .close_cited_items(paths, &tip, &mut door)
+            .and_then(|mut closed| {
+                let index = self.write_index(&committed, &closed, &mut door)?;
+                closed.extend(index);
+                Ok(closed)
+            }) {
             Ok(extra) => extra,
             Err(refusal) => return Err(door.restore_into(refusal)),
         };
+        let index_written = extra.iter().any(|d| d == BACKLOG_INDEX);
         let mut writes = paths.to_vec();
-        writes.extend(extra.into_iter().filter(|d| !paths.contains(d)));
+        // With the port the index is the door's alone: when it did not write it (nothing fed it), the
+        // caller's own bytes for it are not committed. The scope is spelled out as concrete files so the
+        // index can be left out of a glob that would otherwise match it.
+        if self.ports.backlog_index.is_some()
+            && !index_written
+            && self.matches_any(BACKLOG_INDEX, paths)?
+        {
+            writes = match self.concrete_paths_without_index(paths, held) {
+                Ok(files) => files,
+                Err(refusal) => return Err(door.restore_into(refusal)),
+            };
+        }
+        let named = writes.clone();
+        writes.extend(extra.into_iter().filter(|d| !named.contains(d)));
         let kept = Cell::new(false);
         let attempt = self.paths_commit(
             command,
@@ -2177,16 +2275,215 @@ impl Lander<'_> {
         }
     }
 
-    /// Whether this land can close backlog items: a backlog port is wired and the caller's scope can
-    /// reach a plan file.
-    fn may_close_items(&self, paths: &[String]) -> Result<bool, LandRefusal> {
+    /// Whether this land can feed the index: a backlog port is wired and the caller's scope can reach a
+    /// row file, a plan, a discussion or the index itself.
+    fn may_feed_index(&self, paths: &[String]) -> Result<bool, LandRefusal> {
         if self.ports.backlog_index.is_none() {
             return Ok(false);
         }
         let scope = fgos_write_scope::canonicalize_all(paths)
             .map_err(|e| refuse("land-request-invalid", e.to_string()))?;
-        fgos_write_scope::scopes_overlap(&scope, &["plans/*/plan.md".to_owned()])
+        fgos_write_scope::scopes_overlap(&scope, &Self::index_feeding_globs())
             .map_err(|e| refuse("land-request-invalid", e.to_string()))
+    }
+
+    /// The globs of every path that feeds the index, the index itself included.
+    fn index_feeding_globs() -> Vec<String> {
+        INDEX_FEEDERS
+            .iter()
+            .copied()
+            .chain([BACKLOG_INDEX])
+            .map(str::to_owned)
+            .collect()
+    }
+
+    /// A branch land: the index file to force into the merge result, when the merged change set (target
+    /// tip to candidate) touches a path the index is built from, or the index itself, and the generator's
+    /// text over the candidate checkout differs from the candidate's committed index. The rows are read
+    /// from the candidate worktree, never from the main checkout.
+    ///
+    /// The backlog items a plan turning done cites are closed first, through `close_cited_items_in` over
+    /// the candidate worktree, exactly as a paths land closes them, so the generator and its drift check
+    /// see the merge result's new state. Returns the items closed and the index, each as a file to force
+    /// into the merge result. `None`: the door does not own the index in this land (no port, no backlog
+    /// directory, or nothing that feeds it changed); `Some` (possibly empty): the generator ran, so the
+    /// index bytes are the door's and the branch's own are never judged.
+    fn candidate_door_files(
+        &self,
+        candidate: &LandCandidate,
+        target: &Oid,
+    ) -> Result<Option<Vec<LandFile>>, LandRefusal> {
+        let Some(port) = self.ports.backlog_index else {
+            return Ok(None);
+        };
+        if !candidate.worktree.join(BACKLOG_ROOT).is_dir() {
+            return Ok(None);
+        }
+        let changed =
+            self.changed_paths(target, &oid_of(self.ports.repo, &candidate.candidate)?)?;
+        if !Self::any_feeds_index(&changed)? {
+            return Ok(None);
+        }
+        // The door's item writes only feed the generator and the bytes read back below; the candidate
+        // worktree goes back as it was so abandoning the session finds it clean.
+        let mut door = DoorWrites::new(&candidate.worktree);
+        let out = self.door_files_in(port, candidate, &changed, target, &mut door);
+        match out {
+            Err(refusal) => Err(door.restore_into(refusal)),
+            Ok(files) => match door.restore() {
+                Some(note) => Err(refuse("land-backlog-restore-failed", note)),
+                None => Ok(Some(files)),
+            },
+        }
+    }
+
+    fn door_files_in(
+        &self,
+        port: BacklogPort<'_>,
+        candidate: &LandCandidate,
+        changed: &[String],
+        target: &Oid,
+        door: &mut DoorWrites,
+    ) -> Result<Vec<LandFile>, LandRefusal> {
+        let mut out = Vec::new();
+        for item in self.close_cited_items_in(&candidate.worktree, changed, target, door)? {
+            let bytes = std::fs::read(candidate.worktree.join(&item))
+                .map_err(|e| refuse("land-backlog-item-unreadable", format!("{item}: {e}")))?;
+            out.push(LandFile {
+                path: item,
+                bytes: Some(bytes),
+            });
+        }
+        let unreadable = |e: std::io::Error| refuse("land-backlog-index-failed", e.to_string());
+        let mut rows = Vec::new();
+        for entry in std::fs::read_dir(candidate.worktree.join(BACKLOG_ROOT)).map_err(unreadable)? {
+            let name = entry
+                .map_err(unreadable)?
+                .file_name()
+                .to_string_lossy()
+                .into_owned();
+            if name.ends_with(".md") {
+                rows.push(format!("{BACKLOG_ROOT}/{name}"));
+            }
+        }
+        let text = (port.index)(&candidate.worktree, &rows)
+            .map_err(|why| refuse("land-backlog-index-failed", why))?;
+        let committed = self.blob_at(&candidate.candidate, BACKLOG_INDEX)?;
+        if committed.as_deref() != Some(text.as_bytes()) {
+            out.push(LandFile {
+                path: BACKLOG_INDEX.to_owned(),
+                bytes: Some(text.into_bytes()),
+            });
+        }
+        Ok(out)
+    }
+
+    /// The branch land exempted `plans/backlog.md` from the footprint judge and from conflict settling
+    /// because the door would write it. When the door did not (nothing fed it, or no backlog directory),
+    /// the exemption lapses: the branch's own index edit is judged against the footprint, and a conflict
+    /// in it is undeclared unless a declared regeneration owns it.
+    fn judge_unwritten_index(
+        &self,
+        command: &LandCommand,
+        (source, target): (&Oid, &Oid),
+        files: &[LandFile],
+    ) -> Result<(), LandRefusal> {
+        if let Some(footprint) = &command.footprint {
+            let base = self.merge_base(target, source)?;
+            let edited = self
+                .changed_paths(&base, source)?
+                .iter()
+                .any(|path| path == BACKLOG_INDEX);
+            if edited && !self.matches_any(BACKLOG_INDEX, footprint)? {
+                return Err(refuse("land-outside-footprint", BACKLOG_INDEX));
+            }
+        }
+        let conflicted = files.iter().any(|f| f.path == BACKLOG_INDEX);
+        if conflicted
+            && !fgos_write_scope::matches(BACKLOG_INDEX.as_bytes(), &self.regen_files)
+                .map_err(|e| refuse("land-regenerate-failed", e.to_string()))?
+        {
+            return Err(refuse("land-conflict-aborted", BACKLOG_INDEX));
+        }
+        Ok(())
+    }
+
+    /// Whether any of `paths` feeds the index (or is the index).
+    fn any_feeds_index(paths: &[String]) -> Result<bool, LandRefusal> {
+        let globs = Self::index_feeding_globs();
+        for path in paths {
+            if fgos_write_scope::matches(path.as_bytes(), &globs)
+                .map_err(|e| refuse("land-request-invalid", e.to_string()))?
+            {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// When the files this land commits (`committed`, plus the item files the door wrote: `writes`)
+    /// include one the index is built from, or the index itself, the generator's text goes to
+    /// `plans/backlog.md` through `door`, replacing whatever bytes the caller had there. Returns the
+    /// index path when it is part of the commit. The caller restores `door` on a refusal.
+    fn write_index(
+        &self,
+        committed: &[String],
+        writes: &[String],
+        door: &mut DoorWrites,
+    ) -> Result<Option<String>, LandRefusal> {
+        let Some(port) = self.ports.backlog_index else {
+            return Ok(None);
+        };
+        let root = self.ports.repo.trusted_main_root();
+        if !root.join(BACKLOG_ROOT).is_dir() {
+            return Ok(None);
+        }
+        let committing: Vec<String> = committed
+            .iter()
+            .chain(writes.iter().filter(|w| !committed.contains(w)))
+            .cloned()
+            .collect();
+        if !Self::any_feeds_index(&committing)? {
+            return Ok(None);
+        }
+        let regenerated = (port.index)(root, &committing)
+            .map_err(|why| refuse("land-backlog-index-failed", why))?;
+        door.put(BACKLOG_INDEX, regenerated.as_bytes())
+            .map_err(|e| refuse("land-backlog-index-failed", e))?;
+        Ok(Some(BACKLOG_INDEX.to_owned()))
+    }
+
+    /// The scope as concrete files with the index left out: an entry that covers the index (a directory
+    /// prefix or a glob) is replaced by the changed files under it, every other entry stays as named.
+    fn concrete_paths_without_index<'h>(
+        &self,
+        paths: &[String],
+        held: &dyn Fn() -> Held<'h>,
+    ) -> Result<Vec<String>, LandRefusal> {
+        let p = self.ports;
+        let baseline = p
+            .git
+            .preflight_commit(p.repo, held()?, None)
+            .map_err(from_git)?;
+        let mut files: Vec<String> = Vec::new();
+        for entry in paths {
+            let one = std::slice::from_ref(entry);
+            if !entry.contains(['*', '?', '[', '{']) && !self.matches_any(BACKLOG_INDEX, one)? {
+                if !files.contains(entry) {
+                    files.push(entry.clone());
+                }
+                continue;
+            }
+            for (changed, _) in &baseline.dirty {
+                if changed != BACKLOG_INDEX
+                    && !files.contains(changed)
+                    && self.matches_any(changed, one)?
+                {
+                    files.push(changed.clone());
+                }
+            }
+        }
+        Ok(files)
     }
 
     /// The concrete files the caller's `paths` commit: every changed file in the checkout one of them
@@ -2216,25 +2513,34 @@ impl Lander<'_> {
     }
 
     /// For every plan the land commits whose frontmatter `status` turns `done` (it was not done at the
-    /// target tip): set each cited backlog item that is not done to done and regenerate the index,
-    /// through `door`; the index is regenerated whenever such a plan cites an item, since it shows the
-    /// plan's status. An item the door adds itself is read at the tip, never from the working tree, so
-    /// its own uncommitted edits cannot ride into the commit and a repeat after a crash writes the same
-    /// bytes; an item inside the caller's own `paths` is the caller's bytes, set to done.
-    /// `committed` is the concrete file list of the caller's paths.
-    /// Returns the paths the door put in place or found already in place: the commit's extra writes.
+    /// target tip): set each cited backlog item that is not done to done, through `door`. The index is
+    /// not written here; `write_index` regenerates it for every land that feeds it. An item the door adds
+    /// itself is read at the tip, never from the working tree, so its own uncommitted edits cannot ride
+    /// into the commit and a repeat after a crash writes the same bytes; an item inside the caller's own
+    /// `paths` is the caller's bytes, set to done.
+    /// Returns the item paths the door put in place or found already in place: the commit's extra writes.
     /// The caller restores `door` on a refusal.
     fn close_cited_items(
         &self,
         paths: &[String],
-        committed: &[String],
+        tip: &Oid,
+        door: &mut DoorWrites,
+    ) -> Result<Vec<String>, LandRefusal> {
+        self.close_cited_items_in(self.ports.repo.trusted_main_root(), paths, tip, door)
+    }
+
+    /// `close_cited_items` over the checkout at `root`: the main checkout for a paths land, the candidate
+    /// worktree for a branch land (where `paths` are the concrete files the merge changes).
+    fn close_cited_items_in(
+        &self,
+        root: &Path,
+        paths: &[String],
         tip: &Oid,
         door: &mut DoorWrites,
     ) -> Result<Vec<String>, LandRefusal> {
         let Some(port) = self.ports.backlog_index else {
             return Ok(Vec::new());
         };
-        let root = self.ports.repo.trusted_main_root();
         let backlog = root.join(BACKLOG_ROOT);
         if !backlog.is_dir() {
             return Ok(Vec::new());
@@ -2291,7 +2597,6 @@ impl Lander<'_> {
         ids.sort();
         ids.dedup();
         let mut closed = Vec::new();
-        let mut cited = false;
         for (id, minted) in &ids {
             let prefix = format!("{id}-");
             let mut found: Vec<String> = std::fs::read_dir(&backlog)
@@ -2327,7 +2632,6 @@ impl Lander<'_> {
                     ))
                 }
             };
-            cited = true;
             let item = format!("{BACKLOG_ROOT}/{name}");
             let invalid = |why: &str| refuse("land-backlog-item-invalid", format!("{item}: {why}"));
             let working = std::fs::read(root.join(&item))
@@ -2365,27 +2669,12 @@ impl Lander<'_> {
             }
             closed.push((item, desired));
         }
-        // The index shows each citing plan's status, so a plan turning done that cites an item changes
-        // it even when no item does.
-        if !cited {
-            return Ok(Vec::new());
-        }
-        let mut writes = Vec::with_capacity(closed.len() + 1);
+        let mut writes = Vec::with_capacity(closed.len());
         for (item, bytes) in closed {
             door.put(&item, &bytes)
                 .map_err(|e| refuse("land-backlog-item-unwritable", e))?;
             writes.push(item);
         }
-        let committing: Vec<String> = committed
-            .iter()
-            .chain(writes.iter().filter(|w| !committed.contains(w)))
-            .cloned()
-            .collect();
-        let regenerated = (port.index)(root, &committing)
-            .map_err(|why| refuse("land-backlog-index-failed", why))?;
-        door.put(BACKLOG_INDEX, regenerated.as_bytes())
-            .map_err(|e| refuse("land-backlog-index-failed", e))?;
-        writes.push(BACKLOG_INDEX.to_owned());
         Ok(writes)
     }
 
@@ -2473,8 +2762,15 @@ impl Lander<'_> {
                 ),
             )));
         }
-        if command.footprint.is_some() {
-            if let Err(refusal) = self.require_footprint_unchanged(tip, &commit) {
+        let guards = [
+            command
+                .footprint
+                .is_some()
+                .then(|| self.require_footprint_unchanged(tip, &commit)),
+            Some(self.require_host_unchanged(tip, &commit)),
+        ];
+        for refusal in guards.into_iter().flatten() {
+            if let Err(refusal) = refusal {
                 return Err(unpublished(refuse(
                     &refusal.code,
                     format!(

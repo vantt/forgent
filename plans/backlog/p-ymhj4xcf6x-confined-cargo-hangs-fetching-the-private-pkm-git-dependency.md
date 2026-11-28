@@ -1,7 +1,7 @@
 ---
 id: p-ymhj4xcf6x
 title: "A confined unit's cargo hangs forever fetching the private pkm git dependency (runner confinement, priority high; source: lead:SUPERVISOR, 2026-11-27)"
-status: proposed
+status: done
 priority: P1
 area: runner
 created: 2026-11-27

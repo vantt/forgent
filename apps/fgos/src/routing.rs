@@ -678,6 +678,8 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
         ("metrics", Some("record")) if head_socket => "metrics record",
         // The release recipe runs from the window (the permission table lets the supervisor and secretary ask).
         ("release", Some("run")) if head_socket => "release run",
+        // The project's checks alone, on one linked worktree (the permission table lets only the lead ask).
+        ("release", Some("check")) if head_socket => "release check",
         ("supervisor", Some("done")) => "supervisor done",
         _ => return None,
     };
@@ -799,6 +801,21 @@ pub(crate) fn confined_head_call_with_reader<R: std::io::Read>(
                 if call.flags().flag("rollback").is_some() {
                     args.insert("rollback".to_owned(), json!(true));
                 }
+            }
+            // The worktree is the only thing the caller names; the supervisor checks it is a linked worktree of the project.
+            "release check" => {
+                if !words.is_empty() {
+                    return Err(
+                        "bad-args: release check takes no argument besides --worktree".to_owned(),
+                    );
+                }
+                if let Some(flag) = call.flag_outside(&["worktree"]) {
+                    return Err(format!("bad-args: release check takes no --{flag}"));
+                }
+                if call.value("worktree")?.is_none() {
+                    return Err("bad-args: release check needs --worktree <path>".to_owned());
+                }
+                text(&mut args, "worktree", "worktree")?;
             }
             // The records themselves are read from stdin by the socket sender, which holds the stream.
             "metrics record" => {
@@ -1539,6 +1556,35 @@ mod confined_tests {
         assert_eq!(rollback.args, json!({"rollback": true}));
         assert!(call(&["release", "run", "deploy"], true).unwrap().is_err());
         assert!(call(&["release", "run", "--force"], true).unwrap().is_err());
+    }
+
+    #[test]
+    fn release_check_is_a_frame_of_its_own_only_from_a_head_with_a_socket_and_takes_only_a_worktree(
+    ) {
+        let call = |words: &[&str], socket: bool| {
+            let words: Vec<OsString> = words.iter().map(OsString::from).collect();
+            confined_head_call(&words, socket)
+        };
+        assert!(call(&["release", "check", "--worktree", "/w"], false).is_none());
+        let frame = call(&["release", "check", "--worktree", "/w"], true)
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            (frame.verb, frame.args),
+            ("release check", json!({"worktree": "/w"}))
+        );
+        assert!(call(&["release", "check"], true).unwrap().is_err());
+        assert!(call(&["release", "check", "/w"], true).unwrap().is_err());
+        assert!(call(
+            &["release", "check", "--worktree", "/w", "--rollback"],
+            true
+        )
+        .unwrap()
+        .is_err());
+        // `release run` does not take the worktree flag.
+        assert!(call(&["release", "run", "--worktree", "/w"], true)
+            .unwrap()
+            .is_err());
     }
 
     #[test]

@@ -43,8 +43,9 @@ the YAML door (`src/util/yaml.mjs`), never a private parser.
 | `status` | `draft` \| `ready` \| `running` \| `done` \| `withdrawn` | one vocabulary, below |
 | `priority` | `P0`..`P3` | |
 | `blockedBy` | list of plan dir names | each must exist under `plans/`; `[]` when none |
-| `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, CHANGELOG, the plan dir. Required when `ready` or `running` |
+| `footprint` | list of repo-relative paths or globs | everything the plan may write: code, tests, docs, changelog.d/<fragment>, the plan dir. Required when `ready` or `running` |
 | `base` | 40-char commit sha | the commit the plan was written against; required when `ready` or `running` |
+| `host` | Identity machine id (2-63 of `a-z0-9-`) | optional placement. On `ready`, only that machine may run the plan (another machine holds it `held-other-machine:<host>`); with no `host`, the first machine whose admission push reaches origin claims it. On `running`, written by admission in the same commit as `lead` and `base`; a land that changes `host` on a running plan is refused `host-change-refused`. The check warns, never errors, when Identity does not know the machine |
 | `lead` | Identity role string, e.g. `lead:S6A` or `head:lead-<handle>-<plan>` | the role of the lead that runs the plan; written in the same commit that sets `status: running`. Required when `status: running` (the check fails if a `running` plan lacks it); the supervisor holds a running plan with no `lead` and never restarts it |
 | `source` | list of strings | the DISCUSSION.md path and/or backlog ids the plan answers |
 | `created` | `YYYY-MM-DD` | |
@@ -74,10 +75,38 @@ Headings (any level) for each, in this order:
    where it has none, `fgos authority locate` answers `authority: inactive`, and the plan records
    `authority: inactive` in place of the table and goes on.
 5. **Phases**: the phase table (section 4).
-6. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
+6. **Unattended run**: the section below. The rule itself lives in the unit `ready-plan-runs-unattended` (Rule: in AGENTS.md;
+   set in .fgos/instructions/effective/rules.json) and the unit `coding-footprint-tracing`
+   (`domains/coding/instructions/coding-footprint-tracing.md`); this contract fixes only the shape.
+7. **Owner questions**: only what the owner alone can answer per `decision-question.md#when-to-ask`. Ask each with `fgos questions ask`
    (five-part form of [decision-question.md](decision-question.md)) and list the `q-` ids here,
    each with its headline. Decide whatever the evidence settles (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2).
-7. **Risks and rollback**: failure modes and the single revert path.
+8. **Risks and rollback**: failure modes and the single revert path.
+
+### Unattended run section
+
+```markdown
+## Unattended run
+
+### Host steps
+| step | argv | executor |
+|---|---|---|
+| full gate on the integrated tree | fgos release check --worktree <path> | lead |
+
+### Cleanup
+Standing rule.            <- or the cleanup that differs
+
+### Beyond the rule
+None.                     <- or a table | item | question |, one answered q- id per row
+
+### Split
+One sentence: which split was chosen and why.
+```
+
+Host steps is `None.` or a table whose every row has an argv starting with `fgos ` and a non-empty executor
+(a persona name). Every top-level item under Acceptance criteria starts with `[core]` or `[debt-ok]` after its
+number or bullet. Required for a plan going `ready` that was created on or after 2026-11-28; earlier plans are
+not failed.
 
 ## 4. Organize for parallel work
 
@@ -101,9 +130,9 @@ The phase table has exactly these columns (order free):
 - **Waves**: a phase's wave is later than the wave of everything it depends on. Every phase
   whose dependencies are met starts at once; layers stay serial (a lower layer lands before
   the one above it starts).
-- **Hot files**: one writer per hot file per wave. A shared file (registry, manifest, index,
-  CHANGELOG) goes to one phase or to a final serial phase. Generated files are named as hot
-  files (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
+- **Hot files**: one writer per hot file per wave. A shared file (registry, manifest, index)
+  goes to one phase or to a final serial phase. Generated files declared in `land.regenerate`
+  are rebuilt at land (Rule: design-principles (in AGENTS.md; set in .fgos/instructions/effective/rules.json)., principle 7).
 - **Size**: a phase fits one short leader, about one to two days of work. Larger: split it,
   by file boundary first.
 - **Execution**: each parallel phase runs as its own Workflow case in its own worktree.
@@ -128,10 +157,9 @@ The phase table has exactly these columns (order free):
   the check fails if a `running` plan lacks it).
 - The land door runs the check on every landed plan (`node scripts/plan-contract-check.mjs`);
   a plan that breaks the contract cannot land.
-- Cross-plan footprint overlap: for a plan that is `ready`, overlap with another active plan
-  is an error (resolve by `blockedBy` or by narrowing a footprint); for a plan already `running`,
-  overlap is read as a warning, because admission already decided it and the plan's own leads
-  must keep landing.
+- Cross-plan footprint overlap: overlap with another `ready` or `running` plan is a warning
+  naming the plan and paths, never an error, and conflicts are met at land; `blockedBy` is for
+  a real ordering, never a workaround for a shared file.
 - A plan blocked by an owner question stays `draft` as a whole, but every phase the answer
   does not touch is marked `ready` in the phase table and may start. List the blocked phase
   and its question; do not hold the others.

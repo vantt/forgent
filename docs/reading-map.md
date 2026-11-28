@@ -30,6 +30,7 @@ This map provides reader routes and the merged detailed product/source map in
 | Resolve documentation authority | [platform/README.md](platform/README.md) and [platform/governance.md](platform/governance.md) |
 | Understand platform-wide docs | [platform/README.md](platform/README.md) |
 | Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |
+| Understand the documentation engine's build order and each step's status | [platform/documentation/spec.md](platform/documentation/spec.md#4-build-order) |
 | Understand the detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |
 | Shape a new multi-round design | Create or update a discussion scratchpad |
 | Understand an area | `docs/platform/<area>/README.md`, then the exact owner it links |
@@ -103,6 +104,7 @@ remains distinct from implemented scope.
 | Relationship | File |
 |---|---|
 | governs documentation system | [docs/platform/governance.md](platform/governance.md) |
+| documentation area spec (H2 map, build order, step status, write door) | [platform/documentation/spec.md](platform/documentation/spec.md) |
 | former authority switchboard (transition evidence) | [platform/documentation/history/switchboard.md](platform/documentation/history/switchboard.md) |
 | platform portal | [platform/README.md](platform/README.md) |
 | merged detailed product/source map | [Section 5](#5-detailed-product-and-source-map) |

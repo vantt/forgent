@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Specs after the context engine, and links to the build order"
-status: ready
+status: done
 dependencies: []
 ---
 
@@ -59,7 +59,7 @@ document identity 14). Phase 5 writes them once the code has merged.
      would close it; link the measurement report and this plan. G9 stays with admission.
 4. Proposal: the section 0 table's H2 row and section 9.2 link to documentation spec section 4. Write "the build
    order and the status of each step live there" in one sentence. Do not copy the steps.
-5. H1 plan section 12.1: one line linking to documentation spec section 4.
+5. Dropped by the owner on 2026-11-28 (q-fzcovlnz5u = A): the H1 plan is not linked; its documentation work finished long ago.
 6. `docs/reading-map.md`: add the documentation area spec (H2 map and build order) next to the other area specs.
 7. Ledger PF-I006: its source pointer names documentation spec section 4 next to the existing ones.
 8. Pin (fact F13): where the documentation spec or document identity states the *current* pkm pin, it says `v0.7.1`

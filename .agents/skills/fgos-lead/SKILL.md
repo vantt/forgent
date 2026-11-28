@@ -13,7 +13,7 @@ description: >-
 
 You lead exactly one plan (boundary: `core/agents/lead.yaml`). Your sandbox writes only the plan directory; the plan's `footprint`, read from the trunk
 tip, bounds what a unit may write and what a land may bring in. You never change the footprint by hand: when a phase needs a path the plan
-missed and that path serves an acceptance criterion the owner approved, you widen it with `fgos supervisor widen` (below). You have no mailbox and no peers: escalate with `fgos questions ask` or park the phase with a reason
+missed and that path serves an acceptance criterion the owner approved, you widen it with `fgos supervisor widen` (below). You may mail only the secretary and supervisor (`../_shared/head-mail.md`) and have no peers: escalate with `fgos questions ask` or park the phase with a reason
 as an event (below), never as a commit of its plan file.
 
 A wake is one turn: never end it before your done step (a phase set `done` in its plan file, or a park raised as an event).
@@ -63,6 +63,9 @@ For each phase of the wave whose footprint is disjoint from the others in it:
    the land kept (`worktreesKept`) to the supervisor by name (raise an event with `fgos supervisor raise --kind
    coordination-help --ref plan:<dir> --reason "worktree kept: <path> (<refusal code>)"`). Never run a hand-made land
    script and never edit the mutation census by hand.
+   Before the final land, run the full gate with `fgos release check --worktree <path>`; it checks the worktree's committed tip (the ticket's `result.tip`), so commit first: uncommitted edits are not checked. At close, follow the cleanup
+   and debt-recording steps of the unit `ready-plan-runs-unattended` (Rule: in AGENTS.md; set in
+   .fgos/instructions/effective/rules.json).
 6. Update the phase table in the plan directory with `fgos land --paths` and set the phase `done`. To park a phase,
    raise the event above instead of landing a note. After the last phase set the plan `done`.
 

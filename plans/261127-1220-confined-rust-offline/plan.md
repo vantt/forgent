@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Confined units compile the Rust workspace offline from the owner's read-only cargo and rustup caches"
-status: running
+status: done
 priority: P0
 blockedBy: []
 footprint:
@@ -13,6 +13,7 @@ footprint:
   - packages/run-supervisor/contracts/worker-env-allowlist.v1.json
   - docs/platform/agent-confinement/spec.md
   - changelog.d/261127-1220-confined-rust-offline.md
+  - packages/execution/engine/src/confinement/cleanup/probes/ports.rs
 base: 2646ea88ac2d652d1a29b3353f820cf2bdf831e2
 source:
   - plans/discussions/ds-wfukp6t6mi-confined-rust-offline/DISCUSSION.md
@@ -137,9 +138,9 @@ mechanisms. It adds one resource name and no new kind of mechanism.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Toolchain cache resource in the Rust resolver](phase-01-toolchain-cache-resource.md) | - | packages/execution/engine/src/confinement/policy/resolver.rs, packages/execution/engine/src/confinement/policy/mod.rs, packages/execution/engine/src/confinement/driver/bwrap.rs, packages/execution/engine/tests/confinement_policy.rs, packages/run-supervisor/contracts/worker-env-allowlist.v1.json | 1 | ready |
-| 2 | [Spec and changelog](phase-02-spec-and-changelog.md) | - | docs/platform/agent-confinement/spec.md, changelog.d/261127-1220-confined-rust-offline.md | 1 | ready |
-| 3 | [Integration and live proof](phase-03-integration-and-live-proof.md) | 1, 2 | plans/261127-1220-confined-rust-offline/reports/ | 2 | ready |
+| 1 | [Toolchain cache resource in the Rust resolver](phase-01-toolchain-cache-resource.md) | - | packages/execution/engine/src/confinement/policy/resolver.rs, packages/execution/engine/src/confinement/policy/mod.rs, packages/execution/engine/src/confinement/driver/bwrap.rs, packages/execution/engine/tests/confinement_policy.rs, packages/run-supervisor/contracts/worker-env-allowlist.v1.json, `packages/execution/engine/src/confinement/cleanup/probes/ports.rs` | 1 | done |
+| 2 | [Spec and changelog](phase-02-spec-and-changelog.md) | - | docs/platform/agent-confinement/spec.md, changelog.d/261127-1220-confined-rust-offline.md | 1 | done |
+| 3 | [Integration and live proof](phase-03-integration-and-live-proof.md) | 1, 2 | plans/261127-1220-confined-rust-offline/reports/ | 2 | done |
 
 Footprint reading check: phases 1 and 2 share no path, and phase 3 writes only its reports directory. Every
 cargo gate (phase 1's verify and phase 3's) runs as a lead:SUPERVISOR job, because confined units cannot run

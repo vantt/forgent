@@ -266,6 +266,11 @@ runner:
       prefer:
         - executor: claude
           invocation: claude-herdr-bypass-bwrap
+  # @fgos:doc Settings of the transient systemd user scope wrapping each run supervisor.
+  supervisorScope:
+    # @fgos:doc Memory cap for the run supervisor's systemd scope in systemd size syntax (e.g. 8G); empty means no cap. Default: 8G.
+    # @fgos:why [c160549d-8032-4983-8e07-2306ae9a1c26] the release recipe (npm test at concurrency 6, then cargo test --workspace) peaks above 8G; the kernel OOM-killed the release run twice on 2026-11-28 at 8G, so no release could finish. Machine has 30G.
+    memoryMax: 12G
 # @fgos:doc How far agent work may skip human approval gates.
 gateBypass:
   # @fgos:doc Gate bypass level for agent work; off approves nothing automatically and each higher level approves work up to that size. Values: off | light | standard | heavy. Default: off.
@@ -302,6 +307,11 @@ mailbox:
     # @fgos:doc Whether a message to another machine leaves its body out of the signed event: the body is written to this machine's mail-body ref and pushed before the event is recorded, and the event carries the body's hash and length (payload version 3). Turn it on only when every machine of the project runs a build that takes version 3 (fgos mailbox status names the versions each takes); an older receiver drops such mail. Default: false.
     # @fgos:why [d1289d42-7a12-4c3e-a3bc-dc1d687aaf99] owner 2026-11-08: bật thường trực trên cả ba máy, dọn tay khi tắt; fg-server2, fg-server, design-lap đều chạy bản có 2d43cdf23
     bodyRef: true
+  # @fgos:doc Limits on waking a recipient.
+  wake:
+    # @fgos:doc Wake sends that took effect by one verified sender session on another machine to one recipient, never reset. In wakes. Smaller than the local cap because a confirmed machine key is all that stands behind it; a starting value, not yet measured on fgOS. Minimum: 0. Maximum: 4294967295. Default: 5.
+    # @fgos:why [c160549d-8032-4983-8e07-2306ae9a1c26] owner agreed 2026-11-05 (đồng ý), re-confirmed 2026-11-28: lost when the local config was stashed for the 2026-11-09 pull; main did not carry it
+    remoteLifetimeCap: 50
 # @fgos:doc Remote, timers and retry limit of the event store.
 eventStore:
   # @fgos:doc The sync timer of the event store.
@@ -389,13 +399,13 @@ sessionRotation:
       soft: 0.3
 # @fgos:doc The project's release recipe that `fgos release run` follows: checks, the rollout command, its probe and its rollback.
 release:
-  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell from the project root. Default: [].
+  # @fgos:doc Commands that must all exit 0 before the release applies, each a list of words run with no shell in a clean checkout of the trunk tip being released (made and removed by the release run), not from the project root, with `TMPDIR` inside that checkout and no inherited `FGOS_*` variable, so a recipe needs no `env TMPDIR=...` or `env -u FGOS_STATE_ROOT` wrapper. Default: [].
   # @fgos:why [8a700ac4-2a1e-4be2-9f74-324a5a3264ae] owner decision q-dhhezn67em: release checks are the full test suite
   checks:
     - - env
       - -u
       - FGOS_STATE_ROOT
-      - TMPDIR=/var/tmp/r
+      - TMPDIR=/tmp/r
       - npm
       - test
       - --
@@ -403,7 +413,7 @@ release:
     - - env
       - -u
       - FGOS_STATE_ROOT
-      - TMPDIR=/var/tmp/r
+      - TMPDIR=/tmp/r
       - cargo
       - test
       - --workspace

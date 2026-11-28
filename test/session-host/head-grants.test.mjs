@@ -11,7 +11,10 @@ import { grantOf, headPersonas, holdsHeadTable } from '../../src/session-host/he
 ensureGitAddon();
 
 test('the port answers a persona its cage size from the permission table, and a persona the table does not name holds nothing', () => {
-  assert.deepEqual(grantOf('head:secretary-x', 'secretary'), { writes: ['plans', 'plans/backlog.md', 'plans/backlog/*'], mailbox: true, peers: true });
+  assert.deepEqual(grantOf('head:secretary-x', 'secretary'), { writes: ['plans', 'plans/backlog/*'], mailbox: true, peers: true });
+  for (const persona of ['secretary', 'supervisor']) {
+    assert.equal(grantOf(`head:${persona}-x`, persona).writes.includes('plans/backlog.md'), false, `${persona} is not granted the generated index`);
+  }
   assert.deepEqual(grantOf('head:planner-x', 'planner'), { writes: ['plans'], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:lead-x', 'lead', { planDir: '261122-0118-test' }), { writes: ['plans/261122-0118-test'], mailbox: false, peers: false });
   assert.deepEqual(grantOf('head:nobody-x', 'nobody'), { writes: [], mailbox: false, peers: false });

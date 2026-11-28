@@ -1,0 +1,1 @@
+- Fixed: a confined unit runs cargo on the workspace offline from the owner's read-only cargo and rustup caches; it no longer hangs on the private pkm git dependency, and a revision missing from the cache fails at once with cargo's offline error.

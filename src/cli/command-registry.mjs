@@ -1538,16 +1538,17 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'release',
-    invoke: 'fgos release run [--rollback]',
-    description: 'Run the project release recipe (`release.*` config) through the head\'s own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. Granted to the supervisor and, by inheritance, the secretary. `--rollback` runs only the recipe\'s rollback, refused `no-release-in-flight` unless a release step never ended. Not paginated.',
+    invoke: 'fgos release <run [--rollback]|check --worktree <path>>',
+    description: 'Run the project release recipe (`release.*` config) through the head\'s own run supervisor, from inside a head session only (a session with FGOS_HEAD_REQUEST_SOCKET); outside one it refuses. Answers at once with a ticket id, and the run goes on in the supervisor; read the outcome with `fgos request result`. `run` is granted to the supervisor and, by inheritance, the secretary; `--rollback` runs only the recipe\'s rollback, refused `no-release-in-flight` unless a release step never ended. `check --worktree <path>` runs only the recipe\'s `checks` in that linked worktree of the project, unconfined, with no release step and nothing changed on main; it is granted to the lead alone, and a red check is an answer, not an error. Not paginated.',
     parameters: {
       type: 'object',
       properties: {
         rollback: { type: 'boolean', description: 'Run only the recipe\'s rollback (for a release whose step never ended).' },
+        worktree: { type: 'string', description: 'For `check`: the absolute path of a linked worktree of this project whose checks run.' },
       },
       required: [],
     },
-    examples: ['fgos release run', 'fgos release run --rollback'],
+    examples: ['fgos release run', 'fgos release run --rollback', 'fgos release check --worktree /path/to/project-worktrees/my-branch'],
     touchesState: false,
     store: 'none',
     externalEffect: true,
@@ -2624,6 +2625,7 @@ export const COMMAND_REGISTRY = [
           properties: {
             draft: { type: 'string', description: 'A draft part, in the corpus language (repeatable; at most 8 parts in all).' },
             'draft-file': { type: 'string', description: 'A file holding one draft part (repeatable).' },
+            exact: { type: 'string', description: 'A literal string to list every section that contains it (repeatable).' },
             area: { type: 'string', description: 'Guessed area value (repeatable): a folder under docs/platform/ with a spec.md, or "platform".' },
             question: { type: 'string', description: 'Guessed question value (repeatable): current-truth, obligation, rationale, choice, direction, procedure, pitfall, lookup, proof, navigation or past-state.' },
             eval: { type: 'string', description: 'Measure locate over a gold set in pkm\'s gold format (repository paths) instead of answering a draft: recall@3, recall@10, right section first and the misses. Refused unless the index is ready.' },
@@ -2633,6 +2635,7 @@ export const COMMAND_REGISTRY = [
         examples: [
           'fgos doc locate --draft "A worktree with live uncommitted work must not be reclaimed." --json',
           'fgos doc locate --draft-file draft.md --area git --question current-truth',
+          'fgos doc locate --draft "A worktree with live uncommitted work must not be reclaimed." --exact worktree-reclaim',
           'fgos doc locate --eval docs/platform/documentation/subcomponents/document-identity/verification/recall/locate-gold-short.yaml --json',
         ],
       },
@@ -2686,11 +2689,12 @@ export const COMMAND_REGISTRY = [
         request: { type: 'string', description: "Admission request work item id that receives the material (handoff)." },
         claim: { type: 'string', description: "The claim's one-sentence statement (handoff)." },
         'material-file': { type: 'string', description: "File holding the drafted material, non-empty (handoff)." },
-        'locate-file': { type: 'string', description: "JSON file with the locate result: {query, candidates: [{path, section?, why_not}], places?} (handoff)." },
+        'locate-file': { type: 'string', description: "JSON file with the writer's locate decision: {query, candidates: [{path, section?, why_not}], places?, mentions?: [{path, section?, missedBySearch, handling: updated|unaffected|too-common, note?}]}. Required for handoff; optional for attest, where it records decision grow and the attested document's own candidate needs no why_not. The verbs cannot check the mention list against the locate answer." },
+        decision: { type: 'string', description: "The writer's decision on a handoff: create (default) or no-place.", enum: ['create', 'no-place'] },
       },
       required: [],
     },
-    examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123', 'fgos knowledge handoff --capture-id tsk-123 --request tsk-456 --claim "Reclaim keeps the branch" --material-file material.md --locate-file locate.json'],
+    examples: ['fgos knowledge status', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123', 'fgos knowledge attest --doc-path docs/worktree/guide.md --capture-id tsk-123 --locate-file locate.json', 'fgos knowledge handoff --capture-id tsk-123 --request tsk-456 --claim "Reclaim keeps the branch" --material-file material.md --locate-file locate.json --decision create'],
     // tsk-28x code review finding: `status`/`attest` both call `rebuild(dir)`,
     // which requires a real `.fgos` store -- `store: 'none'`
     // was wrong for both subcommands. `attest` also durably records a

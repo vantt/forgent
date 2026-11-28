@@ -407,7 +407,7 @@ export async function placeHead({ persona, name, projectRoot, beside = null, gen
   const request = {
     binding, runnerConfig: launchRunnerConfig, key, role, grant, opening: text, ceilingMs: HEAD_HARD_CEILING_MS,
     // The sandbox gives every launch a private writable tmpfs at /tmp (bwrap driver `--tmpfs /tmp`), so /tmp is the head's own scratch, not the shared one.
-    env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
+    env: { TMPDIR: '/tmp', FGOS_HEAD_ROLE: role, FGOS_HEAD_PROJECT_ROOT: path.resolve(projectRoot), FGOS_HEAD_PERSONA: persona, FGOS_HEAD_NAME: name, FGOS_HEAD_GEN: String(generation) },
     projectRoot, beside, display: { role: persona, title: subjectOfHead(persona, name, task) },
     ...(workdir ? { workdir } : {}),
   };

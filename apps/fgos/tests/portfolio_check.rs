@@ -89,7 +89,7 @@ notes
 "#;
 
     let res = parse_backlog_item(Path::new("bad.md"), text);
-    assert!(matches!(res, Err(PortfolioRefusal::KeyMissing(_))));
+    assert!(matches!(res, Err(PortfolioRefusal::KeyMissing(m)) if m.contains("'title'")));
 }
 
 #[test]
@@ -112,14 +112,14 @@ notes
 "#;
 
     let res1 = parse_backlog_item(Path::new("bad.md"), text_bad_status);
-    assert!(matches!(res1, Err(PortfolioRefusal::StatusUnknown(_))));
+    assert!(matches!(res1, Err(PortfolioRefusal::StatusUnknown(m)) if m.contains("in-progress")));
 
     let text_bad_priority = text_bad_status
         .replace("status: in-progress", "status: proposed")
         .replace("priority: P1", "priority: P9");
 
     let res2 = parse_backlog_item(Path::new("bad.md"), &text_bad_priority);
-    assert!(matches!(res2, Err(PortfolioRefusal::PriorityUnknown(_))));
+    assert!(matches!(res2, Err(PortfolioRefusal::PriorityUnknown(m)) if m.contains("P9")));
 }
 
 #[test]
@@ -140,7 +140,7 @@ done
 "#;
 
     let res = parse_backlog_item(Path::new("bad.md"), text_missing_notes);
-    assert!(matches!(res, Err(PortfolioRefusal::BodySectionMissing(_))));
+    assert!(matches!(res, Err(PortfolioRefusal::BodySectionMissing(m)) if m.contains("Notes")));
 }
 
 #[test]
@@ -169,14 +169,20 @@ created: 2026-11-20
 
     let bad_status = text.replace("status: settled", "status: closed");
     let res_bad_status = parse_discussion(Path::new("bad.md"), &bad_status);
-    assert!(matches!(
-        res_bad_status,
-        Err(PortfolioRefusal::StatusUnknown(_))
-    ));
+    assert!(
+        matches!(res_bad_status, Err(PortfolioRefusal::StatusUnknown(m)) if m.contains("closed"))
+    );
 
     let bad_id = text.replace("id: ds-234567abcd", "id: ds-bad_id!");
     let res_bad_id = parse_discussion(Path::new("bad.md"), &bad_id);
     assert!(matches!(res_bad_id, Err(PortfolioRefusal::InvalidId(_))));
+
+    let scalar_source = text.replace("source:\n  - p-rw5iadsp2p", "source: \"p-rw5iadsp2p\"");
+    let res_scalar_source = parse_discussion(Path::new("bad.md"), &scalar_source);
+    assert!(matches!(
+        res_scalar_source,
+        Err(PortfolioRefusal::KeyMissing(m)) if m.contains("'source' must be a sequence")
+    ));
 }
 
 #[test]
@@ -199,6 +205,10 @@ fn test_create_and_edit_item() {
     assert_eq!(created.id, "p-234567abcd");
     assert_eq!(created.filename, "p-234567abcd-test-item.md");
     assert!(created.full_path.exists());
+    let created_text = fs::read_to_string(&created.full_path).unwrap();
+    let created_item = parse_backlog_item(&created.rel_path, &created_text).unwrap();
+    assert_eq!(created_item.title, "Test Create Item");
+    assert_eq!(created_item.status, "proposed");
 
     // Edit item
     let edit_req = EditItemRequest {
@@ -217,6 +227,7 @@ fn test_create_and_edit_item() {
 
     let read_back = fs::read_to_string(&edited.full_path).unwrap();
     let parsed = parse_backlog_item(&edited.rel_path, &read_back).unwrap();
+    assert_eq!(parsed.title, "Test Create Item");
     assert_eq!(parsed.status, "in-flight");
     assert_eq!(parsed.priority, "P0");
     assert_eq!(parsed.notes, "Updated notes");
