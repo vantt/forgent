@@ -53,8 +53,8 @@ lower it. Never a provider, model or tier: Rule: capability-routing-rules, in AG
    follow an approval; it writes nothing. Fields, exit codes and every refusal:
    [`references/propose.md`](references/propose.md). Never size a frame or pick a
    pattern by hand.
-3. **Ask once.** Show the question it printed, in the decision-question template
-   (`../_shared/decision-question.md`), together with every ambiguity of the plan,
+3. **Ask once.** Show the question it printed, as the decision question of the
+   communication standard (`../_shared/owner-communication.md#decision-question`), together with every ambiguity of the plan,
    in one batched message. A slice that must wait for the owner (data, migrations,
    anything irreversible) is in that question, never dispatched. Inside the
    approved frame you decide and report (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2);
@@ -118,4 +118,4 @@ lower it. Never a provider, model or tier: Rule: capability-routing-rules, in AG
   stay authoritative; `bind()` alone picks who runs a slice.
 - Claim only what you re-ran or read: Rule: driver-discipline (in AGENTS.md; set in .fgos/instructions/effective/rules.json).
 - Do not touch Work items: the old Work-item path is `/fgOS:deliver`.
-- The approved frame: `../_shared/decision-question.md`.
+- The approved frame: `../_shared/owner-communication.md#when-to-ask`.

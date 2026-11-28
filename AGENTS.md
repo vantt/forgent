@@ -99,15 +99,6 @@ This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relatio
 
 ### law
 
-#### Decision Question Template
-
-- id: `decision-question-template`
-- source: `core/instructions/decision-question-template.md`
-
-# Decision Question Template
-
-Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer. Full template: `core/skills/_shared/decision-question.md`. Ask the owner only to set or change a direction. Before asking, run the three questions of its section When to ask (is the intent clear; does the fastest direction deviate from the approved goal; is there a real reverse path). Inside the approved goal, decide, do it, and record it where the work lives.
-
 #### Definition of Done (platform-foundations L5)
 
 - id: `definition-of-done`
@@ -152,6 +143,18 @@ fgOS tồn tại để:
  
 fgOS KHÔNG phải để (3) tự phát triển chính nó. Mission #3 là dogfood cần thiết trong lúc xây, không phải lý do fgOS tồn tại.  Khi làm việc trong chính repo (nơi fgOS tự-host trên chính source của mình), đừng mặc định coi "sửa fgOS" là mục tiêu chỉ vì đó là việc trước mắt — hỏi việc đang làm có phục vụ mission #1/#2 (năng lực fgOS mang lại cho project/workflow khác) hay chỉ tiện cho chính đội fgOS (mission #3). fgOS đã cài global và đang vận hành thật trên nhiều project khác ngoài repo này — mission #1/#2 không phải lý thuyết. Chi tiết + bằng chứng: docs/platform/platform-foundations.md's "Lịch sử quyết định" § D-ADR0035 (docs/decisions/*.md corpus đã retired tsk-1lv-4).
 
+#### Communication Standard
+
+- id: `owner-communication`
+- source: `core/instructions/owner-communication.md`
+
+# Communication Standard
+
+The owner's attention is the scarcest resource in the system, and the owner is overloaded: every message competes
+for attention already spent, so the agent does the heavy work (reading, checking, weighing) before it speaks, and the
+owner is left with the decision. What the agent presents is taken in with one read and decided at once, without
+asking back and without looking anything up. Every question asking the owner to choose a direction carries five parts: what is happening, cause, options with cost, recommendation, and scope of the answer; options are lettered, the recommended one first, with a stated default. Ask the owner only to set or change a direction. Before asking, run the three questions of its section When to ask (is the intent clear; does the fastest direction deviate from the approved goal; is there a real reverse path). Inside the approved goal, decide, do it, and record it where the work lives. Full standard: `core/skills/_shared/owner-communication.md`.
+
 #### Platform Operating Laws
 
 - id: `platform-operating-laws`
@@ -184,7 +187,7 @@ Authoritative statements, rationales, evidence sources, and review thresholds ar
 Source: D-ADR0030, docs/platform/runner/decisions/h-36d872fbb0e5.md#d-adr0030-thêm-bậc-ưu-tiên-2-release-con-người-vào-thứ-tự-ưu-tiên-sản-phẩm.
 
 1. **Ship Faster** — giao nhanh hơn, không đoán mò, giảm friction/better-dev-ux, ít chờ đợi.
-2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/decision-question.md`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
+2. **Release con người** — giải phóng con người khỏi việc ngồi canh chờ trả lời. Hệ thống tự phán đoán, tự vận hành ở mức cao nhất có thể; chỉ hỏi người khi thật sự cần, và khi hỏi thì gom thành bộ để mỗi lần người quay lại trả lời được nhiều nhất rồi đi tiếp; mỗi câu theo mẫu câu hỏi quyết định (`core/skills/_shared/owner-communication.md#decision-question`). Tự quyết trong khung đã duyệt (phạm vi + ngân sách ghi lúc duyệt); sắp vượt khung thì dừng và hỏi theo mẫu. Một câu hỏi treo không được nghẽn phần việc khác của cùng item còn tiến được — stage/skill vì vậy phải chia nhỏ, mịn, mỗi mảnh park/tiến độc lập.
    Khi phân tích của chính agent đã chọn rõ một phương án, hãy quyết và báo cáo, không hỏi lại. Chỉ hỏi khi các phương án thật sự ngang nhau hoặc phụ thuộc vào ý định của người dùng.
 3. **DoD** — reproducibly verifiable result + evidence-linked documentation.
 4. **Polish Sau DoD** — hoàn thiện sau ngưỡng, không mở scope.

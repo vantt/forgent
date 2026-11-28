@@ -1,7 +1,7 @@
 // The one check for every door that asks the owner to decide: the `fgos ask`
 // validator (status-fsm.mjs) and the AskUserQuestion hook both call it, so
 // the rule is written once. The full template lives in
-// core/skills/_shared/decision-question.md.
+// core/skills/_shared/owner-communication.md#decision-question.
 //
 // A part is found by a label line: a Markdown heading ("## Nguyên nhân"), or
 // a line whose label is followed by ":" or a dash ("2. **Cause:** ..."), so a

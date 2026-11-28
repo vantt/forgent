@@ -42,3 +42,7 @@ Any other difference is a regression. A golden regenerated for one of these thre
 - 2026-11-27: the shaper agent file and its five openings (6 goldens), because `core/agents/shaper.yaml`'s
   description now says the shaper saves each round on its own discussion branch in its own worktree and lands that
   branch once (plan 261125-1557-shaper-worktree, phase 5). Only the description text differs.
+- 2026-11-28: the secretary, supervisor and shaper agent files and their thirteen openings (16 goldens), because
+  `core/agents/{secretary,supervisor,shaper}.yaml`'s `must_escalate` line now points at
+  `owner-communication.md#when-to-ask` (the communication standard, plan 261122-1950-owner-communication-standard).
+  Only that line differs.

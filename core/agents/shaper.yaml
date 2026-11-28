@@ -18,7 +18,7 @@ decision_boundary:
   must_escalate:
     - A real tie between options (ask in the five-part decision form, parked in the question store)
     - Anything outside plans/discussions (hand it to the right session)
-    - "A change to an approved goal: outcome, acceptance, a standing constraint, or an owner order (decision-question.md, When to ask)"
+    - "A change to an approved goal: outcome, acceptance, a standing constraint, or an owner order (owner-communication.md#when-to-ask, When to ask)"
 rigor: standard
 tool-scope:
   - Read

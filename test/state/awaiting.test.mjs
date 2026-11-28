@@ -29,7 +29,7 @@ function moveToDurableDoingForTest(dir, id, from = 'todo', extra = {}) {
 }
 
 // `ask` must follow the decision-question template
-// (core/skills/_shared/decision-question.md): every part >= 20 characters.
+// (core/skills/_shared/owner-communication.md#decision-question): every part >= 20 characters.
 const VALID_ASK = '## Chuyện gì đang xảy ra\n\nWe need to decide the login mechanism for the new API.\n\n## Nguyên nhân\n\nThe choice determines the SDK dependencies: OAuth or password?\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
 const VALID_ASK_FIRST = '## Chuyện gì đang xảy ra\n\nFirst round of this decision, still open.\n\n## Nguyên nhân\n\nThe first open question in this round.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';
 const VALID_ASK_SECOND = '## Chuyện gì đang xảy ra\n\nSecond round of this decision, still open.\n\n## Nguyên nhân\n\nThe second open question in this round.\n\n## Các lựa chọn\n\n(a) giữ cách hiện tại; (b) đổi sang cách đã đề xuất ở trên.\n\n## Khuyến nghị\n\n(b), vì nó giải quyết đúng vấn đề đã nêu.\n\n## Phạm vi của câu trả lời\n\nĐồng ý chỉ cho phép làm đúng thay đổi này, không gì thêm.';

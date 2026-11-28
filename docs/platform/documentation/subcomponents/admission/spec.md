@@ -116,7 +116,7 @@ A week is counted per project.
 
 ### 6.4. The owner's batch and the digest
 
-Escalated requests wait in one batch. When the batch is presented, each request is one question in the decision-question template (`core/skills/_shared/decision-question.md`). The batch is asked through the existing ask door on one work item (`fgos ask` / `fgos answer`), so a hanging question blocks only that item, not the writers.
+Escalated requests wait in one batch. When the batch is presented, each request is one question in the decision-question shape of the communication standard (`core/skills/_shared/owner-communication.md#decision-question`). The batch is asked through the existing ask door on one work item (`fgos ask` / `fgos answer`), so a hanging question blocks only that item, not the writers.
 
 The digest lists, per week, everything the reviewer admitted: the effect, the evidence, the reviewer run. It is the owner's view of what changed without having been asked.
 
@@ -176,7 +176,7 @@ fgOS has no proof of a person: the Identity spec leaves out human accounts, and 
 | `fgos ask` / `fgos answer` | work state | the owner's batch |
 | Registry doors and lineage | [knowledge-registry contract](../../../work-state/contracts/knowledge-registry.md) | where records are checked; reversal |
 | Locate result, observer proposals | [document identity](../document-identity/spec.md) | evidence |
-| Decision-question template | `core/skills/_shared/decision-question.md` | the owner's batch |
+| Communication standard's decision question | `core/skills/_shared/owner-communication.md#decision-question` | the owner's batch |
 
 ## 10. Edge Cases
 

@@ -4,7 +4,7 @@ user-invocable: false
 description: >-
   Procedure of the secretary (Miu), the owner's front session: classify each request's domain, keep one backlog row per
   actionable request, route it (status from portfolio files, discussion to a shaper; ready work is raised on the
-  supervision queue and the supervisor woken), order topics by the product priority, report in at most 10 lines, and batch owner
+  supervision queue and the supervisor woken), order topics by the product priority, report in the status-report shape of the communication standard, and batch owner
   questions. Domain-free: it knows no domain's steps. Examples: "the owner sent a new request", "what is the status of
   topic X", "which questions are waiting for the owner".
 ---
@@ -32,7 +32,7 @@ the harness's own scheduler (in Claude Code: invoke the loop skill with `/loop 1
 which creates a session cron; it lives only in that session, so it is re-armed on every start).
 
 Each tick does, in order: read open owner questions (`fgos questions`), then unread mail (`fgos mailbox inbox`), then
-relay what is new to the owner in one batch in the five-part form (`core/skills/_shared/decision-question.md`), then the
+relay what is new to the owner in one batch in the five-part form (`core/skills/_shared/owner-communication.md#decision-question`), then the
 `fgos.coordination.question-relayed` records already described in this skill; a tick with nothing new ends at once with
 no message. The relay follows the cap of the 'Owner questions' section (at most 5 at a time, by priority then age);
 'new' means not yet relayed in this session, so a rotation successor relays the open ones again once.
@@ -124,14 +124,14 @@ Friction you meet or an owner reports (a workaround, conflicting rules, a missin
 
 ## Reports
 
-At most 10 lines. Put the full report in a file named with `fgos convention path --kind report` and link it.
+In the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report` and link it.
 
 ## Owner questions
 
 Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by plan priority,
-then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of `core/skills/_shared/decision-question.md`, in the owner's plain words
-(see its "Make it easy to answer" section). Relay only questions that pass the when-to-ask rule (`core/skills/_shared/decision-question.md#when-to-ask`),
-and report self-decisions gathered by plan and by file. Rewrite a question that breaks the when-to-ask rule and template in `core/skills/_shared/decision-question.md` before showing it. Record the owner's reply with `fgos questions answer
+then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of `core/skills/_shared/owner-communication.md#decision-question`, in the owner's plain words
+(see the presentation points of `core/skills/_shared/owner-communication.md`). Relay only questions that pass the when-to-ask rule (`core/skills/_shared/owner-communication.md#when-to-ask`),
+and report self-decisions gathered by plan and by file. Rewrite a question that breaks the when-to-ask rule and the decision question of `core/skills/_shared/owner-communication.md` before showing it. Record the owner's reply with `fgos questions answer
 <id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).
 
 "Seen by the owner" means your message to the owner that names the question id: your report or batch. A question the

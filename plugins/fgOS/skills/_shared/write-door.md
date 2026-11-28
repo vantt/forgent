@@ -51,7 +51,7 @@ Pass the file, or `"$(cat <file>)"` where a verb takes only a value.
 6. **grow, a composite document (spec, contract, guide).** Edit the section only when the claim changes what it states,
    then run `node scripts/doc-health.mjs`. Otherwise the claim is already carried: record a non-engine decision that
    names `path#heading` and why nothing is added.
-7. **ask.** Two candidates fit. Use the decision-question template (`decision-question.md`); resume at grow or create
+7. **ask.** Two candidates fit. Use the decision question of the communication standard (`owner-communication.md#decision-question`); resume at grow or create
    with the answer.
 8. **create or no-place.** No candidate carries the claim, or no area fits. Write the request to
    `.fgos/runtime/tmp/<id>-request.txt` (first line `Admission request: <claim>`, then a line linking the item). Write
