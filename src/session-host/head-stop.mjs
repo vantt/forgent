@@ -67,10 +67,12 @@ function defaultSupervisorAlive(runDir) {
 }
 
 /**
- * Ends the attempt of a head whose run supervisor is gone: the run supervisor's `end-dead-attempt` op stops the one
- * systemd scope the attempt's binding names, waits for the domain to empty, and adopts the run dir (`closed.json`).
- * `runDir` is `<fgos>/assignments/<id>/runs/<NN>`. A refusal (`{ refused: { code, message } }`) is returned as it is: the
- * attempt was not ended.
+ * Ends the attempt of a head whose run supervisor is gone: the run supervisor's `end-dead-attempt` op signals only the one
+ * systemd scope the attempt's binding names and the binding's own gate record (by pid and start identity, `SIGTERM` then
+ * `SIGKILL`: a head's gate and agent live in the herdr pane's cgroup, not in the scope), waits for the gate to be judged
+ * dead, and adopts the run dir (`closed.json`). `runDir` is `<fgos>/assignments/<id>/runs/<NN>`. A refusal
+ * (`{ refused: { code, message } }`) is returned as it is: the attempt was not ended. A throw means the op did not answer
+ * (the host died mid-op), so what it already signalled is unknown.
  */
 async function defaultEndAttempt(runDir, projectRoot) {
   const { executionOp } = await import('../native/execution-door.mjs');
@@ -88,11 +90,13 @@ async function defaultEndAttempt(runDir, projectRoot) {
  * that will not close (`retire-refused`) is reported with the stamp kept.
  *
  * A supervisor judged gone can neither answer a stop request nor close the attempt, so that head is never asked to stop:
- * its attempt is ended through the run supervisor's `end-dead-attempt` op (the attempt's own systemd scope is stopped, the
- * empty domain adopted and `closed.json` published) and its pane is retired only once the attempt is closed. A refusal
+ * its attempt is ended through the run supervisor's `end-dead-attempt` op (only the attempt's own systemd scope and the
+ * binding's own gate record are signalled, the gate by pid and start identity; the gate is then waited on, the empty
+ * domain adopted and `closed.json` published) and its pane is retired only once the attempt is closed. A refusal
  * that signalled nothing (no-binding, supervisor-alive, domain-not-scope, scope-mismatch) is `stop-not-ended` with the
- * stamp put back; `domain-not-ended`, or an answer whose adopt did not close the attempt, is `stop-not-ended` with the
- * stamp kept and the pane left alone. The next generation starts through `fgos session start`.
+ * stamp put back; `domain-not-ended`, an op that threw (the scope and the gate may already have been signalled), or an
+ * answer whose adopt did not close the attempt, is `stop-not-ended` with the stamp kept and the pane left alone. The next
+ * generation starts through `fgos session start`.
  *
  * A short role is resolved through Identity to its live session, and its lineage (run directory, pane and `retiredAt`
  * stamp) is the head its record names (`ids.head`), ended exactly as a head is. A lead whose record names no lineage with
@@ -103,7 +107,8 @@ async function defaultEndAttempt(runDir, projectRoot) {
  * `identity({ role, projectRoot }) -> { live, record? }`, `now() -> Date`, `groupKeyOf(record) -> string`,
  * `end(runDir) -> boolean` (asks the head's supervisor to stop it), `closed(runDir) -> boolean`, `sleep(ms)`, `waitMs`,
  * `supervisorAlive(runDir) -> boolean` (the attempt's supervisor is not proven dead), `endAttempt(runDir) -> { ended } |
- * { refused }` (ends the attempt of a gone supervisor), `config(projectRoot)` (sessionRotation config) and
+ * { refused }` (ends the attempt of a gone supervisor; a throw is `stop-not-ended` with the stamp kept, because the op may
+ * have signalled before it died), `config(projectRoot)` (sessionRotation config) and
  * `writeHandoff(args)` (the existing handoff writer).
  * A sleep requires wakeAt, stamps its wake/plan/phase/context/CLI binding in that same first write, and writes its
  * handoff before asking for the stop. A handoff failure restores the placement and ends nothing.
@@ -177,13 +182,20 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
         while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
         if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
       } else {
-        const ended = await (ports.endAttempt ?? ((runDir) => defaultEndAttempt(runDir, projectRoot)))(record.runDir);
+        let ended;
+        try {
+          ended = await (ports.endAttempt ?? ((runDir) => defaultEndAttempt(runDir, projectRoot)))(record.runDir);
+        } catch (err) {
+          // An op that did not answer may already have signalled the scope and its gate, so the stamp stays.
+          requested = true;
+          throw new HeadStopError('stop-not-ended', `${role} could not be ended: end-dead-attempt did not answer (${err.message})`);
+        }
         if (ended?.refused) {
-          // Only `domain-not-ended` signalled the scope; every other refusal signalled nothing, so the stamp is put back.
+          // Only `domain-not-ended` signalled the scope and its gate; every other refusal signalled nothing, so the stamp is put back.
           if (ended.refused.code === 'domain-not-ended') requested = true;
           throw new HeadStopError('stop-not-ended', `${role} could not be ended: ${ended.refused.code} (${ended.refused.message})`);
         }
-        // The scope was stopped, so the stamp stays; the pane is retired only once the attempt is closed.
+        // The scope was stopped and its gate signalled, so the stamp stays; the pane is retired only once the attempt is closed.
         requested = true;
         const state = ended?.adopt?.state;
         if (state !== 'closed' && !(ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json'))))(record.runDir)) {

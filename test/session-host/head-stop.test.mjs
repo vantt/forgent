@@ -89,11 +89,21 @@ async function deadStop(t, endAttempt, extra = {}) {
   return { outcome, retired, dir };
 }
 
-test('a dead supervisor whose attempt signalled nothing is refused by name, puts the stamp back and retires no pane', async (t) => {
-  const { outcome, retired, dir } = await deadStop(t, async () => ({ refused: { code: 'domain-not-scope', message: 'inherited' } }));
+for (const code of ['domain-not-scope', 'supervisor-alive']) {
+  test(`a dead supervisor whose attempt signalled nothing (${code}) is refused by name, puts the stamp back and retires no pane`, async (t) => {
+    const { outcome, retired, dir } = await deadStop(t, async () => ({ refused: { code, message: 'signalled nothing' } }));
+    assert.equal(outcome?.code, 'stop-not-ended');
+    assert.deepEqual(retired, []);
+    assert.equal(readHeadPlacement(dir).retiredAt, undefined);
+  });
+}
+
+test('a dead supervisor whose end-dead-attempt op throws keeps the stamp and retires no pane', async (t) => {
+  const { outcome, retired, dir } = await deadStop(t, async () => { throw new Error('execution-route-no-answer: the host died mid-op'); });
   assert.equal(outcome?.code, 'stop-not-ended');
+  assert.match(outcome.message, /execution-route-no-answer/);
   assert.deepEqual(retired, []);
-  assert.equal(readHeadPlacement(dir).retiredAt, undefined);
+  assert.equal(readHeadPlacement(dir).retiredAt, '2026-11-19T01:02:03.000Z');
 });
 
 test('a dead supervisor whose scope survived the kill is refused domain-not-ended and keeps the stamp', async (t) => {

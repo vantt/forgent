@@ -672,7 +672,7 @@ mod tests {
     }
 
     /// The machine, answering as told: the supervisor's verdict, the moment the gate ends, and the stops, gate
-    /// signals and sleeps that were asked for.
+    /// signals and sleeps that were asked for, in the order they were asked (`events`).
     struct FakePorts {
         supervisor_dead: bool,
         gate_alive_until_slept_ms: u64,
@@ -681,6 +681,8 @@ mod tests {
         gate_signal_error: Option<String>,
         slept_ms: u64,
         adopted: usize,
+        /// One entry per call the decision made, in order: "stop", "term", "kill-unit", "kill", "sleep", "adopt".
+        events: Vec<String>,
     }
 
     impl FakePorts {
@@ -693,6 +695,7 @@ mod tests {
                 gate_signal_error: None,
                 slept_ms: 0,
                 adopted: 0,
+                events: Vec::new(),
             }
         }
     }
@@ -707,6 +710,8 @@ mod tests {
         }
 
         fn stop_unit(&mut self, unit: &str, kill: bool) -> Result<(), String> {
+            self.events
+                .push(if kill { "kill-unit" } else { "stop" }.to_string());
             self.stops.push((unit.to_string(), kill));
             Ok(())
         }
@@ -717,6 +722,8 @@ mod tests {
                 Some("gate"),
                 "only the binding's own gate record is signalled: {gate}"
             );
+            self.events
+                .push(if kill { "kill" } else { "term" }.to_string());
             self.gate_signals.push(kill);
             match &self.gate_signal_error {
                 Some(message) => Err(message.clone()),
@@ -725,10 +732,12 @@ mod tests {
         }
 
         fn sleep(&mut self, ms: u64) {
+            self.events.push("sleep".to_string());
             self.slept_ms += ms;
         }
 
         fn adopt(&mut self, _run_dir: &Path) -> Value {
+            self.events.push("adopt".to_string());
             self.adopted += 1;
             json!({ "v": 1, "attemptDir": "…", "state": "closed" })
         }
@@ -834,6 +843,33 @@ mod tests {
         assert_eq!(ports.gate_signals, vec![false, true]);
         assert_eq!(ports.slept_ms, SCOPE_STOP_WAIT_MS + SCOPE_POLL_MS);
         assert_eq!(ports.adopted, 1);
+        // Order, not just totals: the scope and its gate are asked to end before the first wait, killed only after
+        // the stop grace ran out, and adopt comes last, once the gate is judged dead.
+        let seen: Vec<&str> = ports.events.iter().map(String::as_str).collect();
+        let kill_at = seen
+            .iter()
+            .position(|event| *event == "kill-unit")
+            .expect("the scope is killed after the stop grace");
+        let first_sleep = seen
+            .iter()
+            .position(|event| *event == "sleep")
+            .expect("the gate is waited on");
+        assert_eq!(
+            &seen[..first_sleep],
+            &["stop", "term"],
+            "the scope stops and its gate is asked to end before the first wait"
+        );
+        assert_eq!(
+            &seen[kill_at..kill_at + 2],
+            &["kill-unit", "kill"],
+            "after the stop wait the scope and its gate are killed together"
+        );
+        assert_eq!(seen.last().copied(), Some("adopt"), "adopt is last");
+        assert_eq!(
+            ports.events.iter().filter(|event| event.as_str() == "adopt").count(),
+            1,
+            "one adopt"
+        );
     }
 
     #[test]
