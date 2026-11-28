@@ -2,7 +2,7 @@
 contract: plan-v1
 title: "Claiming a plan: who runs it, on which machine, recorded on origin at once"
 description: "A plan's host field on origin is the one placement record. Admission on machine M admits only a plan whose host is absent or M, writes host with status running, and never leaves its commit unpushed: a paths land undoes its commit when the push is refused before sending, and a catch-up pushes this checkout's own leftover land commit. Running plans of another machine are never restarted here."
-status: running
+status: done
 priority: P1
 host: fg-server-sqs7es
 blockedBy: []
@@ -113,10 +113,10 @@ portfolio and the paths land all live in `packages/supervision/rust/`, owned by 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Push outcomes of the paths land](phase-01-push-outcomes-of-the-paths-land.md) | - | packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/git/rust/src/inspect.rs, packages/git/rust/tests/** | 1 | done |
-| 2 | [Host on the plan record](phase-02-host-on-the-plan-record.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/portfolio.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, `packages/git/rust/src/land.rs` | 1 | draft |
-| 3 | [Machine-aware admission and watching](phase-03-machine-aware-admission-and-watching.md) | 1, 2 | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/keeper.rs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/supervision/rust/src/portfolio.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, `packages/supervision/rust/tests/portfolio.rs` | 2 | draft |
-| 4 | [Doctrine: spec and skills](phase-04-doctrine-spec-and-skills.md) | 2 | docs/platform/supervision/spec.md, core/skills/_shared/plan-contract.md, domains/coding/skills/fgos-coding-planning/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/_shared/plan-contract.md, .agents/skills/fgos-coding-planning/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/_shared/plan-contract.md, plugins/fgOS/skills/fgos-coding-planning/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md | 2 | draft |
-| 5 | [Integrate and gate](phase-05-integrate-and-gate.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261127-1535-plan-claim-who-and-where/reports/** | 3 | draft |
+| 2 | [Host on the plan record](phase-02-host-on-the-plan-record.md) | - | packages/supervision/rust/src/portfolio.rs, packages/supervision/rust/tests/portfolio.rs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, `packages/git/rust/src/land.rs` | 1 | done |
+| 3 | [Machine-aware admission and watching](phase-03-machine-aware-admission-and-watching.md) | 1, 2 | packages/supervision/rust/src/wake.rs, packages/supervision/rust/src/supervisor.rs, packages/supervision/rust/src/keeper.rs, packages/supervision/rust/tests/wake.rs, packages/supervision/rust/tests/keeper.rs, packages/supervision/rust/src/land.rs, packages/supervision/rust/tests/land.rs, packages/supervision/rust/src/portfolio.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, `packages/supervision/rust/tests/portfolio.rs` | 2 | done |
+| 4 | [Doctrine: spec and skills](phase-04-doctrine-spec-and-skills.md) | 2 | docs/platform/supervision/spec.md, core/skills/_shared/plan-contract.md, domains/coding/skills/fgos-coding-planning/SKILL.md, core/skills/fgos-secretary/SKILL.md, .agents/skills/_shared/plan-contract.md, .agents/skills/fgos-coding-planning/SKILL.md, .agents/skills/fgos-secretary/SKILL.md, plugins/fgOS/skills/_shared/plan-contract.md, plugins/fgOS/skills/fgos-coding-planning/SKILL.md, plugins/fgOS/skills/fgos-secretary/SKILL.md | 2 | done |
+| 5 | [Integrate and gate](phase-05-integrate-and-gate.md) | 1, 2, 3, 4 | CHANGELOG.md, plans/261127-1535-plan-claim-who-and-where/reports/** | 3 | done |
 
 Phase 1 lands first in practice: it removes the stranding on every head write, not only admission. Phases 1 and 2
 share no file. Phase 3 writes `land.rs` and `portfolio.rs` after phases 1 and 2 own them in wave 1. The generated

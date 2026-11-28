@@ -1,7 +1,7 @@
 ---
 id: p-p5k2htczq3
 title: "A running plan names its lead and machine on main at once: admission is never stranded locally (supervision, priority high; source: owner, 2026-11-27)"
-status: proposed
+status: done
 priority: P1
 area: supervision
 created: 2026-11-27
