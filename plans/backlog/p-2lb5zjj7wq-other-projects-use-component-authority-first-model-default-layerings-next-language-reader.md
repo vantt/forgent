@@ -9,7 +9,7 @@ created: 2026-11-28
 
 # Why
 
-Component authority works only on this repository today. A project that adopts fgOS has no way to start its model, no default layerings, and no reader for code in a language other than Node or Rust. Step B of the layering work (`CAS-D24`) leaves the next language open until a real project needs it.
+Component authority works only on this repository today. A project that adopts fgOS has no way to start its model, no default layerings, and no reader for code in a language other than Node or Rust. Step B of the layering work leaves the next language open until a real project needs it.
 
 # Done when
 

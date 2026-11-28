@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Component authority declares four layerings as data, with fixed rule kinds in code"
-description: "Step A of CAS-D5 against CAS-D1..D24: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; values sit on component rows; the checks run per fixed rule kind read from the model, measured before they block; ownerless and retired rows are cleaned; no hardcoded layer or tier list remains."
+description: "Step A of CAS-D5 against CAS-D1..D26: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; values sit on component rows; the checks run per fixed rule kind read from the model, measured before they block; ownerless and retired rows are cleaned; decision kinds give way to component rows; architecture-map renders the layerings and every row has a summary; no hardcoded layer or tier list remains."
 status: draft
 priority: P2
 blockedBy: []
@@ -29,6 +29,21 @@ footprint:
   - docs/platform/workflow/spec.md
   - docs/platform/vision.md
   - changelog.d/261127-1247-component-authority-layerings.md
+  - apps/fgos/src/wiring/authority.rs
+  - src/report/decision-index.mjs
+  - scripts/plan-contract-check.mjs
+  - test/scripts/plan-contract-check.test.mjs
+  - core/instructions/design-principles.md
+  - core/instructions/ready-plan-runs-unattended.md
+  - core/skills/_shared/plan-contract.md
+  - core/skills/fgos-shaping/SKILL.md
+  - domains/coding/skills/fgos-coding-implement/SKILL.md
+  - AGENTS.md
+  - .fgos/instructions/effective/rules.json
+  - .agents/skills/**
+  - plugins/fgOS/skills/**
+  - docs/reading-map.md
+  - docs/decisions/index.md
 ---
 
 # Component authority declares four layerings
@@ -43,6 +58,12 @@ The decisions that replace earlier ones are applied as the discussion orders the
 only its parts (1) definition, (2) `T8-delivery` and (3) `sameAs`; CAS-D16 sets the ring values
 and `source: declared`; CAS-D12 stands (no `fromLayering`); CAS-D22 replaces the `work-driver`
 parts of CAS-D15 and CAS-D19.
+
+Amended 2026-11-28 15:50 for CAS-D25 and CAS-D26, which the discussion settled after the
+re-plan. CAS-D25 is the new phase 10. It runs between phases 2 and 3 and is numbered 10 so the
+other phase numbers stay as they were. CAS-D26's step-A part goes into phase 2 (the `summary`
+field), phase 3 (a summary on every row) and phase 8 (the layering render layout and the
+reading path).
 
 ## Outcome
 
@@ -63,6 +84,11 @@ through `aliases`; `host-runtime` owns `packages/host-runtime/` (CAS-D20..D22). 
 `T0-native` .. `T9-surface` with `T4-agent-runtime`, `T7-domain`, `T8-delivery` (CAS-D7, D13,
 D15, D18). The layering definitions are rendered into `architecture-map.md` §3 from the model
 and the prose uses the new vocabulary.
+The model has no decision kinds. Each live row is a decision scope whose narrative home is its
+`spec` or its `decisions` field. The governance holder table, `fgos decision-index` and the plan
+contract check read from component rows, and design principle 7 says "each component does one
+job" (CAS-D25). `architecture-map.md` renders the four layerings in the CAS-D26 (2) layout, and
+every component row carries a one-sentence `summary` that `declare` requires (CAS-D26).
 
 ## Acceptance criteria
 
@@ -94,8 +120,8 @@ Numbers in brackets are the hand-off acceptance numbers of the discussion.
    `docs/platform/vision.md` §6 Known gaps use the new vocabulary; the Work/Domain order gap is
    closed; `fgos authority render --check` reports no drift. (6, 7)
 7. [core] `stack` values: Work rows (`work-state`, `runner`, `supervision`) carry `T8-delivery`;
-   Domain rows (`domain-components`, `coding-domain`, `group-thinking`, `domain-registry-loader`,
-   `enduser-docs-*`) carry `T7-domain`; `run-supervisor`, `launch-gate`, `agent-mailbox` carry
+   Domain rows (`domain-components`, `coding-domain`, `group-thinking`, `domain-registry-loader`)
+   carry `T7-domain`; `run-supervisor`, `launch-gate`, `agent-mailbox` carry
    `T4-agent-runtime`; `src/report/knowledge-resolver.mjs` is a `T8-delivery` exception. (7, 9, 12)
 8. [core] `fgos authority declare` refuses a component missing a value for any `declared`
    layering, and refuses an `orchestration-ring` order that runs against `stack`, naming both
@@ -117,11 +143,26 @@ Numbers in brackets are the hand-off acceptance numbers of the discussion.
     lists every runner spec file; each `documentation` family row points to a plan or is
     removed. (13)
 13. [core] No `team-cognition-engine` or `work-driver` row; `fgos authority locate work-driver`
-    returns `runner`; the secretary has a backlog row for the hardcoded `MODEL_DIR` and one for
-    splitting `src/util/` to its owning components. (15)
+    returns `runner`; backlog rows exist for the hardcoded `MODEL_DIR` (p-glsrogszi7) and for
+    splitting `src/util/` to its owning components (p-3kjg52xfaa). (15)
 14. [core] `reports/measure-layerings.md` records, per layering and rule, the violation count
     measured in report mode, and how each was resolved (model fix or named exception); no new
     rule blocks before its count is zero. (16)
+15. [core] `decision-kinds.yaml`, the `DecisionKind` type and `--kind decision-kind` are gone;
+    every live row has a narrative home (`decisions`, default its `spec`); the governance holder
+    table and `fgos decision-index` read scopes from component rows, and an old scope id
+    (`architecture-map`, the nine kind ids and their aliases) resolves to its successor; design
+    principle 7 reads "Each component does one job, and no second component does a similar job";
+    no `enduser-docs-authoring` or `enduser-docs-index` row, and `fgos authority locate` of either
+    returns `learning-docs-registry`. Checked by `cargo test -p component-authority`,
+    `node --test test/report/decision-index.test.mjs test/scripts/plan-contract-check.test.mjs`
+    and the `rg` of phase 10. (17)
+16. [core] `architecture-map.md` carries one rendered section per layering from `layers.yaml` in
+    the CAS-D26 (2) layout (heading = the question, meaning paragraph, Mermaid diagram from the
+    value order, values with meaning and two or three representative components, a "distinct
+    from" line, rules as sentences) between markers that `fgos authority render --check` guards;
+    every component row has a one-sentence `summary`, and `fgos authority declare` requires it;
+    a render unit test and a declare test prove each. (18)
 
 ## Non-goals
 
@@ -134,6 +175,10 @@ Numbers in brackets are the hand-off acceptance numbers of the discussion.
 - Fixing the hardcoded `MODEL_DIR` (CAS-D22 (3): its own backlog row).
 - `fromLayering`, a general rule interpreter, a baseline file (CAS-D12, RUL104, CAS-D24 (5)).
 - Refactoring code to satisfy a rule (CAS-D23: A changes data and checks only).
+- The rest of CAS-D26, which is backlog row p-xtgvunuvxy: the brief-card layout of
+  `component-boundary.md`, merging the duplicate component tables, moving the content that
+  belongs elsewhere (CAS-D26 (6)), rewriting `owns`/`mustNotOwn` as full sentences on about 70
+  rows with the owner's trial read, and retiring the six old roles (CAS-D26 (7)).
 
 ## Authority map
 
@@ -150,7 +195,10 @@ Numbers in brackets are the hand-off acceptance numbers of the discussion.
 | Port on a contract row (`port: {kind, implementers}`) | component-authority | Extends the contract index (CAS-D10). |
 | Rendered view `architecture-map-layerings` | component-authority | New view in `render.rs` `view_definitions`, same marker contract. |
 | Component `host-runtime` | declare: component host-runtime | CAS-D21; owner approval `q-o2r2zblera`; row draft `reports/host-runtime-row.json`. Overlaps retired `host-invocation-routing`: survivor: host-runtime; retired: components.yaml row `host-invocation-routing`. |
-| Rows merged into survivors | component-authority | survivor: runner; retired: rows `work-driver` and `h-*` (CAS-D20, CAS-D22). survivor: fgos-gateway; retired: rows `herdr-web-dashboard`, `ui-spec`. survivor: workflow and run-result; retired: row `agent-coordination` (CAS-D21). |
+| Component field `decisions` (narrative home) | component-authority | survivor: component rows as decision scopes; retired: `decision-kinds.yaml`, `DecisionKind`, `--kind decision-kind`, the `decisionKinds` reads in `src/report/decision-index.mjs` and `scripts/plan-contract-check.mjs` (CAS-D25). |
+| Component field `summary` | component-authority | Extends the component row and the declare door (CAS-D26 (5)); no new door. |
+| Principle 7 wording | agent-context-engine | Rules belong to ACE (CAS-D25 (2)); `locate` names no path owner for `core/instructions/` today. Edits the existing unit `core/instructions/design-principles.md`; rendered copies regenerate. |
+| Rows merged into survivors | component-authority | survivor: runner; retired: rows `work-driver` and `h-*` (CAS-D20, CAS-D22). survivor: fgos-gateway; retired: rows `herdr-web-dashboard`, `ui-spec`. survivor: workflow and run-result; retired: row `agent-coordination` (CAS-D21). survivor: learning-docs-registry; retired: rows `enduser-docs-authoring`, `enduser-docs-index` (CAS-D25). |
 
 ## Phases
 
@@ -158,20 +206,22 @@ Numbers in brackets are the hand-off acceptance numbers of the discussion.
 |---|---|---|---|---|---|
 | 1 | [Spec first](phase-01-spec-first.md) | - | docs/platform/component-authority/spec.md | 1 | ready |
 | 2 | [Model shape, values and every caller](phase-02-model-shape.md) | 1 | packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, apps/fgos/tests/authority.rs, test/architecture.test.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | draft |
-| 3 | [Row cleanup: owners, retired rows, merges](phase-03-row-cleanup.md) | 2 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, packages/component-authority/model/decision-kinds.yaml, packages/component-authority/rust/src/render.rs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 3 | draft |
-| 4 | [Declare and locate see every layering](phase-04-declare-and-locate.md) | 3 | packages/component-authority/model/layers.yaml, packages/component-authority/rust/src/declare.rs, packages/component-authority/rust/src/locate.rs, packages/component-authority/rust/src/model.rs, packages/component-authority/rust/tests/, apps/fgos/tests/authority.rs | 4 | draft |
-| 5 | [Rule kinds in report mode, measured](phase-05-rule-kinds-measured.md) | 3 | test/architecture.test.mjs, plans/261127-1247-component-authority-layerings/reports/measure-layerings.md | 4 | draft |
-| 6 | [Data to clean: ranks, exceptions, ports, owners](phase-06-data-to-clean.md) | 4, 5 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, plans/261127-1247-component-authority-layerings/reports/measure-layerings-after.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 5 | draft |
-| 7 | [Rules block, hand guards folded](phase-07-rules-block.md) | 6 | test/architecture.test.mjs | 6 | draft |
-| 8 | [Rendered definitions and prose](phase-08-rendered-definitions-and-prose.md) | 6 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md | 6 | draft |
-| 9 | [Integrate](phase-09-integrate.md) | 7, 8 | changelog.d/261127-1247-component-authority-layerings.md, plans/261127-1247-component-authority-layerings/reports/closing.md | 7 | draft |
+| 10 | [Decision kinds retired, four owners](phase-10-decision-kinds-retired.md) | 2 | packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, apps/fgos/src/wiring/authority.rs, apps/fgos/tests/authority.rs, src/report/decision-index.mjs, test/report/decision-index.test.mjs, scripts/plan-contract-check.mjs, test/scripts/plan-contract-check.test.mjs, test/architecture.test.mjs, core/instructions/design-principles.md, core/instructions/ready-plan-runs-unattended.md, core/skills/_shared/plan-contract.md, core/skills/fgos-shaping/SKILL.md, domains/coding/skills/fgos-coding-implement/SKILL.md, AGENTS.md, .fgos/instructions/effective/rules.json, .agents/skills/, plugins/fgOS/skills/, docs/decisions/index.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 3 | draft |
+| 3 | [Row cleanup: owners, retired rows, merges, summaries](phase-03-row-cleanup.md) | 10 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/model.rs, packages/component-authority/rust/src/render.rs, packages/component-authority/rust/tests/, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | draft |
+| 4 | [Declare and locate see every layering](phase-04-declare-and-locate.md) | 3 | packages/component-authority/model/layers.yaml, packages/component-authority/rust/src/declare.rs, packages/component-authority/rust/src/locate.rs, packages/component-authority/rust/src/model.rs, packages/component-authority/rust/tests/, apps/fgos/tests/authority.rs | 5 | draft |
+| 5 | [Rule kinds in report mode, measured](phase-05-rule-kinds-measured.md) | 3 | test/architecture.test.mjs, plans/261127-1247-component-authority-layerings/reports/measure-layerings.md | 5 | draft |
+| 6 | [Data to clean: ranks, exceptions, ports, owners](phase-06-data-to-clean.md) | 4, 5 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, plans/261127-1247-component-authority-layerings/reports/measure-layerings-after.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 6 | draft |
+| 7 | [Rules block, hand guards folded](phase-07-rules-block.md) | 6 | test/architecture.test.mjs | 7 | draft |
+| 8 | [Rendered definitions and prose](phase-08-rendered-definitions-and-prose.md) | 6 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md, docs/reading-map.md | 7 | draft |
+| 9 | [Integrate](phase-09-integrate.md) | 7, 8 | changelog.d/261127-1247-component-authority-layerings.md, plans/261127-1247-component-authority-layerings/reports/closing.md | 8 | draft |
 
 Phase 1 is `ready` (the owner question does not touch it). Phases 2-9 are `draft` until
 `q-o2r2zblera` is answered, because phase 2 starts with the `host-runtime` declare and every
 later phase builds on phase 2.
 
 Why mostly serial: `components.yaml`, `contracts.yaml`, `test/architecture.test.mjs` and the
-seven rendered docs are hot files with one writer per wave. Phases 4 and 5 run together (the
+seven rendered docs are hot files with one writer per wave. Phase 10 sits between 2 and 3
+because it rewrites the same model files and Rust modules. Phases 4 and 5 run together (the
 door code and the test file are disjoint); phases 7 and 8 run together (test file vs. render
 code and prose). Every phase leaves `npm test` and `cargo test --workspace` green on its own, so
 the gate holds on a tree with only the first phases landed. Contract check:
@@ -191,7 +241,7 @@ the declare door's existing approval, alias and provider checks are extended, no
 | step | argv | executor |
 |---|---|---|
 | declare `host-runtime` before the model shape changes (phase 2 step 1, in the phase-2 worktree) | fgos authority declare --kind component --row plans/261127-1247-component-authority-layerings/reports/host-runtime-row.json --approved-by q-o2r2zblera --dir <phase-2 worktree> | lead |
-| render the ownership views after each model change (phases 2, 3, 6, 8) | fgos authority render --dir <phase worktree> | lead |
+| render the ownership views after each model change (phases 2, 10, 3, 6, 8) | fgos authority render --dir <phase worktree> | lead |
 | full gate on the integrated tree (phase 9) | fgos release check --worktree <integration worktree> | lead |
 
 `fgos can-i` on 2026-11-28 answered `ask` for `authority declare` (no head row grants it), so
@@ -235,6 +285,16 @@ Decided by the planner inside the approved frame, not asked:
 - **`host-runtime` stack value.** Declared `tier: 3` (T3-event) because `observe` (T3) and
   `execution` (T5) depend on it (CAS-D21 note); phase 6 splits its routing part by path
   exception if the measure demands it.
+- **The enduser-docs spec text stays a spec.** CAS-D25 makes the authoring practice an ACE unit
+  only "if it is a rule". `knowledge-registry.md`'s enduser-docs-authoring section describes
+  behaviour (the `retrospective` status, the `fgos compound` producer), which is spec, so no ACE
+  unit is added (RUL104).
+- **Summaries in this plan, sentence rewrites in the backlog row.** Acceptance (18) asks for a
+  `summary` on every row, so phase 3 writes them. CAS-D26 (5)'s full-sentence rewrite of
+  `owns`/`mustNotOwn` and the owner's trial read of the two rendered pages belong to the
+  brief-card page, which backlog row p-xtgvunuvxy builds.
+- **Representative components are chosen, not declared.** The layering render shows the first two
+  or three live rows carrying a value, in model order; no new field (RUL104).
 - **`sameAs` pairs.** `orchestration-ring.surface` sameAs `stack.T9-surface`;
   `domain-scope.domain` sameAs `stack.T7-domain`; `hexagon.domain` distinctFrom all three
   (CAS-D15 (3)). Phase 4 checks there is no other shared word.
@@ -256,6 +316,10 @@ Decided by the planner inside the approved frame, not asked:
 - **No baseline proof here.** The planner's sandbox cannot load the native addon
   (`git-addon-not-shipped`), so `test/architecture.test.mjs` was not run on `base`; phase 2's
   first step records the baseline result.
+- **Phase 10 regenerates shared render surfaces** (`AGENTS.md`, `.fgos/instructions/effective/rules.json`,
+  `.agents/skills/`, `plugins/fgOS/skills/`) that other plans also regenerate. The lead reruns
+  `npm run build:skills` on the rebased branch right before land, so the generated bytes come
+  from the merged sources rather than being hand-merged.
 - **Rollback**: each phase is one branch; revert its merge commits in reverse wave order.
   Phase 2 is the only shape change; reverting it restores `layer`/`tier`/`source`. The
   `host-runtime` row is removed by reverting phase 2.

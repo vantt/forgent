@@ -19,4 +19,4 @@ The door ledger and the contract ledger are written by hand in the model. A door
 
 # Notes
 
-Related: the layering checks of plan `261127-1247-component-authority-layerings` (report-only first, CAS-D23).
+Related: the layering checks of plan `261127-1247-component-authority-layerings` (report-only first, the component-authority discussion (`ds-zfqskcns7j`)).

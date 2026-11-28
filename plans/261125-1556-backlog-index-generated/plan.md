@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The backlog index is generated from the row files and never committed: a row lands as one file, the land door renders plans/backlog.md locally, and the head write grant on the index is retired"
-status: draft
+status: withdrawn
 priority: P1
 blockedBy:
   - 261126-2324-changelog-fragments-and-skill-surface-regeneration

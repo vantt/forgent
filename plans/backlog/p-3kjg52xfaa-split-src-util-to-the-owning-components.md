@@ -1,6 +1,6 @@
 ---
 id: p-3kjg52xfaa
-title: "Split src/util/ to the components that own its files (component-authority, priority P2; source: ds-zfqskcns7j CAS-D19, owner via Miu, 2026-11-28)"
+title: "Split src/util/ to the components that own its files (component-authority, priority P2; source: ds-zfqskcns7j, owner via Miu, 2026-11-28)"
 status: proposed
 priority: P2
 area: component-authority
@@ -19,4 +19,4 @@ created: 2026-11-28
 
 # Notes
 
-Depends on step A (every file under `coverage.roots` has exactly one owner, CAS-D17).
+Depends on step A (every file under `coverage.roots` has exactly one owner, the component-authority discussion (`ds-zfqskcns7j`)).

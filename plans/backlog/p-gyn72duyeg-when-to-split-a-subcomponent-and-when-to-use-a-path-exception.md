@@ -9,7 +9,7 @@ created: 2026-11-28
 
 # Why
 
-The model has both subcomponents and path exceptions (CAS-D10), and nothing says which to use when. The choice is made case by case, so two similar cases end up modelled differently.
+The model has both subcomponents and path exceptions, and nothing says which to use when. The choice is made case by case, so two similar cases end up modelled differently.
 
 # Done when
 
@@ -19,4 +19,4 @@ The model has both subcomponents and path exceptions (CAS-D10), and nothing says
 
 # Notes
 
-Prior art: CAS-D10 and CAS-D22 in `ds-zfqskcns7j`.
+Prior art: the decisions on path exceptions and splitting in `ds-zfqskcns7j`.

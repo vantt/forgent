@@ -19,4 +19,4 @@ A component row carries a status (live, designed, planned, retired). Nothing com
 
 # Notes
 
-Related: CAS-D19 (status checked by code) in `ds-zfqskcns7j`.
+Related: the decision in `ds-zfqskcns7j` that a component's status is checked by code.
