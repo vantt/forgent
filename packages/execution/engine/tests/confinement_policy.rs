@@ -861,4 +861,39 @@ fn a_confined_launch_reads_the_owners_cargo_and_rustup_caches_read_only_and_runs
         }),
     );
     assert!(found.is_empty(), "{found:?}");
+
+    // Exactly one ort prebuilt lib directory under <home>/.cache/ort.pyke.io/dfbin/<triple>/<hash>: the cache is bound
+    // read-only on its own path and ORT_LIB_PATH names that lib directory, because ort-sys reads CARGO_NET_OFFLINE as
+    // "skip download" and never links the binary it already unpacked.
+    let fixture = Fixture::new(&json!({
+        "dirs": ["home/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/5c5f3a1f"],
+    }));
+    let ort_cache = format!("{}/home/.cache/ort.pyke.io", fixture.root);
+    let ort_lib = format!("{ort_cache}/dfbin/x86_64-unknown-linux-gnu/5c5f3a1f");
+    let found = toolchain(&fixture, json!({}));
+    assert_eq!(found.len(), 1, "{found:?}");
+    assert_eq!(found[0].identity, "toolchain-cache:ort");
+    assert_eq!(found[0].host_target.as_deref(), Some(&*ort_cache));
+    assert_eq!(
+        found[0].execution_target.path, ort_cache,
+        "the cache is bound on its own path"
+    );
+    assert!(found[0].delivery == "mount" && found[0].access == "read");
+    assert_eq!(env_of(&found[0]), json!({ "ORT_LIB_PATH": ort_lib }));
+
+    // Two lib directories, or no cache directory at all: no ort mount and no ORT_LIB_PATH.
+    let fixture = Fixture::new(&json!({
+        "dirs": [
+            "home/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/5c5f3a1f",
+            "home/.cache/ort.pyke.io/dfbin/aarch64-unknown-linux-gnu/9d2b7c04",
+        ],
+    }));
+    assert!(toolchain(&fixture, json!({})).is_empty());
+    let fixture = Fixture::new(&json!({ "dirs": ["home/.cargo"] }));
+    let found = toolchain(&fixture, json!({}));
+    assert_eq!(found.len(), 1, "{found:?}");
+    assert!(found.iter().all(|r| r.identity != "toolchain-cache:ort"));
+    assert!(found
+        .iter()
+        .all(|r| env_of(r).get("ORT_LIB_PATH").is_none()));
 }

@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "a7eaff9878fd38e52cb3c8431c5c20b8326d157e4ad70aa0d1228873af5289a2",
+  "payloadDigest": "28fc9a6fbcca25595afa5c44374deed675c6b42d83fb6a6688194ae95e7dd3ab",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -625,7 +625,7 @@
     "packages/execution/engine/src/confinement/policy/mod.rs": "e9bb22bd6da0ecd72aba56f710d7becac0d1d135e46478b28cef843354d6a62b",
     "packages/execution/engine/src/confinement/policy/paths.rs": "2f2a10ab1fc200ae7960068f79295489dbc031b8b621fb4b3aa125f50b938c93",
     "packages/execution/engine/src/confinement/policy/posture.rs": "6bb7ce55f27d88b10610c1e1d391e5b6dcec69df026b99653f3b5bb03be59612",
-    "packages/execution/engine/src/confinement/policy/resolver.rs": "0ef57cbb7c37366b1153cabe96229c38a8ceac0bd73aa0d9aaf44ea82c27d6bd",
+    "packages/execution/engine/src/confinement/policy/resolver.rs": "094413b230e8a442998b9e691c3e155d7b7e05508aed48f875cd9b4841e0a600",
     "packages/execution/engine/src/confinement/policy/roots.rs": "f55dcdc0609b077187affe7c4326b26127494484154cb8e2eacebeebe625d664",
     "packages/execution/engine/src/confinement/policy/shape.rs": "5302f8357deee2a4102518e8acc45f2de85b52d1b65d03e62004a7968684b4f8",
     "packages/execution/engine/src/confinement/policy/workspace_paths.rs": "6d229fe0b1ec7e416da5fd6c8cde8360fc1f4fef1c3c21b9a3a5e1998bc2e5a5",
@@ -704,7 +704,7 @@
     "packages/execution/engine/tests/assignment_runner.rs": "1e16af64092f365afdbf243b314cbf24be618e81c26b331b417649a003a9156d",
     "packages/execution/engine/tests/confinement_cleanup.rs": "f96c022169c95b360cfffbb00ba798043cec7211bb91f4a5ea0ea3f0d0113666",
     "packages/execution/engine/tests/confinement_driver.rs": "9e4b8023175bdc0ca1d0c0eed9a4defaded96dbb44c68849b76df36b3cb9b67c",
-    "packages/execution/engine/tests/confinement_policy.rs": "54b6dea6a489708910300495642225134bc6d64839f8a80887bb1eba5a3843c4",
+    "packages/execution/engine/tests/confinement_policy.rs": "9f8e6a919e0bcc4d78c74ae983411f7991abf074caa51c6ec1664be2b0dda730",
     "packages/execution/engine/tests/confinement_request.rs": "fccae18d8decb885a2a3ce22a3ab8943b6efc625da00673fbafe39b851bfd3dc",
     "packages/execution/engine/tests/contract.rs": "fc9d1086d9409390a24ed28915bd0edfea4d57baf98c99ed26c70405416b5c22",
     "packages/execution/engine/tests/credentials.rs": "f7b3aac1de387e2f467bffea2be66bfe1cd4540d8c0ab6b39d35f993df397ea3",
