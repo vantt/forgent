@@ -1,1 +1,0 @@
-- Changed: a shaper now works in its own worktree on branch `discussion/<dir>` instead of editing the main checkout, so the main checkout stays clean between rounds. It saves each round with the new `fgos session save <path>... --message <text>` (commits exactly the named files on its own branch) and lands the discussion branch once when settled or paused.

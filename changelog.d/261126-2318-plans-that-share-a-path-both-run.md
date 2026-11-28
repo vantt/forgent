@@ -1,1 +1,0 @@
-- Changed: plans whose footprints overlap are both admitted; the plan contract check and `fgos supervisor plans` report the overlap as a warning naming the other plan and the shared paths, and conflicts are met at land.

@@ -1,1 +1,0 @@
-- Fixed: the nearest-rule check of rule units finishes in seconds. Its search index now holds only the rule roots (`core/instructions/`, `components/*/instructions/`, `domains/*/instructions/`), not every Markdown file of the repository; before, the first build never finished inside the check's wait and every check refused with `rule-search-unavailable`. Needs pkm 0.7.1.
