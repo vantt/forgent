@@ -701,3 +701,31 @@ fn an_ended_head_raises_session_gone_and_head_gone_like_a_gone_one_unless_it_is_
         assert_eq!(rows(&head_gone).len(), raised, "{role} {state} head-gone");
     }
 }
+
+#[test]
+fn a_head_whose_supervisor_is_gone_raises_session_gone() {
+    // The session-gone definition matches supervisor-gone; head-gone is not asserted here.
+    let root = project(
+        "supervisor-gone-shaper",
+        &[
+            head_line("h0", "2026-11-18T09:00:00Z", "h1", "live", "head:shaper-x"),
+            head_line(
+                "h1",
+                "2026-11-18T11:00:00Z",
+                "h1",
+                "supervisor-gone",
+                "head:shaper-x",
+            ),
+        ],
+        true,
+    );
+    let env = environment(&[("watcher.sessionGoneLimit", 0.0)]);
+    let session_gone = answer(
+        &root,
+        "session-gone",
+        "2026-11-18T12:00:00Z",
+        Some("2026-11-18T10:00:00Z"),
+        &env,
+    );
+    assert_eq!(rows(&session_gone).len(), 1, "supervisor-gone session-gone");
+}
