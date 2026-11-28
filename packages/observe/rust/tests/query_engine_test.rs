@@ -230,6 +230,38 @@ fn since_and_until_take_absolute_dates_and_relative_offsets_from_the_clock() {
 }
 
 #[test]
+fn a_window_bound_snapped_to_the_hour_reads_only_whole_hours() {
+    let wake = |id: &str, ts: &str| {
+        format!(
+            r#"{{"v":2,"id":"{id}","kind":"fgos.supervisor.wake","ts":"{ts}","subject":{{"kind":"session","id":"sup-snap"}},"attrs":{{"fgos.supervisor.outcome":"failed"}},"basis":"observed","origin":{{"source":"fixture"}}}}"#
+        )
+    };
+    let lines = [
+        wake("s1", "2026-12-01T09:50:00Z"), // the hour before the window
+        wake("s2", "2026-12-01T10:05:00Z"), // the closed hour
+        wake("s3", "2026-12-01T10:55:00Z"), // the closed hour
+        wake("s4", "2026-12-01T11:10:00Z"), // the open hour
+    ];
+    let lines: Vec<&str> = lines.iter().map(String::as_str).collect();
+    let count = |window: &str| {
+        let q = query(&format!(
+            r#"{{"kind":["fgos.supervisor.wake"],{window},"agg":["count"]}}"#
+        ));
+        ask_with(&q, "2026-12-01T11:30:00Z", &[], &lines).map(|r| r.rows[0].count)
+    };
+    assert_eq!(count(r#""since":"-1h@hour","until":"@hour""#).unwrap(), 2);
+    // A plain -2h is not whole hours: it starts mid-hour and runs into the open hour.
+    assert_eq!(count(r#""since":"-2h""#).unwrap(), 4);
+    assert_eq!(count(r#""since":"@day","until":"@hour""#).unwrap(), 3);
+    for bad in [r#""since":"-1h@minute""#, r#""since":"2026-12-01@hour""#] {
+        assert!(
+            matches!(count(bad), Err(QueryError::Invalid { .. })),
+            "{bad}"
+        );
+    }
+}
+
+#[test]
 fn by_groups_and_every_aggregate_computes_over_the_group() {
     let q = query(
         r#"{"kind":["fgos.run.attempt"],"by":["gen_ai.provider.name"],

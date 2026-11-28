@@ -426,7 +426,19 @@ fn the_main_commits_source_sorts_each_trunk_commit_by_the_most_durable_kind_it_t
     );
     assert!(records.iter().all(|r| {
         let kind = attr(r, "fgos.main.commit.kind").unwrap();
-        r.measures[&format!("fgos.main.commit.{kind}")].as_u64() == Some(1)
+        let kinds = [
+            "code",
+            "plan-status",
+            "backlog",
+            "discussion",
+            "report",
+            "plan-note",
+        ];
+        r.measures.len() == 7
+            && r.measures.contains_key("fgos.main.commit.note")
+            && kinds.iter().all(|k| {
+                r.measures[&format!("fgos.main.commit.{k}")].as_u64() == Some(u64::from(*k == kind))
+            })
     }));
 
     let window = Window {

@@ -296,8 +296,8 @@ fn a_raised_definition_carries_its_row_template_and_a_pace_definition_carries_no
             .unwrap()
             .starts_with("fgos "));
         assert!(
-            file["query"]["until"].is_null()
-                && (file["window"] == "own" || file["query"]["since"].is_null()),
+            file["window"] == "own"
+                || (file["query"]["until"].is_null() && file["query"]["since"].is_null()),
             "{name}: the watcher owns the window unless the definition bounds itself"
         );
     }
@@ -481,7 +481,7 @@ fn a_main_commits_hour_over_the_rate_alone_raises_one_row_and_an_unset_threshold
 {
     // Thirteen code commits in one clock hour: a note share of 0, so only the rate branch holds.
     let lines: Vec<String> = (0..13)
-        .map(|i| main_commit_line(i, &format!("2026-11-18T10:{:02}:00Z", 5 + i), "code", 0))
+        .map(|i| main_commit_line(i, &format!("2026-11-18T11:{:02}:00Z", 5 + i), "code", 0))
         .collect();
     let root = project("main-commits-rate", &lines, true);
     let keys = [
@@ -495,7 +495,7 @@ fn a_main_commits_hour_over_the_rate_alone_raises_one_row_and_an_unset_threshold
             &root,
             "main-notes-outrun-code",
             "2026-11-18T12:00:00Z",
-            Some("2026-11-18T10:00:00Z"),
+            Some("2026-11-18T11:00:00Z"),
             &environment(config),
         )
     };
@@ -512,6 +512,27 @@ fn a_main_commits_hour_over_the_rate_alone_raises_one_row_and_an_unset_threshold
             "{unset}"
         );
     }
+
+    // A closed hour of two note commits is under the sample minimum and the rate: nothing raises.
+    let quiet: Vec<String> = (0..2)
+        .map(|i| {
+            main_commit_line(
+                i,
+                &format!("2026-11-18T11:{:02}:00Z", 5 + i),
+                "plan-note",
+                1,
+            )
+        })
+        .collect();
+    let root = project("main-commits-all-notes", &quiet, true);
+    let got = answer(
+        &root,
+        "main-notes-outrun-code",
+        "2026-11-18T12:00:00Z",
+        Some("2026-11-18T11:00:00Z"),
+        &environment(&config(12.0)),
+    );
+    assert!(rows(&got).is_empty(), "two notes: {got}");
 }
 
 // This projection has no historical fixture pair: its absence watermark and open-work inputs

@@ -5,7 +5,8 @@ use super::aggregate::{
 };
 use super::error::{invalid, QueryError};
 use super::model::{
-    Agg, Anchor, Cond, Factor, Filter, Having, LatestPer, Op, Operand, Query, WindowOn, Within,
+    Agg, Anchor, Bucket, Cond, Factor, Filter, Having, LatestPer, Op, Operand, Query, WindowOn,
+    Within,
 };
 use super::result::{AggValue, Coverage, QueryResult, ResultRow};
 use super::time::{
@@ -17,6 +18,38 @@ use crate::record::registry::Registry;
 use crate::record::types::Record;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::Path;
+
+/// A window bound: an instant as `parse_instant` reads it, optionally floored to a clock unit by an `@hour`, `@day`
+/// or `@week` suffix (`-1h@hour` is the start of the previous hour, `@hour` the start of the current one).
+fn parse_bound(value: &str, now: i64) -> Result<i64, QueryError> {
+    let Some((base, unit)) = value.split_once('@') else {
+        return parse_instant(value, now);
+    };
+    let bucket = match unit {
+        "hour" => Bucket::Hour,
+        "day" => Bucket::Day,
+        "week" => Bucket::Week,
+        _ => {
+            return Err(invalid(
+                "time",
+                value,
+                "a snap unit after '@' is hour, day or week",
+            ))
+        }
+    };
+    let at = if base.is_empty() {
+        now
+    } else if base.starts_with('-') {
+        parse_instant(base, now)?
+    } else {
+        return Err(invalid(
+            "time",
+            value,
+            "'@' snaps a relative bound such as -1h@hour, or now as @hour, not an absolute stamp",
+        ));
+    };
+    Ok(bucket_start(at, bucket))
+}
 
 /// Everything a query reads besides the query itself. The clock is an input, so a result never depends on when it
 /// runs.
@@ -341,12 +374,12 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
     let since = query
         .since
         .as_deref()
-        .map(|s| parse_instant(s, ctx.now_millis))
+        .map(|s| parse_bound(s, ctx.now_millis))
         .transpose()?;
     let until = query
         .until
         .as_deref()
-        .map(|s| parse_instant(s, ctx.now_millis))
+        .map(|s| parse_bound(s, ctx.now_millis))
         .transpose()?;
     if matches!((since, until), (Some(a), Some(b)) if a > b) {
         return Err(invalid(
