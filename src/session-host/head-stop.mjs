@@ -67,13 +67,14 @@ function defaultSupervisorAlive(runDir) {
 }
 
 /**
- * Settles the attempt of a head whose run supervisor is gone, through the existing adopt door (`run-supervisor`'s
- * `sweep-attempts`, which publishes `closed.json` for it). `runDir` is `<fgos>/assignments/<id>/runs/<NN>`, so the
- * assignments root adopt scans is three levels up.
+ * Ends the attempt of a head whose run supervisor is gone: the run supervisor's `end-dead-attempt` op stops the one
+ * systemd scope the attempt's binding names, waits for the domain to empty, and adopts the run dir (`closed.json`).
+ * `runDir` is `<fgos>/assignments/<id>/runs/<NN>`. A refusal (`{ refused: { code, message } }`) is returned as it is: the
+ * attempt was not ended.
  */
-async function defaultAdopt(runDir, projectRoot) {
+async function defaultEndAttempt(runDir, projectRoot) {
   const { executionOp } = await import('../native/execution-door.mjs');
-  await executionOp('sweep-attempts', { assignmentsRoot: path.resolve(runDir, '..', '..', '..') }, { cwd: projectRoot });
+  return executionOp('end-dead-attempt', { runDir: path.resolve(runDir) }, { cwd: projectRoot });
 }
 
 /**
@@ -87,8 +88,10 @@ async function defaultAdopt(runDir, projectRoot) {
  * that will not close (`retire-refused`) is reported with the stamp kept.
  *
  * A supervisor judged gone can neither answer a stop request nor close the attempt, so that head is never asked to stop:
- * its attempt is settled through the existing adopt door (`sweep-attempts` over its assignments root, which publishes
- * `closed.json`) and its pane retired, and the stamp stays. The next generation starts through `fgos session start`.
+ * its attempt is ended through the run supervisor's `end-dead-attempt` op (the attempt's own systemd scope is stopped, the
+ * empty domain adopted and `closed.json` published) and its pane retired, and the stamp stays. An attempt whose domain is
+ * not a scope of its own, or that cannot be ended, is refused by name (`stop-not-ended`) with the stamp kept. The next
+ * generation starts through `fgos session start`.
  *
  * A short role is resolved through Identity to its live session, and its lineage (run directory, pane and `retiredAt`
  * stamp) is the head its record names (`ids.head`), ended exactly as a head is. A lead whose record names no lineage with
@@ -98,9 +101,9 @@ async function defaultAdopt(runDir, projectRoot) {
  * `ports` (for a test): `host` (Session Host client: `retireAsync(placement, 'close', { groupKey })`),
  * `identity({ role, projectRoot }) -> { live, record? }`, `now() -> Date`, `groupKeyOf(record) -> string`,
  * `end(runDir) -> boolean` (asks the head's supervisor to stop it), `closed(runDir) -> boolean`, `sleep(ms)`, `waitMs`,
- * `supervisorAlive(runDir) -> boolean` (the attempt's supervisor is not proven dead), `adopt(runDir) -> void` (settles the
- * attempt of a gone supervisor), `config(projectRoot)` (sessionRotation config) and `writeHandoff(args)` (the existing
- * handoff writer).
+ * `supervisorAlive(runDir) -> boolean` (the attempt's supervisor is not proven dead), `endAttempt(runDir) -> { ended } |
+ * { refused }` (ends the attempt of a gone supervisor), `config(projectRoot)` (sessionRotation config) and
+ * `writeHandoff(args)` (the existing handoff writer).
  * A sleep requires wakeAt, stamps its wake/plan/phase/context/CLI binding in that same first write, and writes its
  * handoff before asking for the stop. A handoff failure restores the placement and ends nothing.
  */
@@ -173,8 +176,12 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
         while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
         if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
       } else {
-        await (ports.adopt ?? ((runDir) => defaultAdopt(runDir, projectRoot)))(record.runDir);
+        // From here the head's attempt may end at any moment, so a refusal leaves the stamp in place.
         requested = true;
+        const ended = await (ports.endAttempt ?? ((runDir) => defaultEndAttempt(runDir, projectRoot)))(record.runDir);
+        if (ended?.refused) {
+          throw new HeadStopError('stop-not-ended', `${role} could not be ended: ${ended.refused.code} (${ended.refused.message})`);
+        }
       }
     }
     const host = ports.host ?? createSessionHost();
