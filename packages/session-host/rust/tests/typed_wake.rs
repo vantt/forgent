@@ -152,14 +152,14 @@ fn empty_composer(cli: &str) -> &'static str {
         "codex" => "›\n\n  gpt-5 · ~/project",
         "agy" => "──────\n\n──────",
         "pi" => "──────────\n\n──────────\n~/project  0.0%/200k",
+        "omp" => " π > ◑ model > ▶─2%─\n╰─                                    ⇧⇥ to change thinking effort",
         other => panic!("no empty composer frame for {other}"),
     }
 }
 
 #[test]
 fn each_cli_gets_raw_text_then_its_enter_gap_then_a_separate_enter() {
-    // omp joins when its profile is re-proven.
-    for cli in ["claude", "codex", "agy", "pi"] {
+    for cli in ["claude", "codex", "agy", "pi", "omp"] {
         let protocol = adapter_for(cli).unwrap();
         let pane = Fake::new(vec![(PaneState::Live, "idle", empty_composer(cli))]).after((
             PaneState::Live,

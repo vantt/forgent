@@ -17,7 +17,8 @@ use std::{cell::RefCell, os::unix::fs::PermissionsExt};
 
 struct Attempt {
     seen: RefCell<Vec<NudgeChannel>>,
-    refusal: Option<&'static str>,
+    queue_refusal: Option<&'static str>,
+    typed_refusal: Option<&'static str>,
 }
 impl Nudge for Attempt {
     fn nudge(
@@ -27,22 +28,28 @@ impl Nudge for Attempt {
         _: &Record,
     ) -> Result<(), String> {
         self.seen.borrow_mut().push(channel);
-        self.refusal.map_or(Ok(()), |why| Err(why.into()))
+        let refusal = match channel {
+            NudgeChannel::Typed => self.typed_refusal,
+            _ => self.queue_refusal,
+        };
+        refusal.map_or(Ok(()), |why| Err(why.into()))
     }
 }
 
 #[test]
 fn typed_versions_are_separate_from_push_versions_and_never_enable_deferred_hooks() {
     let tested = TestedClis::embedded();
-    for (cli, version) in [
-        ("claude", "2.1.332"),
-        ("codex", "0.163.0"),
-        ("agy", "1.4.2"),
+    for (cli, version, channels) in [
+        ("claude", "2.1.332", vec![NudgeChannel::Typed]),
+        // codex 0.166.0 is also measured for the queue push, which goes first.
+        (
+            "codex",
+            "0.166.0",
+            vec![NudgeChannel::CodexQueue, NudgeChannel::Typed],
+        ),
+        ("agy", "1.5.18", vec![NudgeChannel::Typed]),
     ] {
-        assert_eq!(
-            tested.nudge_channels_for(cli, version),
-            vec![NudgeChannel::Typed]
-        );
+        assert_eq!(tested.nudge_channels_for(cli, version), channels, "{cli}");
         assert!(tested.nudge_channels_for(cli, "9.9.9").is_empty());
     }
     // Existing push-channel proofs own their versions; this checks order when both are allowed.
@@ -60,20 +67,33 @@ fn typed_versions_are_separate_from_push_versions_and_never_enable_deferred_hook
 
 #[test]
 fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unread() {
-    for (version, refusal, expected_channel, expected_path) in [
+    for (version, untested, queue_refusal, typed_refusal, expected_seen, expected_path) in [
         (
             "0.162.1",
+            true,
             None,
-            Some(NudgeChannel::CodexQueue),
+            None,
+            vec![NudgeChannel::CodexQueue],
             "local-pushed",
         ),
-        ("0.163.0", None, Some(NudgeChannel::Typed), "local-typed"),
         (
-            "0.163.0",
+            "0.166.0",
+            true,
+            Some("queue-down"),
+            None,
+            vec![NudgeChannel::CodexQueue, NudgeChannel::Typed],
+            "local-typed",
+        ),
+        (
+            "0.166.0",
+            true,
+            Some("queue-down"),
             Some("composer-not-empty"),
-            Some(NudgeChannel::Typed),
+            vec![NudgeChannel::CodexQueue, NudgeChannel::Typed],
             "local-next-tool-call",
         ),
+        // A version neither channel was measured on: nothing is attempted.
+        ("0.163.0", true, None, None, vec![], "local-next-tool-call"),
     ] {
         let fgos = TempFgos::new("typed-send");
         let record = fgos.record();
@@ -109,7 +129,8 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
         };
         let attempt = Attempt {
             seen: RefCell::new(vec![]),
-            refusal,
+            queue_refusal,
+            typed_refusal,
         };
         let request = |body| {
             let mut req = send_req("sender", &name, body);
@@ -128,21 +149,21 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
         );
         assert!(sent.recorded);
         assert_eq!(sent.path, Some(expected_path));
-        assert_eq!(
-            attempt.seen.borrow().as_slice(),
-            &[expected_channel.unwrap()]
-        );
-        if let Some(cause) = refusal {
+        assert_eq!(attempt.seen.borrow().as_slice(), expected_seen.as_slice());
+        if let Some(cause) = typed_refusal {
             assert!(sent
                 .text
                 .contains(&format!("could not be nudged ({cause})")));
         }
-        if expected_path == "local-typed" {
-            // A typed-wake recording does not prove the hook at this version.
-            assert!(!TestedClis::embedded().lists_version("codex", version));
-            assert!(sent.text.contains(&format!(
+        // A version no recording covers is reported as untested, whatever channel it has.
+        assert_eq!(
+            sent.text.contains(&format!(
                 "Its CLI version {version} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified."
-            )));
+            )),
+            untested,
+            "untested-version notice for {version}"
+        );
+        if expected_path == "local-typed" {
             let second = send(
                 &record,
                 request("second message"),
@@ -155,7 +176,7 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
             assert!(second
                 .text
                 .contains("An earlier nudge to it is still unread"));
-            assert_eq!(attempt.seen.borrow().len(), 1);
+            assert_eq!(attempt.seen.borrow().len(), expected_seen.len());
         }
     }
 }

@@ -794,12 +794,13 @@
     {
       "name": "composer-state-empty-ready",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
+      "source": "real idle screen recorded at agy 1.5.18 with `fgos session read`; the account line is replaced by a placeholder",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "ready"
+            "file": "idle-empty-1.5.18"
           }
         ]
       },
@@ -810,12 +811,13 @@
     {
       "name": "composer-state-half-typed",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
+      "source": "real half-typed screen recorded at agy 1.5.18 with `fgos session read`; the account line is replaced by a placeholder",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "half-typed"
+            "file": "half-typed-1.5.18"
           }
         ]
       },
@@ -824,9 +826,26 @@
       }
     },
     {
+      "name": "composer-state-quota-reached-idle",
+      "step": "composer-state",
+      "version": "1.5.18",
+      "source": "real screen recorded at agy 1.5.18 after a prompt was refused with `Individual quota reached`: no turn ran, the composer below the error is empty; account line and error id are replaced by placeholders",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "quota-reached-idle-1.5.18"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
       "name": "composer-state-blank-first-line-draft",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
       "source": "synthesized: short multiline draft below a blank prompt, between composer separators",
       "script": {
         "frames": [
@@ -848,12 +867,13 @@
     {
       "name": "composer-state-draft-in-composer",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
+      "source": "real screen recorded at 1.4.2 with the banner line rewritten to 1.5.18 (no 1.5.18 frame was captured)",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "draft-in-composer"
+            "file": "draft-in-composer-banner-updated"
           }
         ]
       },
@@ -864,12 +884,13 @@
     {
       "name": "composer-state-start-banner",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
+      "source": "synthesized: the real start-banner screen recorded at 1.4.2 with the banner line rewritten to 1.5.18 (no 1.5.18 start frame was captured); unknown comes from the start-banner rule, not a version mismatch",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "start-banner"
+            "file": "start-banner-banner-updated"
           }
         ]
       },
@@ -880,7 +901,7 @@
     {
       "name": "composer-state-dialog-blocked",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
       "script": {
         "frames": [
           {
@@ -896,7 +917,7 @@
     {
       "name": "composer-state-busy-working",
       "step": "composer-state",
-      "version": "1.4.2",
+      "version": "1.5.18",
       "script": {
         "frames": [
           {

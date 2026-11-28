@@ -677,6 +677,159 @@
       },
       "message": "Read the brief file and do the task.",
       "source": "the typed path takes 7 to 25 s for a 4 KB brief and can lose its final Enter; the prompt door does not"
+    },
+    {
+      "name": "composer-state-empty-idle-with-hint-only",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real idle screen recorded at omp 18.11.2 with `fgos session read`: the composer line holds only the right-aligned thinking-effort hint",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "idle-empty-18.11.2"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-empty-after-the-reply",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real screen recorded at omp 18.11.2 just after a reply (`ok`) finished: an idle turn-finished frame with an empty composer",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "turn-finished-empty-18.11.2"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "empty"
+      }
+    },
+    {
+      "name": "composer-state-half-typed-with-autocomplete-suggestion",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real half-typed screen recorded at omp 18.11.2 with `fgos session read`; the composer text includes an autocomplete suggestion",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "half-typed-18.11.2"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-draft-before-the-right-aligned-hint",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: a draft on the composer line with the hint set off by a long run of spaces",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": " π > ◑ model > (sub) ▶─2%─\n╰─ fix the broken test                                       ⇧⇥ to change thinking effort\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-mark-higher-in-the-transcript-is-unknown",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: a `╰─` line in the agent's output that is not at the bottom of the screen; no composer is on screen",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "╰─ branch tree\n\nthe agent explains how the tree is drawn\nand keeps writing about it\nover several lines of transcript\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-busy-working-frame-is-unknown",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real working screen recorded 2026-10-18 from omp on herdr; the busy status line leads with a spinner glyph, not π",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-paste-chip-in-composer-is-not-empty",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real composer with its attachment chip recorded from omp on herdr",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "chip-in-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-spinner-led-status-line-is-unknown",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: a busy status line led by a spinner glyph above an empty composer line; no working footer, so the predicate itself decides",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": " ⠦ 2s > ◑ model > (sub) ▶─2%─\n╰─\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-text-after-a-wide-gap-is-not-empty",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: the composer line holds a draft after a long run of spaces; a wide gap alone is not a hint",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": " π > ◑ model > (sub) ▶─2%─\n╰─                                                            foo\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
     }
   ]
 }
