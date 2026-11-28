@@ -1,0 +1,104 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:31:09.504Z",
+  "data_hash": "151f0840cc6af876c1b15d752ee1dccab9a17d3e6d1ddb651162753564c91e00",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/explanation/runtime-claim-doing-separation.md",
+            "title": "runtime-claim-doing-separation",
+            "section": [
+              "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
+              "Acceptance bar this item held itself to"
+            ],
+            "excerpt": "...\nAfter `pick`/`take`, `git status .fgos/events` shows no change; the UI\nstill shows claimed/ru",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+            "title": "claim-a-clarify-or-decompose-stage-item",
+            "section": [
+              "How to claim an item that is still at stage `clarify` or `decompose`",
+              "Re-claiming after the claim is released at the `executing` boundary"
+            ],
+            "excerpt": "...\nA claim held through `clarify`/`decompose` is released back to `todo` the\nmoment the item reaches",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+            "title": "why-clarify-split-into-clarify-discovery-and-exploring",
+            "section": [
+              "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+              "Implementation (`tsk-30v`): the edge choice itself finally reads the verdict, not just the stage"
+            ],
+            "excerpt": "...into the\n> Socratic collab instead of looping back through discovery.\n\nSc",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+            "title": "herdr-fgos-dashboard-three-piece-build",
+            "section": [
+              "Why the herdr fgOS dashboard shipped as three sequential children, and what surfaced along the way",
+              "The event-log race this build ran into"
+            ],
+            "excerpt": "...build is one more real data point for it, not a new report.\n3. Because a branch-source claim alwa",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/explanation/settleclaim-revision-drift-self-caused.md",
+            "title": "settleclaim-revision-drift-self-caused",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+            "title": "fgos-lifecycle-tracking-concurrent-desync",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 6
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

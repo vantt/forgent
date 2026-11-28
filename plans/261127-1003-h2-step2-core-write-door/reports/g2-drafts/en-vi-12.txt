@@ -1,0 +1,1 @@
+On Linux, process containment uses a bwrap pid namespace only when bwrap is found and a real probe command in a user plus pid namespace succeeds. Otherwise it falls back to the process-group driver and records why, for example bwrap-not-found or a refused mount. The probe result is cached once per process for each bwrap path.

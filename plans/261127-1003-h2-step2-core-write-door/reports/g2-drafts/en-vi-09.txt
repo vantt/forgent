@@ -1,0 +1,1 @@
+On land, `mergedTreeAlreadyVerified` skips rerunning the checks only when the branch tip still equals the SHA that passed at return and main has not touched any path the branch introduced since the fork point. Anything less provable reruns the checks, because a false skip would put an unverified tree on main.

@@ -1,0 +1,226 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:33:03.353Z",
+  "data_hash": "63820d895ac76ea675ef62e5f4e074e86eddf5c5469469a46f8eb6856bbc409f",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ],
+            "excerpt": "... or the CLI default is deleted. When several `prefer` families exist, or in a walk, a family with no cell is skipped and recorded in `provenance.skipped`, and the refusal names the last skipped cell",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/config/spec.md",
+            "title": "spec",
+            "section": [
+              "Config Component Specification",
+              "9. Secrets and file safety"
+            ],
+            "excerpt": "...they name a login store, so `show` prints the account names and pools, never what a login store holds. On Windows file modes do not restrict readers; the equivalent protection i",
+            "axes": {
+              "area": "config",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/runner/contracts/executor-model.md",
+            "title": "executor-model",
+            "section": [
+              "Executor Model Contract — Execution",
+              "3. Derived facts"
+            ],
+            "excerpt": "...<provider>.accounts` is retired, and a config that still lists accounts there is refused by name (`config-key-retired`, at `check_runner_config`); an empty `accounts` list is a lefto",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "title": "h-36d872fbb0e5",
+            "section": [
+              "Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the next candidate"
+            ],
+            "excerpt": "Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) > Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) > 0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the ne",
+            "axes": {
+              "area": "runner",
+              "question": "choice"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.7. Every row and its registered fix"
+            ],
+            "excerpt": "...pool) is declared in runner.llmAccounts, since a pool with no account is skipped by the walk; warns otherwise | none reg",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+            "title": "P00.2",
+            "section": [
+              "Cell P00.2 — Truthful provider/tier/executor resolution (Phase 00 R5-R8)",
+              "Review"
+            ],
+            "excerpt": "... literal text), or (b) keep the exemption but restrict its effect to\nskipping *only* the throw, not the provider-family derivation — i.e. still\ncompute `re",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+            "title": "P00.3",
+            "section": [
+              "Cell P00.3 — CLI override, fallback posture, live two-executor proof (Phase 00 R9-R11)",
+              "Red-Team",
+              "MEDIUM — a third, previously-unflagged `deriveProviderFamily`-family bug, live-reproduced in the glm-cli proof log's own quoted evidence"
+            ],
+            "excerpt": "...",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Data Dictionary",
+              "Data Dictionary"
+            ],
+            "excerpt": "...capacity theo account. Inventory là machine-local secret-bearing config, không phải project policy; state/lease/quarantine là runtime-local evidence. | Inventory chỉ đọc từ `~/.fgos/config.json`:",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "title": "setup-doctor-registry",
+            "section": [
+              "Contract: Setup Doctor Registry",
+              "3. Doctor Contract"
+            ],
+            "excerpt": "...an incident. `--fix --only <fix-id>` (repeatable) runs just the named fixes and then judges only the rows the named fixes repair (each fix's `repairs`, group-expanded; for a hook fix t",
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md",
+            "title": "I03",
+            "section": [
+              "I03 — RunResult v2 And Attribution",
+              "Coordination sessions"
+            ],
+            "excerpt": "...he accompanying regression test does not prove it. |\n\n**Structural findings for a future Lead (new):**\n1. Same as I01: a fix-round-only session (no new first pass) never auto-clo",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 3
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "config",
+            "home": "docs/platform/config/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "packaging-distribution",
+            "home": "docs/platform/packaging-distribution/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 2
+          },
+          {
+            "axis": "question",
+            "value": "choice",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

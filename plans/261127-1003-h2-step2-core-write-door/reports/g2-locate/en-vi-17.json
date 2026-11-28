@@ -1,0 +1,219 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:33:35.231Z",
+  "data_hash": "14a04b520e5aa53d173138f543dd504349295e386bdf87d3d188c65c89c5393e",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+            "title": "multi-domain-status-category-schema",
+            "section": [
+              "Why status splits into status + statusCategory only for the front segment of the lifecycle",
+              "`domainFields` (D6) landed as a thin, narrowly-verified addition"
+            ],
+            "excerpt": "...nothing in the coding domain reads or writes\n`domainFields` yet. Landed `awaiti",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/observe/spec.md",
+            "title": "spec",
+            "section": [
+              "Observe Component Specification",
+              "5. Mục theo làn (Sub-spec sections)",
+              "§ Record contract v2 (đo vận hành)"
+            ],
+            "excerpt": "...Without `--apply` it is a dry run that lists what would go; `--apply` rewrites the shard under the observe lock and answers a lock",
+            "axes": {
+              "area": "observe",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+            "title": "why-the-merge-target-ref-slot-disabled-lock-self-recognition",
+            "section": [
+              "Why the merge target-ref slot disabled lock self-recognition",
+              "A third round reopens the target-slot's release/renew path (fable audit, `tsk-18k`)"
+            ],
+            "excerpt": "...\nA code-review audit (`tsk-25r`, `plans/reports/worktree-merge-audit-260814-1809-fable-hid",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+            "title": "decision-record",
+            "section": [
+              "Why the \"Locked decisions\" heading contract fails open, not closed",
+              "Why the obvious \"loosen the regex\" fix was rejected"
+            ],
+            "excerpt": "... writes with a Vietnamese heading.\n- **Measurement 2 — what do the real heading variants actually look\n  like?** At",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+            "title": "node-to-rust-migration",
+            "section": [
+              "Architecture: Node To Rust Migration"
+            ],
+            "excerpt": "...when: Preserve the selected Node-to-Rust migration sequence and constraints\nDo not use this for: Authority beyond the declared scope or implementation truth without the cited verification\nSupersedes:",
+            "axes": {
+              "area": "host-invocation-routing",
+              "question": "rationale"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+            "title": "worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher",
+            "section": [
+              "Worker slot is the engine-owned occupancy unit across every launcher",
+              "The herdr-plugin adapter: reuse by polling the engine, never a pane label"
+            ],
+            "excerpt": "...— real `work.decision` capture, id `tsk-1zq`\n\nA binary left/right-by-x rule cannot address f",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "title": "setup-doctor-registry",
+            "section": [
+              "Contract: Setup Doctor Registry"
+            ],
+            "excerpt": "...The topic stated by this document, subject to the unchanged switchboard route and independent review\nUse this when: Reading this area topic and its retained design details\nDo not use this for: Claiming a t",
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+            "title": "produce-failing-test-first-proof-for-an-iron-law-gated-diff",
+            "section": [
+              "Produce failing-test-first proof for an Iron Law-gated diff",
+              "Watch out for: a guard test scoped by `git ls-files` silently skips its own uncommitted files"
+            ],
+            "excerpt": "...the item\nitself had just created were still uncommitted: the new decision record",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/holder-lock/spec.md",
+            "title": "spec",
+            "section": [
+              "Holder-lock Component Specification",
+              "19. Known limits",
+              "Stranded custody record: manual recovery until Git phase 03"
+            ],
+            "excerpt": "...\nThe dispatch-cwd key includes the real cwd's device, inode and nanosecond birth time, so deleting a worktree does not t",
+            "axes": {
+              "area": "holder-lock",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/questions/spec.md",
+            "title": "spec",
+            "section": [
+              "Questions Component Specification",
+              "8. Hook"
+            ],
+            "excerpt": "...after one notice later stops pass.\n- \"This session\" means the session id or the same `head:` role. The session writes the answer back to the origin, then\n  runs `ack`. Doctor rows `*-hook-wired",
+            "axes": {
+              "area": "questions",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 5
+          },
+          {
+            "axis": "area",
+            "value": "holder-lock",
+            "home": "docs/platform/holder-lock/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "host-invocation-routing",
+            "home": "docs/platform/host-invocation-routing/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "observe",
+            "home": "docs/platform/observe/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "packaging-distribution",
+            "home": "docs/platform/packaging-distribution/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "questions",
+            "home": "docs/platform/questions/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "rationale",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

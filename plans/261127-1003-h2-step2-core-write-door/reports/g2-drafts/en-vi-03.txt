@@ -1,0 +1,1 @@
+Every work event appended to the event store is stamped with the precondition its writer saw: whether the item exists, and for status moves only, the status it must still hold. That way a concurrent status change rejects a stale move but never drops an edit, step change or attempt record on the same item.

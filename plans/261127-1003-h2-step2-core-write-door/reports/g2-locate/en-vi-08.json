@@ -1,0 +1,110 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:31:30.336Z",
+  "data_hash": "0324661eee834648d2ce2cdfb1e22e19d49bd908fb2b696f767e9ad46413828b",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+            "title": "discover-loop-pool-ordering-and-stop-rules",
+            "section": [
+              "Why discover-loop's pool ordering and stop rules diverge from merge-loop's",
+              "Two different sort orders for the two sub-pools"
+            ],
+            "excerpt": "...clarify pool sorts by **`blocks`**\n  (how many other open items this one blocks — from `rankImpact`, defined\n  a",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+            "title": "why-clarify-split-into-clarify-discovery-and-exploring",
+            "section": [
+              "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+              "Implementation (`tsk-5mj`, P5 of this design): the runner dispatches `discovery` the same way it already dispatches `executing`"
+            ],
+            "excerpt": "...\nThe final piece wired `fgos-runner` to ac",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+            "title": "title-semantic-contract-lives-in-submitting-skills",
+            "section": [
+              "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
+              "The `description` gap this contract's own migration deliberately avoided walking into"
+            ],
+            "excerpt": "... add` with no\n`--description` fl",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
+            "title": "P01.2",
+            "section": [
+              "Cell P01.2 — Plan-Verdict Derivation And Planning Sweep Wiring",
+              "Red-Team",
+              "Final Pass (Post Findings 1-3 Fix)"
+            ],
+            "excerpt": "...both `tsk-qod` (its own \"## Decide the split\" at\nline 321: \"No split. This is one coherent piece...\") and `tsk-2yo` (its own\n\"",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/explanation/discovered-work-risk-kind-vocabulary-coercion.md",
+            "title": "discovered-work-risk-kind-vocabulary-coercion",
+            "section": [
+              "A real discovered-work item silently vanished from an out-of-vocabulary `risk` value",
+              "What shipped — both suggested fix directions, together"
+            ],
+            "excerpt": "...\n1. **Prompt templates corrected** (`worker-prompt-default.txt`,\n   `worker-prompt-discovery.tx",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

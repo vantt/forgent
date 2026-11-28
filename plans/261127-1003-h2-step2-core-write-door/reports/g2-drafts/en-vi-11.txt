@@ -1,0 +1,1 @@
+Old confinement flags like privateHome, isolatedSession and ownWorktree are normalized into the single v1 confinement policy. Controls nobody set default to allow host writes, reads and network, host process and home, and shared session and workspace. A private home always adds a read-write private-home grant scoped to the dispatch.

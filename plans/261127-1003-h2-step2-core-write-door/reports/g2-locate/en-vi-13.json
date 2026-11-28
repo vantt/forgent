@@ -1,0 +1,231 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:32:20.464Z",
+  "data_hash": "e53a8bec8abaac0621a765999d071e0c8d74b83921be61540ec507a7f43f9fda",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ],
+            "excerpt": "... binds unpinned and `provenance.account.skipped` names why (`account-pin-other-pool`, `account-pin-no-inventory`, `account-pin-unsupported`); an unknown account of the seat's own pool refuses `accou",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/runner/contracts/unit-run-result.md",
+            "title": "unit-run-result",
+            "section": [
+              "Unit Run Result Contract — Execution to Workflow",
+              "4. Attempt shape fields (RunResult version 3, optional fields)",
+              "Output"
+            ],
+            "excerpt": "...\n`output.report.path` is an absolute path chosen by Execution. A caller reads that path and never infers the run d",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+            "title": "compare-discussion-setups-with-metrics-eval",
+            "section": [
+              "Compare discussion setups with metrics eval",
+              "2. Blind the judge; distinguish data blindness from isolation"
+            ],
+            "excerpt": "... one output's\ncontent. Record the normalization policy outside the scratch directory.\n\nCheck the workspace once before the judge",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/runner/contracts/executor-model.md",
+            "title": "executor-model",
+            "section": [
+              "Executor Model Contract — Execution",
+              "6. The bind",
+              "6.4 The walk, `explain` and the config digest"
+            ],
+            "excerpt": "...one answer is cached per ask and\ndigest for the life of the process.\n\n### 6.5 Pre-admission facts\n\nTwo facts are read before a run is admit",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+            "title": "P01.2",
+            "section": [
+              "Cell P01.2 — Session engine, dynamic consult, resume, live proof (Phase 01 R5-R8)",
+              "Fix Evidence",
+              "Verification run (post-fix)"
+            ],
+            "excerpt": "... not 15 and not the originally-claimed 18).\n\n```\nnode src/runner/dispatch.mjs decide --for smoke --needs-soul",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "2. Order of operations for a new project"
+            ],
+            "excerpt": "...a missing or mismatching entry stops the init before anything\n   is staged. A URL given to `--from`/`FGCTL_FROM` must have a `SHA256SUMS` nex",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md",
+            "title": "P03.1",
+            "section": [
+              "Cell P03.1 — R1+R2: Domain Harness Seam And The Non-Driving Rule",
+              "Red-Team",
+              "Confirmed sound (no finding)"
+            ],
+            "excerpt": "...LAN'` (case) against a real planning-stage Work\n  — all three rejected by the harness's strict `stageOps.find((o) => o.id\n  === co",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/config/spec.md",
+            "title": "spec",
+            "section": [
+              "Config Component Specification",
+              "3. Files, scope and precedence"
+            ],
+            "excerpt": "...is refused with the same error.\n3. A schema path can name every entry of a map (`additionalProperties`, section 4), so a rule such as \"`runner.providers.<name>.accounts` is",
+            "axes": {
+              "area": "config",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.1.md",
+            "title": "P06.1",
+            "section": [
+              "Cell P06.1 — Recovery, quorum, retry/replacement, cancellation (Phase 06 R1-R4)",
+              "Review history (full rigor — this class of work matches P01.1's own"
+            ],
+            "excerpt": "...g \"never double-counts\"/\n\"resume-safe\" with no caveat, directly contradicted by the rep",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P02.1.md",
+            "title": "P02.1",
+            "section": [
+              "Cell P02.1 — Capability-Fit And Hard/Soft Placement Audit",
+              "Table 2 — Hard/soft placement, owner, rationale"
+            ],
+            "excerpt": "... **existing-hard-primitive, working as designed** | `session-engine.mjs`'s `grantedContextRefs` gate | This IS \"an invalid action",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 3
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "config",
+            "home": "docs/platform/config/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 4
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 2
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 2
+          }
+        ],
+        "mentions": [
+          {
+            "term": "account-pin-invalid",
+            "total": 1,
+            "truncated": false,
+            "sections": [
+              {
+                "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+                "section": [
+                  "Runner Business Rules",
+                  "Business Rules"
+                ],
+                "line": 190,
+                "missedBySearch": false
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "group": null
+  }
+}

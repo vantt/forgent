@@ -1,0 +1,1 @@
+Closing a workflow case is refused while a closure milestone is stale or a consent gate is still parked. After a successful close, each worktree binding whose attempt is quiet is released, and the busy ones are kept and named in the result instead of being torn down.

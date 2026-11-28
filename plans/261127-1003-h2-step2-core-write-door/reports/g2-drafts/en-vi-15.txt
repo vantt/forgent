@@ -1,0 +1,1 @@
+Accounts in a pool are leased sticky first, then those whose credential probe passed. Disabled accounts, accounts without a login store for the needed CLI, quarantined ones, failed probes and accounts that already failed in this walk are all excluded. A pool with no accounts can only run on the executor's own login when the pool is the implicit one named after the family.

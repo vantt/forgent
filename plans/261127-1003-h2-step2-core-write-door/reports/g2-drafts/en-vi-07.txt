@@ -1,0 +1,1 @@
+The anti-loop guard caps re-dispatch at three visits per item, and it counts only recorded execute-phase attempt events, not moves into doing. A claim taken and released during clarify or decompose therefore never eats into the retry budget.

@@ -1,0 +1,216 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:29:49.571Z",
+  "data_hash": "2960a4d83f3404e6b936f44d04608be8ab96fe63afc416c5cdfae54dceb7bdfc",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+            "title": "handle-a-duplicate-work-item",
+            "section": [
+              "How to close a duplicate, superseded, or admin-decided work item",
+              "Before this existed"
+            ],
+            "excerpt": "...\nThere was no honest terminal status for this. The only reachable park was\n`blocked`, which structurally means \"stuck, unresolved\" and has no forward",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/git/spec.md",
+            "title": "spec",
+            "section": [
+              "Git Component Specification",
+              "13. Caller migration contract"
+            ],
+            "excerpt": "...landed) committed each move as one ScopedCommit of its two literal paths and rolled path and content back before any registry event; test-select-mutate takes its throwaway HEAD",
+            "axes": {
+              "area": "git",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/supervision/spec.md",
+            "title": "spec",
+            "section": [
+              "Supervision Component Specification",
+              "5. Flows"
+            ],
+            "excerpt": "...ate and prepared again with a fresh operation id. A `--paths` land holds the same merge slot across its sync, gates, commit and push (a live Land of the target makes it wait, then refuse `me",
+            "axes": {
+              "area": "supervision",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+            "title": "close-out-a-work-item-already-done-before-claim",
+            "section": [
+              "How to close out a work item whose real work was already done before this claim",
+              "Steps"
+            ],
+            "excerpt": "...\n1. **Confirm the work is really already done, not just stuck.** Check the\n   branch/HEAD content directly — if it already satisfies verify with zero",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+            "title": "close-out-a-goaltier-milestone-after-all-targets-are-done",
+            "section": [
+              "How to close out a goalTier milestone/MVP item once all its targets are done",
+              "Real-world lesson: a milestone verify that only reads status is vacuous — check the content it claims"
+            ],
+            "excerpt": "...verify\nadded content assertions (RUL11 wording, two `not",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/runner/contracts/unit-run-result.md",
+            "title": "unit-run-result",
+            "section": [
+              "Unit Run Result Contract — Execution to Workflow",
+              "7. What each layer must do"
+            ],
+            "excerpt": "...worktree custody\" that the case gate calls instead of taking the lease itself) and one door \"run a verify under custody and classify it\" that answers `{ verdic",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/workflow/spec.md",
+            "title": "spec",
+            "section": [
+              "Spec: Workflow (guide, case, admission)"
+            ],
+            "excerpt": "...docs/specs/workflow.md at 947dc310396071a4d530216d5c06d05993d63bf5; first committed in 9ec72efbc (2026-10-19)\nWriter type: Human + agent coauthor\nCanonical for: The Workflow contract: guide, case a",
+            "axes": {
+              "area": "workflow",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+            "title": "why-approve-blocks-closing-a-milestone-with-drifted-targets",
+            "section": [
+              "Why `approve` blocks closing a milestone with drifted targets",
+              "The wiring"
+            ],
+            "excerpt": "...\n```js\n// Close-out drift guard (tsk-62y, docs/history/\n// tsk-3bn-merge-conductor-harness-v2/): tsk-3bn's own origin incident\n// was closing a milestone (a `targ",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-mailbox/spec.md",
+            "title": "spec",
+            "section": [
+              "Agent Mailbox Component Specification",
+              "10. Failure modes"
+            ],
+            "excerpt": "...a sender that keeps being refused | refusals are bounded counters in the snapshot, never entries |\n| A message is offered twice | process died between emit and finish, finish lost",
+            "axes": {
+              "area": "agent-mailbox",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/holder-lock/spec.md",
+            "title": "spec",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "holder-lock",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "agent-mailbox",
+            "home": "docs/platform/agent-mailbox/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "git",
+            "home": "docs/platform/git/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "holder-lock",
+            "home": "docs/platform/holder-lock/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "supervision",
+            "home": "docs/platform/supervision/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "workflow",
+            "home": "docs/platform/workflow/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 5
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

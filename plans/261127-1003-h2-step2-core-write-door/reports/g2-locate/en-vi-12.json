@@ -1,0 +1,227 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:32:06.937Z",
+  "data_hash": "95e9468865d5a1cc11c972dd2a8075a890251ef36d6d8dbe5457901514dffb9c",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/process/spec.md",
+            "title": "spec",
+            "section": [
+              "Process Facts And Control Component Specification",
+              "10. Containment port"
+            ],
+            "excerpt": "...the namespace starts and `direct` mode's rule holds: it outlives its caller. The driver reads the file by position until the pid parses and reads bwrap's exit from",
+            "axes": {
+              "area": "process",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/run-supervisor/spec.md",
+            "title": "spec",
+            "section": [
+              "Run Supervisor Component Specification",
+              "5. Supervisor and gate",
+              "5.2 Containment drivers"
+            ],
+            "excerpt": "...\nThe supervisor calls the containment port ([process spec, section 9](../process/spec.md#10-containment-port)); the driver is chosen from `envelope",
+            "axes": {
+              "area": "run-supervisor",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+            "title": "README",
+            "section": [
+              "Filesystem confinement for a herdr worker — what was measured, 2026-09-08",
+              "The three findings that matter",
+              "3. `unshare` confines just as hard and keeps the pid"
+            ],
+            "excerpt": "...\n`unshare --mount --map-root-user` calls the syscall and then `exec`s — no",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/git/spec.md",
+            "title": "spec",
+            "section": [
+              "Git Component Specification",
+              "15. Verification and claims needing proof"
+            ],
+            "excerpt": "... failing hook (which reports the hook's own failure), and `macos-tree`. 2026-10-21 (phase 07 unit 25, host gate): the watch no longer depends on the containment driv",
+            "axes": {
+              "area": "git",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md",
+            "title": "P03",
+            "section": [
+              "P03 — Local Bwrap Backend, Probes, And Attestation",
+              "Deferred (not blocking — cap of 3 fix rounds reached; 0 HIGH remaining, all confirmed non-regressing)"
+            ],
+            "excerpt": "...t phase touching this code has no test net for either fix.\n- **M-4** (MEDIUM): rou",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md",
+            "title": "P00.1",
+            "section": [
+              "Cell P00.1 — Read-Only Dispatch Readiness",
+              "Red-Team (Red-Team)"
+            ],
+            "excerpt": "... (`bwrap-direct-escape.json`) was never actually committed to the repo —\n  Red-Team-recheck re-ran the identical direct-escape test live and its\n  real output is committed a",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.4. Confinement",
+              "4.4.1. Linux host setup for the bwrap rows"
+            ],
+            "excerpt": "...Linux host setup for the bwrap rows\n\n`bwrap-available`, `confinement-bwrap-platform` and `confin",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+            "title": "configure-and-operate-agent-confinement",
+            "section": [
+              "How to Configure and Operate Agent Confinement",
+              "6. Interpreting Dispatch Outcomes & Errors",
+              "Blind units"
+            ],
+            "excerpt": "...home or process list. It still reads the repo, tracked `.fgos` files and `node`, reads its own assignment directory (read-only) and",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-confinement/spec.md",
+            "title": "spec",
+            "section": [
+              "Spec: Agent Confinement Authority"
+            ],
+            "excerpt": "...Define the stated scope and preserve its source provenance and limits\nDesign status: Accepted at atomic cutover\nImplementation: Carriage only; current implementation truth is not certified\nProvenance: do",
+            "axes": {
+              "area": "agent-confinement",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/holder-lock/spec.md",
+            "title": "spec",
+            "section": [
+              "Holder-lock Component Specification",
+              "5. Description rules",
+              "Explicit I/O borrowing"
+            ],
+            "excerpt": "...is made once, at exclusive Linux release. Capture the original description's stat key, exact fdinfo `major:minor:inode` token and the holder's proc-mount",
+            "axes": {
+              "area": "holder-lock",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 3
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "agent-confinement",
+            "home": "docs/platform/agent-confinement/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "git",
+            "home": "docs/platform/git/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "holder-lock",
+            "home": "docs/platform/holder-lock/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "process",
+            "home": "docs/platform/process/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "run-supervisor",
+            "home": "docs/platform/run-supervisor/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 5
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 3
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

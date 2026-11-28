@@ -1,0 +1,1 @@
+Only one process can advance a workflow run at a time, enforced by a kernel lock file under the run directory that is released automatically when the holder dies. A second advance attempt gets a busy refusal naming the holding pid and pointing at the status command, and a crash mid-append leaves a torn ledger line that the next lock holder repairs.

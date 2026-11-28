@@ -1,0 +1,218 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:33:26.007Z",
+  "data_hash": "7eed31d74cbb2f9ecba6b3a077ddd3e1479921fb7631b73846b2f38d019aa60c",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+            "title": "events-jsonl-lost-update-race-under-concurrent-session-writes",
+            "section": [
+              "Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes"
+            ],
+            "excerpt": "`.fgos/events.jsonl` is fgOS's own append-only audit log — every mutating\nverb funnels through it. Under investigation (`tsk-1q5`) as a real\nlost-update bug:",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+            "title": "fgos-lifecycle-tracking-concurrent-desync",
+            "section": [
+              "Two different desync bugs, confirmed live, only one of them was this item's own fix",
+              "Two genuinely distinct bug classes"
+            ],
+            "excerpt": "...\nhistory vanished mid-drive, the session's own per-writer shard file\ndisappeared from disk entirely, and `main-check",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/event-store/spec.md",
+            "title": "spec",
+            "section": [
+              "Event Store Component Specification",
+              "13. Work gate: the read-check-append serialization (C1)"
+            ],
+            "excerpt": "...The draft's lines \"Per-writer lock; writers never contend\" (draft section 11) and \"P01 and P02/P04 are re-cut around claims only\" (draft sectio",
+            "axes": {
+              "area": "event-store",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+            "title": "P06.2-P07.2-red-team",
+            "section": [
+              "Recheck (Fix Round 4 — Final)",
+              "Finding P06.2-5 (MEDIUM, claim squatting): CONFIRMED-RESOLVED",
+              "One residual, deliberately accepted (observation, NOT a finding)"
+            ],
+            "excerpt": "...\n`RT-S`: the same carve-out that keeps FN-3 alive means an *unstamped* squat",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/observe/spec.md",
+            "title": "spec",
+            "section": [
+              "Observe Component Specification"
+            ],
+            "excerpt": "...None\n```\n\nRelated reading: [discussion quality rubric](../../reference/discussion-quality-rubric.md) and [discussion setup evaluation](../../how-to/compare-discussion-setups-with-metrics-eval.md). The sour",
+            "axes": {
+              "area": "observe",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+            "title": "workspace-topology-audit",
+            "section": [
+              "Workspace Topology Codebase Audit",
+              "Summary"
+            ],
+            "excerpt": "...## Summary\n\nThe current codebase has several strong local fixes:\n\n- isolated worker branches/worktrees;\n- per-writer event shards;\n- event append plus derived-view refresh under one lock;\n- git",
+            "axes": {
+              "area": "platform",
+              "question": "rationale"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+            "title": "resolve-an-events-jsonl-merge-conflict",
+            "section": [
+              "How to resolve a git merge conflict on `.fgos/events.jsonl` without breaking seq contiguity"
+            ],
+            "excerpt": "...3tp`, on top of `tsk-3ve`):** `.fgos/events.jsonl` is\nnow a frozen baseline — new events land in per-writer shard files under\n`.fgos/events/<writ",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/git/spec.md",
+            "title": "spec",
+            "section": [
+              "Git Component Specification",
+              "16. Frozen catalogue: complete disposition"
+            ],
+            "excerpt": "...the dispatch attestation guard reads the unified Event Store view, not baseline `events.jsonl` plus `.fgos/events/` writer shards. Retained lesson: \"no event found\"",
+            "axes": {
+              "area": "git",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/holder-lock/spec.md",
+            "title": "spec",
+            "section": [
+              "Holder-lock Component Specification",
+              "20. Lịch sử quyết định"
+            ],
+            "excerpt": "...and `lock fence` run in the host; the hot record and the beacon have one owner each.** (1) The hot record's reader and compare-and-clear are `hot_record.rs`; Node's functions c",
+            "axes": {
+              "area": "holder-lock",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md",
+            "title": "eventlog-tier-a-multifile-content-hash-redesign",
+            "section": [
+              "Tier A: redesigning `.fgos/events.jsonl` around content-hash identity and per-session files",
+              "The locked design (17 decisions, `TA-D0` through `TA-D15` plus the incident record)"
+            ],
+            "excerpt": "...at fgOS's real observed scale (~1000 events/day,\n  birthday",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 5
+          },
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "event-store",
+            "home": "docs/platform/event-store/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "git",
+            "home": "docs/platform/git/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "holder-lock",
+            "home": "docs/platform/holder-lock/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "observe",
+            "home": "docs/platform/observe/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 4
+          },
+          {
+            "axis": "question",
+            "value": "rationale",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

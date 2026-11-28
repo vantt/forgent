@@ -1,0 +1,310 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:33:43.278Z",
+  "data_hash": "843f3aeb2e756ce251e56c3948b8c203bf8d7633618911c6955db7e7f59e738c",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "5. Before your first Workflow run",
+              "5.3. Trust in every agent CLI home"
+            ],
+            "excerpt": "...them has seen; fgOS pre-trusts its own\nworktrees for claude **only when the repo root is already trusted by you",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/coexistence/spec.md",
+            "title": "spec",
+            "section": [
+              "Coexistence",
+              "Nhường-nhịn lúc init (marker detection)"
+            ],
+            "excerpt": "...init (marker detection)\n\n`fgos init` quét **read-only** project để nhận diện dấu hiệu (marker) một\nharness khác đã có mặt: một số thư mục dấu ấn phổ biến (ví dụ `.bee/`,\n`.claude/`, `",
+            "axes": {
+              "area": "coexistence",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+            "title": "add-a-read-only-fgos-verb-and-plugin-skill",
+            "section": [
+              "Add a read-only fgOS verb and its plugin skill",
+              "2. Register it in `COMMAND_REGISTRY`"
+            ],
+            "excerpt": "... returns data —\nnever for one that writes any real file.** `docs-index` copied exactly\nthis block (`false`/`false`/`false`) despite writing\n`docs/endus",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+            "title": "fgos-capture-points-and-the-why-gap",
+            "section": [
+              "Why fgOS's automatic capture records the what, but not the why",
+              "The one mechanism that does capture the why — and why it's not enough"
+            ],
+            "excerpt": "...\n`docs/history/<feature>/CONTEXT.md`, written by the `fgos-coding-exploring` and\n`fgos-coding-planning",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/packaging-distribution/spec.md",
+            "title": "spec",
+            "section": [
+              "Spec: Packaging-Distribution",
+              "area: distribution\nupdated: 2026-10-16\nsources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle, str87-fgos-setup-doctor]\ndecisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f, b799cbaa, 563db0a9, e52cc667, e8852403, 4cb11e46, 589eb4b0, 175cfc08, 1005dae0, 4206a0a6, 7d982955, ef531b22]\ncoverage: full",
+              "Spec: Distribution",
+              "Business Rules"
+            ],
+            "excerpt": "Spec: Packaging-Distribution > area: distribution\nupdated: 2026-10-16\nsources: [distribution-packaging, str76-runner-bootstrap, str77-79-doc-gap-fixes, str87-fgos-install-ux, str88-fgos-pnpm-lifecycle, str87-fgos-setup-doctor]\ndecisions: [1",
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+            "title": "fgctl-and-local-fgos",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "rationale"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/how-to/measure-a-real-case.md",
+            "title": "measure-a-real-case",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/seat-binding/spec.md",
+            "title": "spec",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "seat-binding",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "title": "setup-doctor-registry",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/packaging-distribution/README.md",
+            "title": "README",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "navigation"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "packaging-distribution",
+            "home": "docs/platform/packaging-distribution/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "coexistence",
+            "home": "docs/platform/coexistence/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "seat-binding",
+            "home": "docs/platform/seat-binding/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "rationale",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "navigation",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": [
+          {
+            "term": ".fgos/coexistence.json",
+            "total": 11,
+            "truncated": false,
+            "sections": [
+              {
+                "path": "docs/how-to/recover-main-checkout-after-ignored-files-wipe.md",
+                "section": [
+                  "Recover the main checkout after its ignored paths were deleted",
+                  "2. fgos doctor --fix"
+                ],
+                "line": 59,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/how-to-safely-git-reset-hard-the-main-checkout/safely-reset-the-main-checkout.md",
+                "section": [
+                  "How to safely `git reset --hard` the main checkout",
+                  "The incident this guards against"
+                ],
+                "line": 34,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/coexistence/spec.md",
+                "section": [
+                  "Coexistence",
+                  "Lãnh địa (territory)"
+                ],
+                "line": 49,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/platform/coexistence/spec.md",
+                "section": [
+                  "Coexistence",
+                  "Manifest schema (`.fgos/coexistence.json`)"
+                ],
+                "line": 86,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/platform/coexistence/spec.md",
+                "section": [
+                  "Coexistence",
+                  "Known Gaps (thành thật, chưa flip)"
+                ],
+                "line": 120,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/platform/config/spec.md",
+                "section": [
+                  "Config Component Specification",
+                  "3. Files, scope and precedence"
+                ],
+                "line": 84,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+                "section": [
+                  "Work State Implementation Pointers",
+                  "2. Implementation Pointers"
+                ],
+                "line": 48,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/spec.md",
+                "section": [
+                  "Work State Specification",
+                  "2. Entry Points And Triggers"
+                ],
+                "line": 33,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/spec.md",
+                "section": [
+                  "Work State Specification",
+                  "9. Behaviors And Operations",
+                  "Init Verb"
+                ],
+                "line": 679,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/spec.md",
+                "section": [
+                  "Work State Specification",
+                  "11. Business Rules"
+                ],
+                "line": 1082,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/reading-map.md",
+                "section": [
+                  "Documentation Reading Map",
+                  "5. Detailed Product And Source Map"
+                ],
+                "line": 139,
+                "missedBySearch": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "group": null
+  }
+}

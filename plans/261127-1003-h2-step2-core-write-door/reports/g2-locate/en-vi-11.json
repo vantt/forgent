@@ -1,0 +1,218 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:31:49.022Z",
+  "data_hash": "fa9881b916364249e9536df76387f2031b13268e40b998d0e5a8de879e2b1fdf",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+            "title": "confinement-authority-v1",
+            "section": [
+              "confinement authority v1",
+              "6. Canonical contracts",
+              "6.2 Nơi đặt policy"
+            ],
+            "excerpt": "...o `confinementPolicies` và vẫn tham chiếu bằng cùng\nfield `policy`; không có syntax thứ hai ở capability.\n\nBuilt-in `host-write-denied` có definition versioned do fgO",
+            "axes": {
+              "area": "agent-confinement",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+            "title": "configure-and-operate-agent-confinement",
+            "section": [
+              "How to Configure and Operate Agent Confinement",
+              "3. Declaring Confinement Policies",
+              "Custom Confinement Policies"
+            ],
+            "excerpt": "...\nYou can define custom policies in `runner.confinementPolicies`:\n\n```json\n{\n  \"runner\": {\n    \"confinementPolicies\": {",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/config/spec.md",
+            "title": "spec",
+            "section": [
+              "Config Component Specification",
+              "18. Lịch sử quyết định"
+            ],
+            "excerpt": "... mechanism, the scope judge already refuses a key, or a list or scalar above one, in the project file by name (`config-key-out-of-scope`). `confinement.ownWorktree`, `contract`, `co",
+            "axes": {
+              "area": "config",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P01.md",
+            "title": "P01",
+            "section": [
+              "P01 — Config, Policy, And Machine Registry",
+              "Coordination sessions"
+            ],
+            "excerpt": "...unrelated, concurrently-active session's real work) instead of its assigned cwd. Red-team's own recheck (op_023) was unaffected and completed cleanly. |\n| `--p01f` | Clea",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+            "title": "permission-posture-findings",
+            "section": [
+              "Permission posture — where it actually comes from, and the rule that follows",
+              "The rule"
+            ],
+            "excerpt": "...\n**Permission posture is declared in the executor profile and never inherited from a shell.**\nThe adapter passes it explicitly through `agent start -",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md",
+            "title": "P08",
+            "section": [
+              "P08 — Bwrap Executor Migration To Confinement Authority (Post-Close Follow-Up)",
+              "Deferred (not blocking — 0 HIGH remaining after the fix)"
+            ],
+            "excerpt": "...\n- **R-1** (LOW, pre-existing, predates this migration): the whole host filesystem is readable insi",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+            "title": "compare-discussion-setups-with-metrics-eval",
+            "section": [
+              "Compare discussion setups with metrics eval",
+              "2. Blind the judge; distinguish data blindness from isolation"
+            ],
+            "excerpt": "...er needs a provisioned writable private authentication runtime: ordinary Pi CLI reads take an adjacent auth-file lock. Redirectin",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "4. Every doctor check",
+              "4.7. Every row and its registered fix"
+            ],
+            "excerpt": "...confinement` | no executor declares \"permissionMode\": \"bypass\" without privateHome, isolatedSession and ownWorktree all",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+            "title": "confinement-authority-decisions",
+            "section": [
+              "confinement authority decisions",
+              "12. Quyết định của proposal"
+            ],
+            "excerpt": "...do agent đặt không được làm host đọc ngoài grant hay treo |\n| 2026-11-06 (quyết định HARDEN 61 3b): `MACHINE_PRIVATE_ROOTS` thêm `{loginStore}` (mọi kho login của account inve",
+            "axes": {
+              "area": "agent-confinement",
+              "question": "choice"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md",
+            "title": "session-findings",
+            "section": [
+              "Worker isolation — separate herdr session, measured",
+              "What this settles"
+            ],
+            "excerpt": "...\n- Option 1 (separate session) is viable, cheap, and needs no config change to work — only\n  to recover in-cockpit watching.\n- Private HOME stays: it closes the `$HO",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 3
+          },
+          {
+            "axis": "area",
+            "value": "agent-confinement",
+            "home": "docs/platform/agent-confinement/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "config",
+            "home": "docs/platform/config/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 4
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "choice",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

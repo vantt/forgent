@@ -1,0 +1,1 @@
+Once a work item reaches done or wontfix it can never move again: neither status has an outgoing edge in the transition table, so any further move is refused as a precondition failure. A wrongly closed item is not reopened; you file a new item that references the old one. The refusal message lists the valid targets, or says the status is terminal.

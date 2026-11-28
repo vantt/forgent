@@ -1,0 +1,224 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:31:01.481Z",
+  "data_hash": "2e61ee6d2b8a3fdb37187bb31b0ae298d6caf6d31b5ad583f9ca9074e8f9a370",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/holder-lock/spec.md",
+            "title": "spec",
+            "section": [
+              "Holder-lock Component Specification",
+              "19. Known limits"
+            ],
+            "excerpt": "... so a person stops the process and attests.\n- `holders()` is `unlistable` on macOS and Windows, so the holder scan of `fgos lock-status` and the leftover kill of `run_borrowed` rely",
+            "axes": {
+              "area": "holder-lock",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/git/spec.md",
+            "title": "spec",
+            "section": [
+              "Git Component Specification",
+              "5. Layering and unchanged 4.3-R locks"
+            ],
+            "excerpt": "...or members that stay in the group. Descendant drain is claimed only where a Process containment domain whose driver answers `Empty` exists (process spec §4-5: `linux-gat",
+            "axes": {
+              "area": "git",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/run-supervisor/spec.md",
+            "title": "spec",
+            "section": [
+              "Run Supervisor Component Specification",
+              "11. Error model"
+            ],
+            "excerpt": "...pt runs that step again | By the matrix | Adopt |\n\nWhen the gate is SIGKILLed the kernel closes its fds before it finishes killing the namespace, so for a moment the lock reads fre",
+            "axes": {
+              "area": "run-supervisor",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+            "title": "p12",
+            "section": [
+              "Cell P12 — fgctl Init And Workspace Activation",
+              "Round 3 (fresh session `-recheck2`, reviewer + red-team together, against `e7c94134`)"
+            ],
+            "excerpt": "... ts}` content to a uniquely-named temp file first, then `hard_link`s\nit onto `activation.lock` — atomi",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ],
+            "excerpt": "...ker-spawn-fail` before any lock. There is no holder record, no `ttlMs`, no heartbeat renewal and no reclaim by a contender: the kernel releases the lock when every process holding the description ha",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/explanation/lock-wait-self-vs-other-holder-identity.md",
+            "title": "lock-wait-self-vs-other-holder-identity",
+            "section": [
+              "The lock-wait poll line couldn't tell a session its own overlapping call from a stranger's",
+              "A second gap in the same poll line — no ETA, no staleness signal — `tsk-6ci`"
+            ],
+            "excerpt": "... at it), or whether to keep\nwaiting versus investigate.\n\nFixed by s",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-report.md",
+            "title": "redteam-report",
+            "section": [
+              "P05.1 red-team report — independent adversarial pass on the hard conformance and recovery proof",
+              "Findings",
+              "F2 (high) — the documented crash workaround can permanently poison an assignment (RT-14 + RT-15)"
+            ],
+            "excerpt": "...and the already-settled `runs/0",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/explanation/dispatch-execute-concurrency-guard.md",
+            "title": "dispatch-execute-concurrency-guard",
+            "section": [
+              "Why `dispatch.mjs execute` needed a per-item concurrency guard",
+              "What shipped"
+            ],
+            "excerpt": "...\nRather than inventing a new lock mechanism, `executeExecutorCli` reuses\nthe already-existing main-checkout lock primitive\n(`acquireMainCheckoutLock`) at a new",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+            "title": "runtime-recovery-design",
+            "section": [
+              "Runtime Recovery And Work Continuity",
+              "6. Local Concurrency And Durability"
+            ],
+            "excerpt": "...holder\nnever self-recognizes a second concurrent acquisition as reentrant. Generation\nrecords are retained with the runtime/session artifacts; compaction is offli",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "rationale"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+            "title": "P01.2",
+            "section": [
+              "Cell P01.2 — Session engine, dynamic consult, resume, live proof (Phase 01 R5-R8)",
+              "Fix Evidence (2026-09-01, round 2)",
+              "Red-Team re-check (round-2 fix + third-variant sweep)"
+            ],
+            "excerpt": "... written) makes this function return\n   `null`, byte-identical",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "git",
+            "home": "docs/platform/git/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "holder-lock",
+            "home": "docs/platform/holder-lock/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "run-supervisor",
+            "home": "docs/platform/run-supervisor/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 4
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "rationale",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

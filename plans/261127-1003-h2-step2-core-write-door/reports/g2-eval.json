@@ -1,0 +1,612 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:28:09.342Z",
+  "data_hash": "860b1649feff82321f08a85df3c3dd057aa4bf6012b38a93ec91665d06608201",
+  "data": {
+    "cases": 17,
+    "owned": 17,
+    "no_owner": 0,
+    "recall@3": 0.4706,
+    "recall@10": 0.6471,
+    "section": {
+      "cases": 11,
+      "first": 6,
+      "rate": 0.5455
+    },
+    "misses": [
+      {
+        "id": "en-vi-02",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+            "section": [
+              "Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`",
+              "The remaining real gap"
+            ]
+          },
+          {
+            "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+            "section": [
+              "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door",
+              "The real cost this message gap caused"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-03",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/platform/event-store/spec.md",
+            "section": [
+              "Event Store Component Specification",
+              "12. Order"
+            ]
+          },
+          {
+            "path": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+            "section": [
+              "How fgOS's event log is allowed to evolve without breaking replay",
+              "Concurrency at the log's write door"
+            ]
+          },
+          {
+            "path": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+            "section": [
+              "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
+              "A comment claiming lock parity with `addWork` didn't match the code (`tsk-1jp`)"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-04",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ]
+          },
+          {
+            "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+            "section": [
+              "Cell P02.1 — Phase 02 R1-R4 (Driver authorization: schema + event + gate)",
+              "Review",
+              "Verification re-run independently"
+            ]
+          },
+          {
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+            "section": [
+              "P07.3 + P08.1 — Independent Review (Wave 3)",
+              "Part 1 — What I verified as genuinely correct",
+              "1.6 P07.3's replay refusals are real forgeries, not mocks"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-05",
+        "rank": 7,
+        "section_first": false,
+        "top": [
+          {
+            "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+            "section": [
+              "How to close a duplicate, superseded, or admin-decided work item",
+              "Before this existed"
+            ]
+          },
+          {
+            "path": "docs/platform/git/spec.md",
+            "section": [
+              "Git Component Specification",
+              "13. Caller migration contract"
+            ]
+          },
+          {
+            "path": "docs/platform/supervision/spec.md",
+            "section": [
+              "Supervision Component Specification",
+              "5. Flows"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-06",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/platform/holder-lock/spec.md",
+            "section": [
+              "Holder-lock Component Specification",
+              "19. Known limits"
+            ]
+          },
+          {
+            "path": "docs/platform/git/spec.md",
+            "section": [
+              "Git Component Specification",
+              "5. Layering and unchanged 4.3-R locks"
+            ]
+          },
+          {
+            "path": "docs/platform/run-supervisor/spec.md",
+            "section": [
+              "Run Supervisor Component Specification",
+              "11. Error model"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-07",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/explanation/runtime-claim-doing-separation.md",
+            "section": [
+              "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
+              "Acceptance bar this item held itself to"
+            ]
+          },
+          {
+            "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+            "section": [
+              "How to claim an item that is still at stage `clarify` or `decompose`",
+              "Re-claiming after the claim is released at the `executing` boundary"
+            ]
+          },
+          {
+            "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+            "section": [
+              "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+              "Implementation (`tsk-30v`): the edge choice itself finally reads the verdict, not just the stage"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-08",
+        "rank": null,
+        "top": [
+          {
+            "path": "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+            "section": [
+              "Why discover-loop's pool ordering and stop rules diverge from merge-loop's",
+              "Two different sort orders for the two sub-pools"
+            ]
+          },
+          {
+            "path": "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+            "section": [
+              "Why `clarify` split into `clarify`, `discovery`, and `exploring`",
+              "Implementation (`tsk-5mj`, P5 of this design): the runner dispatches `discovery` the same way it already dispatches `executing`"
+            ]
+          },
+          {
+            "path": "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+            "section": [
+              "Why a work item title's \"object + action + scope\" rule lives in the submitting skills, not just the decompose prompt",
+              "The `description` gap this contract's own migration deliberately avoided walking into"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-09",
+        "rank": 5,
+        "section_first": true,
+        "top": [
+          {
+            "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+            "section": [
+              "Why verify moved from the merge lock to catchup's inbound gate",
+              "The mechanism that was already there but could never turn on"
+            ]
+          },
+          {
+            "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+            "section": [
+              "The approve skip-verify fast path was correct but almost never fired on a busy trunk"
+            ]
+          },
+          {
+            "path": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+            "section": [
+              "Why `checkMergeStillResolves` can false-positive after a root branch prune",
+              "The rebased-not-pruned case (`tsk-2q8`) — content landed, ancestry sha didn't"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-11",
+        "rank": 1,
+        "section_first": false,
+        "top": [
+          {
+            "path": "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+            "section": [
+              "confinement authority v1",
+              "6. Canonical contracts",
+              "6.2 Nơi đặt policy"
+            ]
+          },
+          {
+            "path": "docs/how-to/configure-and-operate-agent-confinement.md",
+            "section": [
+              "How to Configure and Operate Agent Confinement",
+              "3. Declaring Confinement Policies",
+              "Custom Confinement Policies"
+            ]
+          },
+          {
+            "path": "docs/platform/config/spec.md",
+            "section": [
+              "Config Component Specification",
+              "18. Lịch sử quyết định"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-16",
+        "rank": 5,
+        "section_first": false,
+        "top": [
+          {
+            "path": "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+            "section": [
+              "Why `.fgos/events.jsonl` can silently lose lines under concurrent session writes"
+            ]
+          },
+          {
+            "path": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+            "section": [
+              "Two different desync bugs, confirmed live, only one of them was this item's own fix",
+              "Two genuinely distinct bug classes"
+            ]
+          },
+          {
+            "path": "docs/platform/event-store/spec.md",
+            "section": [
+              "Event Store Component Specification",
+              "13. Work gate: the read-check-append serialization (C1)"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-17",
+        "rank": 2,
+        "section_first": false,
+        "top": [
+          {
+            "path": "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+            "section": [
+              "Why status splits into status + statusCategory only for the front segment of the lifecycle",
+              "`domainFields` (D6) landed as a thin, narrowly-verified addition"
+            ]
+          },
+          {
+            "path": "docs/platform/observe/spec.md",
+            "section": [
+              "Observe Component Specification",
+              "5. Mục theo làn (Sub-spec sections)",
+              "§ Record contract v2 (đo vận hành)"
+            ]
+          },
+          {
+            "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+            "section": [
+              "Why the merge target-ref slot disabled lock self-recognition",
+              "A third round reopens the target-slot's release/renew path (fable audit, `tsk-18k`)"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "en-vi-18",
+        "rank": 2,
+        "section_first": false,
+        "top": [
+          {
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "5. Before your first Workflow run",
+              "5.3. Trust in every agent CLI home"
+            ]
+          },
+          {
+            "path": "docs/platform/coexistence/spec.md",
+            "section": [
+              "Coexistence",
+              "Nhường-nhịn lúc init (marker detection)"
+            ]
+          },
+          {
+            "path": "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+            "section": [
+              "Add a read-only fgOS verb and its plugin skill",
+              "2. Register it in `COMMAND_REGISTRY`"
+            ]
+          }
+        ]
+      }
+    ],
+    "results": [
+      {
+        "id": "en-vi-01",
+        "rank": 2,
+        "section_first": true,
+        "top": [
+          "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+          "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+          "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+          "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md"
+        ]
+      },
+      {
+        "id": "en-vi-02",
+        "rank": null,
+        "top": [
+          "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+          "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md"
+        ]
+      },
+      {
+        "id": "en-vi-03",
+        "rank": null,
+        "top": [
+          "docs/platform/event-store/spec.md",
+          "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+          "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+          "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+          "docs/explanation/runtime-claim-doing-separation.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md"
+        ]
+      },
+      {
+        "id": "en-vi-04",
+        "rank": null,
+        "top": [
+          "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md",
+          "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md",
+          "docs/explanation/dispatch-verify-run-once-cadence.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md"
+        ]
+      },
+      {
+        "id": "en-vi-05",
+        "rank": 7,
+        "section_first": false,
+        "top": [
+          "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+          "docs/platform/git/spec.md",
+          "docs/platform/supervision/spec.md",
+          "docs/knowledge/how-to-close-out-a-work-item-whose-real-work-was-already-don/close-out-a-work-item-already-done-before-claim.md",
+          "docs/knowledge/how-to-close-out-a-goaltier-milestone-mvp-item-once-all-its/close-out-a-goaltier-milestone-after-all-targets-are-done.md",
+          "docs/platform/runner/contracts/unit-run-result.md",
+          "docs/platform/workflow/spec.md",
+          "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
+          "docs/platform/agent-mailbox/spec.md",
+          "docs/platform/holder-lock/spec.md"
+        ]
+      },
+      {
+        "id": "en-vi-06",
+        "rank": null,
+        "top": [
+          "docs/platform/holder-lock/spec.md",
+          "docs/platform/git/spec.md",
+          "docs/platform/run-supervisor/spec.md",
+          "docs/platform/agent-coordination/verification/rust-host-r1-kernel/p12.md",
+          "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "docs/explanation/lock-wait-self-vs-other-holder-identity.md",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-report.md",
+          "docs/explanation/dispatch-execute-concurrency-guard.md",
+          "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md"
+        ]
+      },
+      {
+        "id": "en-vi-07",
+        "rank": null,
+        "top": [
+          "docs/explanation/runtime-claim-doing-separation.md",
+          "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+          "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+          "docs/knowledge/why-the-herdr-fgos-dashboard-shipped-as-three-sequential-chi/herdr-fgos-dashboard-three-piece-build.md",
+          "docs/explanation/settleclaim-revision-drift-self-caused.md",
+          "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md"
+        ]
+      },
+      {
+        "id": "en-vi-08",
+        "rank": null,
+        "top": [
+          "docs/knowledge/why-discover-loop-s-pool-ordering-and-stop-rules-diverge-fro/discover-loop-pool-ordering-and-stop-rules.md",
+          "docs/knowledge/why-clarify-split-into-clarify-discovery-and-exploring/why-clarify-split-into-clarify-discovery-and-exploring.md",
+          "docs/knowledge/why-a-work-item-title-s-object-action-scope-rule-lives-in-th/title-semantic-contract-lives-in-submitting-skills.md",
+          "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
+          "docs/explanation/discovered-work-risk-kind-vocabulary-coercion.md"
+        ]
+      },
+      {
+        "id": "en-vi-09",
+        "rank": 5,
+        "section_first": true,
+        "top": [
+          "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+          "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+          "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+          "docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+          "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+          "docs/explanation/fgos-return-skip-redundant-verify.md",
+          "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+          "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+          "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md"
+        ]
+      },
+      {
+        "id": "en-vi-11",
+        "rank": 1,
+        "section_first": false,
+        "top": [
+          "docs/platform/agent-confinement/contracts/confinement-authority-v1.md",
+          "docs/how-to/configure-and-operate-agent-confinement.md",
+          "docs/platform/config/spec.md",
+          "docs/platform/agent-coordination/verification/confinement-authority-implementation/P01.md",
+          "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/permission-posture-findings.md",
+          "docs/platform/agent-coordination/verification/confinement-authority-implementation/P08.md",
+          "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/platform/agent-confinement/decisions/confinement-authority-decisions.md",
+          "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-06-isolation/session-findings.md"
+        ]
+      },
+      {
+        "id": "en-vi-12",
+        "rank": 1,
+        "section_first": true,
+        "top": [
+          "docs/platform/process/spec.md",
+          "docs/platform/run-supervisor/spec.md",
+          "docs/platform/agent-coordination/verification/visibility-herdr/proofs/2026-09-08-bwrap/README.md",
+          "docs/platform/git/spec.md",
+          "docs/platform/agent-coordination/verification/confinement-authority-implementation/P03.md",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/P00.1.md",
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/how-to/configure-and-operate-agent-confinement.md",
+          "docs/platform/agent-confinement/spec.md",
+          "docs/platform/holder-lock/spec.md"
+        ]
+      },
+      {
+        "id": "en-vi-13",
+        "rank": 1,
+        "section_first": true,
+        "top": [
+          "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "docs/platform/runner/contracts/unit-run-result.md",
+          "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+          "docs/platform/runner/contracts/executor-model.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/platform/agent-coordination/verification/step-07-mvp/P03.1.md",
+          "docs/platform/config/spec.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P06.1.md",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/P02.1.md"
+        ]
+      },
+      {
+        "id": "en-vi-14",
+        "rank": 1,
+        "section_first": true,
+        "top": [
+          "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "docs/decisions/index.md",
+          "docs/platform/runner/contracts/executor-model.md",
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/platform/seat-binding/spec.md",
+          "docs/platform/runner/contracts/unit-run-result.md",
+          "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-report.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.2.md",
+          "docs/platform/run-supervisor/spec.md"
+        ]
+      },
+      {
+        "id": "en-vi-15",
+        "rank": 1,
+        "section_first": true,
+        "top": [
+          "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+          "docs/platform/config/spec.md",
+          "docs/platform/runner/contracts/executor-model.md",
+          "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+          "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+          "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/platform/agent-coordination/verification/dispatch-operability-implementation/I03.md"
+        ]
+      },
+      {
+        "id": "en-vi-16",
+        "rank": 5,
+        "section_first": false,
+        "top": [
+          "docs/knowledge/why-fgos-events-jsonl-can-silently-lose-lines-under-concurre/events-jsonl-lost-update-race-under-concurrent-session-writes.md",
+          "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+          "docs/platform/event-store/spec.md",
+          "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+          "docs/platform/observe/spec.md",
+          "docs/platform/system-architecture/architecture/workspace-topology-audit.md",
+          "docs/knowledge/how-to-resolve-a-git-merge-conflict-on-fgos-events-jsonl-wit/resolve-an-events-jsonl-merge-conflict.md",
+          "docs/platform/git/spec.md",
+          "docs/platform/holder-lock/spec.md",
+          "docs/explanation/eventlog-tier-a-multifile-content-hash-redesign.md"
+        ]
+      },
+      {
+        "id": "en-vi-17",
+        "rank": 2,
+        "section_first": false,
+        "top": [
+          "docs/knowledge/why-status-splits-into-status-statuscategory-only-for-the-fr/multi-domain-status-category-schema.md",
+          "docs/platform/observe/spec.md",
+          "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+          "docs/knowledge/why-the-locked-decisions-heading-contract-between-plan-mjs-s/decision-record.md",
+          "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+          "docs/knowledge/worker-slot-concept-and-engine-wide-worker-occupancy-ceiling/worker-slot-is-the-engine-owned-occupancy-unit-across-every-launcher.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/knowledge/produce-failing-test-first-proof-for-an-iron-law-gated-diff/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md",
+          "docs/platform/holder-lock/spec.md",
+          "docs/platform/questions/spec.md"
+        ]
+      },
+      {
+        "id": "en-vi-18",
+        "rank": 2,
+        "section_first": false,
+        "top": [
+          "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+          "docs/platform/coexistence/spec.md",
+          "docs/knowledge/add-a-read-only-fgos-verb-and-its-plugin-skill/add-a-read-only-fgos-verb-and-plugin-skill.md",
+          "docs/knowledge/why-fgos-s-automatic-capture-records-the-what-but-not-the-wh/fgos-capture-points-and-the-why-gap.md",
+          "docs/platform/packaging-distribution/spec.md",
+          "docs/platform/packaging-distribution/architecture/fgctl-and-local-fgos.md",
+          "docs/how-to/measure-a-real-case.md",
+          "docs/platform/seat-binding/spec.md",
+          "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+          "docs/platform/packaging-distribution/README.md"
+        ]
+      }
+    ],
+    "index": {
+      "built_at": "2026-11-28T10:23:24",
+      "notes": 1009,
+      "profile": "fgos-docs",
+      "profile_digest": "f2df908502a8",
+      "index_profile": "fgos-docs@f2df908502a8"
+    }
+  }
+}

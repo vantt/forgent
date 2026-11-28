@@ -1,0 +1,84 @@
+format: 1
+cases:
+  - id: "en-vi-01"
+    query: "Once a work item reaches done or wontfix it can never move again: neither status has an outgoing edge in the transition table, so any further move is refused as a precondition failure. A wrongly closed item is not reopened; you file a new item that references the old one. The refusal message lists the valid targets, or says the status is terminal."
+    expect:
+      - {path: "docs/platform/work-state/spec.md", section: ["9. Behaviors And Operations", "Move Verb"]}
+      - {path: "docs/platform/work-state/spec.md", section: ["3. Work Item Data Dictionary"]}
+      - {path: "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md", section: ["Steps"]}
+  - id: "en-vi-02"
+    query: "`transitionWork` demands a non-empty `reason` on exactly three edges: awaiting-approval to todo, awaiting-approval to blocked, and cleanup to blocked. Entering awaiting-human needs an `ask` written in the decision-question template, and leaving it needs an `answer`. The edge legality check runs first, so an illegal edge reports precondition before any validation error."
+    expect:
+      - {path: "docs/platform/work-state/spec.md", section: ["9. Behaviors And Operations", "Move Verb"]}
+      - {path: "docs/platform/work-state/spec.md", section: ["3. Work Item Data Dictionary"]}
+  - id: "en-vi-03"
+    query: "Every work event appended to the event store is stamped with the precondition its writer saw: whether the item exists, and for status moves only, the status it must still hold. That way a concurrent status change rejects a stale move but never drops an edit, step change or attempt record on the same item."
+    expect:
+      - {path: "docs/platform/work-state/spec.md", section: ["Bố cục dữ liệu, thứ tự và xung đột (sau cutover Event Store)"]}
+  - id: "en-vi-04"
+    query: "The case gate never runs a command the caller passes in. It runs the verify command the runner config declares for the named capability, and refuses with `gate-command-missing` when none is declared, so a gate cannot pass simply because there was nothing to run. It also refuses when no tested paths are given or the worktree does not exist."
+    expect:
+      - {path: "docs/platform/workflow/spec.md", section: ["6. Business Rules"]}
+  - id: "en-vi-05"
+    query: "Closing a workflow case is refused while a closure milestone is stale or a consent gate is still parked. After a successful close, each worktree binding whose attempt is quiet is released, and the busy ones are kept and named in the result instead of being torn down."
+    expect:
+      - {path: "docs/platform/workflow/spec.md", section: ["7. Luồng (Behaviors)", "7.5 Đóng case"]}
+  - id: "en-vi-06"
+    query: "Only one process can advance a workflow run at a time, enforced by a kernel lock file under the run directory that is released automatically when the holder dies. A second advance attempt gets a busy refusal naming the holding pid and pointing at the status command, and a crash mid-append leaves a torn ledger line that the next lock holder repairs."
+    expect:
+      - {path: "docs/platform/workflow/spec.md", section: ["5. Ranh giới component và authority", "5.4 Holder-lock: `advance` theo Shape C (owner 2026-10-19)"]}
+      - {path: "docs/platform/workflow/spec.md", section: ["5. Ranh giới component và authority", "5.5 Lưu trữ ledger, Event Store, Session Identity"]}
+      - {path: "docs/platform/workflow/spec.md", section: ["6. Business Rules"]}
+  - id: "en-vi-07"
+    query: "The anti-loop guard caps re-dispatch at three visits per item, and it counts only recorded execute-phase attempt events, not moves into doing. A claim taken and released during clarify or decompose therefore never eats into the retry budget."
+    expect:
+      - {path: "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md", section: ["Business Rules"]}
+      - {path: "docs/platform/runner/subcomponents/h-02842f76ffd2/spec.md", section: ["Data Dictionary"]}
+      - {path: "docs/platform/runner/spec.md", section: ["Data Dictionary"]}
+  - id: "en-vi-08"
+    query: "Work a worker reports through fenced discovery blocks is untrusted data: the runner acts on at most 20 blocks per dispatch and drops the rest with a log line. A block whose title matches an item already discovered from the same parent (case and whitespace insensitive) is skipped, and new items start at todo in the clarify step with a placeholder verify."
+    expect:
+      - {path: "docs/platform/runner/operations/h-51f5cd7279fd.md", section: ["Behaviors & Operations", "Báo việc-phát-hiện từ trợ lý (worker→runner discovery report)"]}
+      - {path: "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md", section: ["Business Rules"]}
+  - id: "en-vi-09"
+    query: "On land, `mergedTreeAlreadyVerified` skips rerunning the checks only when the branch tip still equals the SHA that passed at return and main has not touched any path the branch introduced since the fork point. Anything less provable reruns the checks, because a false skip would put an unverified tree on main."
+    expect:
+      - {path: "docs/platform/git/spec.md", section: ["Appendix A. Per-row catalogue disposition G-001..G-234"]}
+      - {path: "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md", section: ["Why the second run is often skipped"]}
+  - id: "en-vi-11"
+    query: "Old confinement flags like privateHome, isolatedSession and ownWorktree are normalized into the single v1 confinement policy. Controls nobody set default to allow host writes, reads and network, host process and home, and shared session and workspace. A private home always adds a read-write private-home grant scoped to the dispatch."
+    expect:
+      - {path: "docs/platform/agent-confinement/contracts/confinement-authority-v1.md", section: ["6. Canonical contracts", "6.2 Nơi đặt policy", "6.2.1 Trust boundary của backend registry"]}
+  - id: "en-vi-12"
+    query: "On Linux, process containment uses a bwrap pid namespace only when bwrap is found and a real probe command in a user plus pid namespace succeeds. Otherwise it falls back to the process-group driver and records why, for example bwrap-not-found or a refused mount. The probe result is cached once per process for each bwrap path."
+    expect:
+      - {path: "docs/platform/process/spec.md", section: ["10. Containment port"]}
+      - {path: "docs/platform/run-supervisor/spec.md", section: ["5. Supervisor and gate", "5.2 Containment drivers"]}
+  - id: "en-vi-13"
+    query: "A pinned account on a seat must be written as pool/account, for example openai/work. Anything else, such as a missing slash or an empty side, is refused with `account-pin-invalid` before any candidate is ranked."
+    expect:
+      - {path: "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md", section: ["Business Rules"]}
+      - {path: "docs/platform/seat-binding/spec.md", section: ["8. Ghim và cờ `--provider`"]}
+  - id: "en-vi-14"
+    query: "When a seat binding fails and the walk continues, the next candidates are first the rest of the failed family, then the tier fallback families if configured (which can only narrow the seat's own families), otherwise the remaining prefer order. A candidate that was already tried never comes back in the same walk."
+    expect:
+      - {path: "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md", section: ["Business Rules"]}
+      - {path: "docs/platform/seat-binding/spec.md", section: ["6. Cấu hình", "6.3 Thứ tự ưu tiên theo từng thuộc tính"]}
+  - id: "en-vi-15"
+    query: "Accounts in a pool are leased sticky first, then those whose credential probe passed. Disabled accounts, accounts without a login store for the needed CLI, quarantined ones, failed probes and accounts that already failed in this walk are all excluded. A pool with no accounts can only run on the executor's own login when the pool is the implicit one named after the family."
+    expect:
+      - {path: "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md", section: ["Business Rules"]}
+  - id: "en-vi-16"
+    query: "Each observe store writes one JSONL shard per writer under the observe directory, and lines over 1 MiB are never written. If a writer died mid-line, the next append starts on a fresh line and the torn line stays in the file, to be named and skipped on read rather than breaking the whole store. Symlinked shards are refused."
+    expect:
+      - {path: "docs/platform/observe/spec.md", section: ["3. Storage Model"]}
+  - id: "en-vi-17"
+    query: "A friction record stays open until a later resolve record settles it, either for the same subject or, when resolved by signature, for its whole class. Reads still include the old friction shards that have not been migrated yet, so no record disappears during the switch to the new record kinds."
+    expect:
+      - {path: "docs/platform/observe/spec.md", section: ["5. Mục theo làn (Sub-spec sections)", "§ Friction (Làn B)"]}
+  - id: "en-vi-18"
+    query: "When fgOS is set up in a project it scans read-only for other agent harnesses (.bee, .claude, .codex, .cursor directories, plus a bee block in AGENTS.md) and writes `.fgos/coexistence.json` declaring its own territory: the .fgos data directory, worktrees under the temp dir, and fgw/* branches. A detection problem, such as an unreadable AGENTS.md, is recorded in the manifest and never fails init."
+    expect:
+      - {path: "docs/platform/coexistence/spec.md", section: ["Nhường-nhịn lúc init (marker detection)"]}
+      - {path: "docs/platform/coexistence/spec.md", section: ["Lãnh địa (territory)"]}
+      - {path: "docs/platform/coexistence/spec.md", section: ["Manifest schema (`.fgos/coexistence.json`)"]}

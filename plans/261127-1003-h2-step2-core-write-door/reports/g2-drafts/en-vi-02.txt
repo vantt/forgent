@@ -1,0 +1,1 @@
+`transitionWork` demands a non-empty `reason` on exactly three edges: awaiting-approval to todo, awaiting-approval to blocked, and cleanup to blocked. Entering awaiting-human needs an `ask` written in the decision-question template, and leaving it needs an `answer`. The edge legality check runs first, so an illegal edge reports precondition before any validation error.

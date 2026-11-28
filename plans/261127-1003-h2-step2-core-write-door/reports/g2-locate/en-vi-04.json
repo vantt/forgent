@@ -1,0 +1,230 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:29:15.572Z",
+  "data_hash": "fcf078a9de8f713de2ce7cf5bef97cd96cba214c7524fa0e51d1f983f09b5bf2",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ],
+            "excerpt": "...home (named by `fgos doctor`, removed only by an explicit `doctor --fix`, never swept), and `fgos run` no longer has a startup rule for homes written with a pane binding by an older release.\n- **(a",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/agent-coordination/verification/step-09-group-thinking-mvp1-mvp2/P02.1.md",
+            "title": "P02.1",
+            "section": [
+              "Cell P02.1 — Phase 02 R1-R4 (Driver authorization: schema + event + gate)",
+              "Review",
+              "Verification re-run independently"
+            ],
+            "excerpt": "...\n- Focused: `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/runner/flow-definition*.test.mjs' 'test/runner/coor",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+            "title": "P07.3-P08.1-review",
+            "section": [
+              "P07.3 + P08.1 — Independent Review (Wave 3)",
+              "Part 1 — What I verified as genuinely correct",
+              "1.6 P07.3's replay refusals are real forgeries, not mocks"
+            ],
+            "excerpt": "...it. Conversely, the non-empty `missingActors` rule at `:444`\nruns only over `spec.req",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3.md",
+            "title": "P07.3",
+            "section": [
+              "P07.3 — FlowDefinition And Session Integration"
+            ],
+            "excerpt": "...No file under\n`src/runner/team-cognition/` was edited — `classifyAggregationOutcome` is\ncalled, never forked. No committed fixture under `core/` was touched.\n\nConcern (one, stated up front r",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/knowledge/why-every-agent-task-tool-dispatch-is-enforced-through-a-pre/why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention.md",
+            "title": "why-dispatch-decide-is-a-hard-hook-enforced-gate-not-a-convention",
+            "section": [
+              "Why `dispatch decide` is a hard, hook-enforced gate, not a convention",
+              "Why an unresolvable capacity reports `configured:false` instead of throwing"
+            ],
+            "excerpt": "...\n> D3: decide them field configured:true|false; KHONG throw khi capacityId\n> khong co tro",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P10.10-reviewer-report.md",
+            "title": "P10.10-reviewer-report",
+            "section": [
+              "P10.10 — Independent Reviewer Report",
+              "Findings",
+              "MEDIUM-2 — inaccurate claim in promoted canonical contract text"
+            ],
+            "excerpt": "...never exposes\nthem at all, and two (switch-protocols, bypass-grants) because this gate's own\nexplicit-selection checks run",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/explanation/dispatch-verify-run-once-cadence.md",
+            "title": "dispatch-verify-run-once-cadence",
+            "section": [
+              "Verify should run once, near the end — a textual gap closed, root cause not fully confirmed",
+              "Two candidate root causes, neither ruled out with certainty"
+            ],
+            "excerpt": "...\n1. **A textual gap.** `worker-prompt-skill-pointer.txt`'s own \"Expected\n   proof\"",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4-P09.1-review.md",
+            "title": "P07.4-P09.1-review",
+            "section": [
+              "P07.4 + P09.1 — Independent Review",
+              "Final Recheck (independent, post Fix Round)",
+              "The self-audit claim — CONFIRMED ACCURATE (independently reproduced)"
+            ],
+            "excerpt": "...There is no\n   bound state for it to resolve from because nothing has bound it yet. A",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.4.md",
+            "title": "P07.4",
+            "section": [
+              "P07.4 — Surface And Regression Proof"
+            ],
+            "excerpt": "...are called and\nread, never touched.\n\n**What this cell closes.** `P07.3.md`'s headline Concern and its Gaps named one\nrequired P07.4 item: *\"make `closeSessionByQuorum` refuse a close when the\nprotocol",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+            "title": "setup-doctor-registry",
+            "section": [
+              "Contract: Setup Doctor Registry",
+              "Retained Distribution Source Detail",
+              "Contributor hooks setup"
+            ],
+            "excerpt": "...to what used to happen automatically. Someone who\n  never runs this command simply does not get the local hook — this is a\n  one-time manual",
+            "axes": {
+              "area": "packaging-distribution",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 6
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "packaging-distribution",
+            "home": "docs/platform/packaging-distribution/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 6
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": [
+          {
+            "term": "gate-command-missing",
+            "total": 1,
+            "truncated": false,
+            "sections": [
+              {
+                "path": "docs/platform/workflow/spec.md",
+                "section": [
+                  "Spec: Workflow (guide, case, admission)",
+                  "6. Business Rules"
+                ],
+                "line": 347,
+                "missedBySearch": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "group": null
+  }
+}

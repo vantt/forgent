@@ -1,0 +1,209 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:31:39.990Z",
+  "data_hash": "36be1fce36b40a38221b09e13b61ba898f43b0f9264d1dba0714d830bcc6c008",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+            "title": "why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate",
+            "section": [
+              "Why verify moved from the merge lock to catchup's inbound gate",
+              "The mechanism that was already there but could never turn on"
+            ],
+            "excerpt": "...\nTwo functions already existed to skip a redundant verify at the landing\ngate, but their preconditions were nev",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+            "title": "merged-tree-verified-disjoint-main-advance",
+            "section": [
+              "The approve skip-verify fast path was correct but almost never fired on a busy trunk"
+            ],
+            "excerpt": "`tsk-2lq` closed a real, subtle problem: `merge.mjs`'s\n`mergedTreeAlreadyVerified` skip-fast-path — meant to avoid a redundant\nfull 5-6 minute test-suite",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/why-checkmergestillresolves-can-false-positive-after-a-root/why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune.md",
+            "title": "why-checkmergestillresolves-can-false-positive-after-a-root-branch-prune",
+            "section": [
+              "Why `checkMergeStillResolves` can false-positive after a root branch prune",
+              "The rebased-not-pruned case (`tsk-2q8`) — content landed, ancestry sha didn't"
+            ],
+            "excerpt": "... set only covers\nmerge-related parks, never `system-error`.\n\n**Chosen fix**: rathe",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/why-mergerunneritem-s-already-merged-fast-path-checks-conten/why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry.md",
+            "title": "why-mergerunneritems-already-merged-fast-path-checks-content-not-just-ancestry",
+            "section": [
+              "Why `mergeRunnerItem`'s already-merged fast path checks content, not just ancestry",
+              "The fix — `branchContentMismatch`"
+            ],
+            "excerpt": "...\nInstead of trusting bare ancestry, the fast path now also checks whether\nthe paths `branch` actually introduced are s",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/knowledge/why-fgos-checks-repo-invariants-at-return-and-merge-instead/why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite.md",
+            "title": "why-fgos-checks-repo-invariants-at-return-and-merge-instead-of-the-full-test-suite",
+            "section": [
+              "Why `fgos` checks repo invariants at `return` and merge instead of running the full test suite",
+              "Why the second run is often skipped"
+            ],
+            "excerpt": "...\nD5: the post-merge invariant run is skipped when the merged tree is\nprovably identical to the tree alre",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/explanation/fgos-return-skip-redundant-verify.md",
+            "title": "fgos-return-skip-redundant-verify",
+            "section": [
+              "`fgos return` no longer re-verifies a tree the worker already proved green",
+              "What shipped"
+            ],
+            "excerpt": "...\nA `--worker-verified-sha` flag on `fgos return`: when the value matches\nthe branch's current tip (`branchHead`), the verify step is skipped\nentire",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/knowledge/why-mergerunneritem-now-checks-ancestry-before-attempting-a/merge-idempotent-on-already-merged-branch.md",
+            "title": "merge-idempotent-on-already-merged-branch",
+            "section": [
+              "Why `mergeRunnerItem` now checks ancestry before attempting a merge",
+              "The fix"
+            ],
+            "excerpt": "...\n`mergeRunnerItemLocked` now checks `git merge-base --is-ancestor <branch>\nHEAD` *before* attempting the merge — not inferred after the fact from an\nempty stag",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/knowledge/why-withmergetargetslot-passes-allowselfrecognition-false-wh/why-the-merge-target-ref-slot-disabled-lock-self-recognition.md",
+            "title": "why-the-merge-target-ref-slot-disabled-lock-self-recognition",
+            "section": [
+              "Why the merge target-ref slot disabled lock self-recognition",
+              "What the test proved"
+            ],
+            "excerpt": "...when one is set — and every forked\nchild process inherits that value byte-identically. Measured directly:\ntwo separate OS processes, different pids (`152",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/knowledge/why-merge-s-ephemeral-worktree-checks-out-a-scratch-ref-not/why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name.md",
+            "title": "why-merge-checks-out-a-scratch-ref-instead-of-the-real-branch-name",
+            "section": [
+              "Why merge's ephemeral worktree checks out a scratch ref, not the real branch name",
+              "Second-order regression (`tsk-46a`): the fix traded a loud failure for a silent one under concurrency"
+            ],
+            "excerpt": "...The main-checkout lock only wraps the merge+commit",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 9
+          }
+        ],
+        "mentions": [
+          {
+            "term": "mergedTreeAlreadyVerified",
+            "total": 6,
+            "truncated": false,
+            "sections": [
+              {
+                "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+                "section": [],
+                "line": 2,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+                "section": [
+                  "The approve skip-verify fast path was correct but almost never fired on a busy trunk"
+                ],
+                "line": 8,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/explanation/merged-tree-verified-disjoint-main-advance.md",
+                "section": [
+                  "The approve skip-verify fast path was correct but almost never fired on a busy trunk",
+                  "What shipped"
+                ],
+                "line": 34,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+                "section": [
+                  "Why verify moved from the merge lock to catchup's inbound gate",
+                  "The mechanism that was already there but could never turn on"
+                ],
+                "line": 35,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+                "section": [
+                  "Why verify moved from the merge lock to catchup's inbound gate",
+                  "The fix: catchup becomes the standard step, and it re-establishes the evidence"
+                ],
+                "line": 57,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/why-fgos-moved-the-full-verify-run-from-the-merge-lock-s-out/why-verify-moved-from-the-merge-lock-to-catchups-inbound-gate.md",
+                "section": [
+                  "Why verify moved from the merge lock to catchup's inbound gate",
+                  "Fail-closed guarantees this had to preserve"
+                ],
+                "line": 83,
+                "missedBySearch": false
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "group": null
+  }
+}

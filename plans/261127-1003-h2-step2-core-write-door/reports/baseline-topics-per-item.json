@@ -1,0 +1,502 @@
+{
+  "eventsRead": 45545,
+  "topicsWithReserve": 147,
+  "topicsOpenedByARetrospectiveItem": 147,
+  "window": {
+    "from": "2026-10-28T19:38:51.000Z",
+    "to": "2026-11-27T19:38:51.000Z",
+    "items": 0,
+    "itemsAttested": 0,
+    "attests": 0,
+    "handoffs": 0,
+    "topicsOpened": 0,
+    "itemsOpeningATopic": 0,
+    "topicsPerItem": null,
+    "topicsPerAttestedItem": null
+  },
+  "allTime": {
+    "items": 771,
+    "itemsAttested": 240,
+    "attests": 240,
+    "handoffs": 0,
+    "topicsOpened": 147,
+    "itemsOpeningATopic": 147,
+    "topicsPerItem": 0.191,
+    "topicsPerAttestedItem": 0.613
+  },
+  "byMonth": {
+    "2026-08": {
+      "items": 492,
+      "itemsAttested": 0,
+      "attests": 0,
+      "handoffs": 0,
+      "topicsOpened": 0,
+      "itemsOpeningATopic": 0,
+      "topicsPerItem": 0,
+      "topicsPerAttestedItem": null
+    },
+    "2026-09": {
+      "items": 277,
+      "itemsAttested": 240,
+      "attests": 240,
+      "handoffs": 0,
+      "topicsOpened": 147,
+      "itemsOpeningATopic": 147,
+      "topicsPerItem": 0.531,
+      "topicsPerAttestedItem": 0.613
+    },
+    "2026-10": {
+      "items": 2,
+      "itemsAttested": 0,
+      "attests": 0,
+      "handoffs": 0,
+      "topicsOpened": 0,
+      "itemsOpeningATopic": 0,
+      "topicsPerItem": 0,
+      "topicsPerAttestedItem": null
+    }
+  },
+  "openedBy": {
+    "tsk-3kl": [
+      "executor-dispatch-manual-log-gap"
+    ],
+    "tsk-38w": [
+      "worktree-guard-refuses-compound-dispatch"
+    ],
+    "tsk-uky": [
+      "enduser-docs-index-orphan-detection"
+    ],
+    "tsk-2uf": [
+      "dispatch-activation-and-handoff-redesign"
+    ],
+    "tsk-4wv": [
+      "dispatch-redesign-batch-final-verify"
+    ],
+    "tsk-2sp": [
+      "citation-drift-backlog-scope-split-with-tsk-56w"
+    ],
+    "tsk-1dsr": [
+      "claude-executor-rtk-hook-root-cause"
+    ],
+    "tsk-1ai": [
+      "capabilities-prefer-symmetry-removed"
+    ],
+    "smoke-tsk-56w-2-child": [
+      "skill-prose-cleanup-smoke-tests"
+    ],
+    "tsk-u87": [
+      "worktree-isolation-existing-path-hazard"
+    ],
+    "tsk-4bq": [
+      "fgos-fanout-out-of-process-dispatch"
+    ],
+    "tsk-4gr": [
+      "gate-bypass-keyword-floor-false-positives"
+    ],
+    "tsk-17h": [
+      "fanout-proof-agy-demo"
+    ],
+    "tsk-397": [
+      "core-foundation-domain-boundary"
+    ],
+    "tsk-5pb": [
+      "worktree-manual-merge-fgos-blob-safety-net"
+    ],
+    "tsk-3av": [
+      "fanout-execute-consolidation"
+    ],
+    "tsk-vuj": [
+      "fanout-batch-background-execution-and-orphan-recovery"
+    ],
+    "tsk-1el": [
+      "postland-drift-notify-consumer"
+    ],
+    "tsk-3of": [
+      "wontfix-worktree-reclaim-startup-reap"
+    ],
+    "tsk-24e": [
+      "events-jsonl-concurrent-data-loss-investigation"
+    ],
+    "tsk-1ji": [
+      "events-jsonl-opportunistic-truncation-check"
+    ],
+    "tsk-2qp": [
+      "approve-lock-lost-mid-merge-guard"
+    ],
+    "tsk-4gc": [
+      "driving-loop-worktree-resync-on-reentry"
+    ],
+    "tsk-2ux": [
+      "dispatch-buildprompt-docsref-pointer"
+    ],
+    "tsk-c5u": [
+      "catchup-self-recovery-shared-reference"
+    ],
+    "tsk-5gd": [
+      "unsignaled-detection-backtick-false-positive"
+    ],
+    "tsk-6al": [
+      "fgos-return-skip-redundant-verify"
+    ],
+    "tsk-2f6": [
+      "fgos-write-rejected-structural-deadlock"
+    ],
+    "tsk-4dk-2": [
+      "routing-orient-stale-postdelivery-advisory"
+    ],
+    "tsk-40a": [
+      "no-stuck-merge-abort-doctor-check"
+    ],
+    "tsk-3ofc": [
+      "loop-descendant-dedup-false-premise"
+    ],
+    "tsk-2jz": [
+      "cleanup-harness-checkmerge-blind-spots"
+    ],
+    "tsk-1vc": [
+      "eventlog-guard-fail-closed-event-count-checkpoint"
+    ],
+    "tsk-1i3": [
+      "precommit-fgos-content-precedence-guard"
+    ],
+    "tsk-3ve": [
+      "eventlog-tier-a-multifile-content-hash-redesign"
+    ],
+    "tsk-32v": [
+      "checkpoint-commit-self-collides-own-lock-holder"
+    ],
+    "tsk-1ml": [
+      "driving-pane-rename-resolved-path"
+    ],
+    "tsk-3tp": [
+      "eventlog-sweep-checkpoint-redesign"
+    ],
+    "tsk-2l8": [
+      "claim-ambiguous-lock-inline-self-heal"
+    ],
+    "tsk-34o5": [
+      "dispatch-attestation-level-2-enforcement-halt"
+    ],
+    "tsk-2tmk": [
+      "submit-deps-direction-blocked-vs-superseded"
+    ],
+    "tsk-3ys": [
+      "worker-prompt-iron-law-evidence-timing"
+    ],
+    "tsk-3km": [
+      "worker-prompt-inline-completion-signal"
+    ],
+    "tsk-4sr": [
+      "dispatch-config-cache-scope-narrowed"
+    ],
+    "tsk-2ewi": [
+      "fanout-batch-per-child-sync-spawn-and-listwork"
+    ],
+    "tsk-5zv": [
+      "main-checkout-lock-release-early-compound-cleanup"
+    ],
+    "tsk-gb3": [
+      "glm-openrouter-executor"
+    ],
+    "tsk-5et": [
+      "catchup-spurious-not-uptodate-merge-refusal"
+    ],
+    "tsk-28x": [
+      "compound-learn-artifact-registry"
+    ],
+    "tsk-38i": [
+      "fgos-lifecycle-tracking-concurrent-desync"
+    ],
+    "tsk-40m": [
+      "runtime-claim-doing-separation"
+    ],
+    "tsk-5x7": [
+      "dispatch-plan-protocol-redesign"
+    ],
+    "tsk-1hq": [
+      "settleclaim-revision-drift-self-caused"
+    ],
+    "tsk-4he": [
+      "d0026-native-first-dispatch-narrative-reconciliation"
+    ],
+    "tsk-4jo": [
+      "decide-for-prefer-fix-and-dispatchplan-minimal"
+    ],
+    "tsk-322": [
+      "dispatch-execute-repo-root-cwd-separation"
+    ],
+    "tsk-by0": [
+      "herdr-spawn-adapter-fresh-pane"
+    ],
+    "tsk-68j": [
+      "submit-dependency-scan-delivered-blindspot"
+    ],
+    "tsk-5x7-2": [
+      "cross-provider-egress-governance"
+    ],
+    "tsk-hem": [
+      "why-hook-registrations-guard-against-gitignored-scripts"
+    ],
+    "tsk-2gw": [
+      "gitignore-docs-history-reverify"
+    ],
+    "tsk-1wdf": [
+      "fgos-faults-read-surface"
+    ],
+    "tsk-5sr": [
+      "discover-stage-graph-post-audit-cleanup"
+    ],
+    "tsk-64o": [
+      "mergedsha-missing-unreproduced-race"
+    ],
+    "tsk-2uf-1": [
+      "dispatch-module-boundaries"
+    ],
+    "tsk-2uf-2": [
+      "coding-worker-contract-shape"
+    ],
+    "tsk-2uf-3": [
+      "runner-capabilities-advise-execute-slots"
+    ],
+    "tsk-1xm": [
+      "agy-permission-denylist-not-allowlist"
+    ],
+    "tsk-2yu": [
+      "citation-baseline-cleanup-calibration-slice"
+    ],
+    "tsk-47r": [
+      "pi-runtime-capacity"
+    ],
+    "tsk-7u7": [
+      "rul11-tum-lum-doctrine"
+    ],
+    "tsk-3wl5": [
+      "codebase-scatter-consolidation-roadmap"
+    ],
+    "tsk-2yu-1": [
+      "fix-bare-citation-findings"
+    ],
+    "tsk-34o": [
+      "fgos-edit-role-flag"
+    ],
+    "tsk-3tkc": [
+      "codex-bypass-executor"
+    ],
+    "tsk-1cn": [
+      "claude-named-executor"
+    ],
+    "tsk-5zi": [
+      "build-skills-mirror-dev-skills-into-plugin"
+    ],
+    "tsk-2sp-1": [
+      "fix-d-local-outside-home-findings"
+    ],
+    "tsk-2sp-2": [
+      "citation-drift-runner-md-cleanup"
+    ],
+    "tsk-2sp-5": [
+      "citation-drift-remaining-docs-cleanup"
+    ],
+    "tsk-1jt": [
+      "claude-executor-d4-proof-test-red"
+    ],
+    "tsk-56w-1": [
+      "skill-prose-cleanup-design"
+    ],
+    "tsk-56w-2": [
+      "skill-prose-cleanup-fgos-fanout"
+    ],
+    "tsk-56w-3": [
+      "skill-prose-cleanup-fgos-coding-exploring"
+    ],
+    "tsk-56w-4": [
+      "skill-prose-cleanup-fgos-coding-planning"
+    ],
+    "tsk-56w-5": [
+      "skill-prose-cleanup-fgos-coding-validating"
+    ],
+    "tsk-56w-6": [
+      "skill-prose-cleanup-fgos-coding-implement"
+    ],
+    "tsk-56w-7": [
+      "skill-prose-cleanup-merge-loop"
+    ],
+    "tsk-56w-8": [
+      "skill-prose-cleanup-cli-fallback-dedupe"
+    ],
+    "tsk-56w-9": [
+      "skill-prose-cleanup-remaining-bare-citations"
+    ],
+    "tsk-3uw4": [
+      "rul11-anchor-test-citation-gloss-update"
+    ],
+    "tsk-64hk": [
+      "dispatch-execute-concurrency-guard"
+    ],
+    "tsk-2ky": [
+      "dispatch-verify-run-once-cadence"
+    ],
+    "tsk-37l": [
+      "write-wrapper-script-shared-helper"
+    ],
+    "tsk-3ps": [
+      "dispatch-execute-prompt-file-flag"
+    ],
+    "tsk-2ua": [
+      "expr-eval-chain-passthrough-vs-split"
+    ],
+    "tsk-3ti": [
+      "tsk-397-post-merge-review-remediation"
+    ],
+    "tsk-37d": [
+      "state-write-single-stringify"
+    ],
+    "tsk-4oq": [
+      "dispatch-execute-unsignaled-outcome"
+    ],
+    "tsk-1uf": [
+      "return-approve-background-execution-guidance"
+    ],
+    "tsk-2y1": [
+      "spawnworker-idletimeout-flaky-test-margin"
+    ],
+    "tsk-5n6": [
+      "session-identity-3hop-walk-flaky-test"
+    ],
+    "tsk-5dnt": [
+      "list-id-callthreads-leak-fix"
+    ],
+    "tsk-jyn": [
+      "root-resolution-two-call-split-propagation"
+    ],
+    "tsk-2lq": [
+      "merged-tree-verified-disjoint-main-advance"
+    ],
+    "tsk-6ci": [
+      "lock-wait-self-vs-other-holder-identity"
+    ],
+    "tsk-4zr": [
+      "list-id-fields-flag-lightweight-projection"
+    ],
+    "tsk-2ck": [
+      "discovered-work-risk-kind-vocabulary-coercion"
+    ],
+    "tsk-2yog": [
+      "mode-gate-tiny-small-skip-load"
+    ],
+    "tsk-5v3": [
+      "fanout-batch-concurrent-dispatch"
+    ],
+    "tsk-3f9k": [
+      "dispatch-waiting-rule-end-turn-no-tool-call"
+    ],
+    "tsk-ut6": [
+      "merge-next-inline-approve-invocation"
+    ],
+    "tsk-3hp": [
+      "planning-passthrough-action-footprint-sync"
+    ],
+    "tsk-5k1": [
+      "opportunistic-checks-test-regression-fgos-oet"
+    ],
+    "tsk-6av": [
+      "approve-owns-self-recovery-merge-loop-thin-caller"
+    ],
+    "tsk-oet": [
+      "opportunistic-checks-regression-root-cause-bisection"
+    ],
+    "tsk-3hks": [
+      "resolve-park-reason-verb"
+    ],
+    "tsk-4te": [
+      "partial-claim-event-loss-covered-by-tsk-1vc"
+    ],
+    "tsk-ri8": [
+      "iron-law-classification-recipe-path"
+    ],
+    "tsk-13g": [
+      "planning-split-root-verify-sync"
+    ],
+    "tsk-3tv": [
+      "sync-root-error-propagation"
+    ],
+    "tsk-3df": [
+      "sync-root-outcome-guard-citation-and-lock-lost-coverage"
+    ],
+    "tsk-3bh": [
+      "dispatch-execute-lost-uncommitted-paths-warning"
+    ],
+    "tsk-67o": [
+      "footprint-diff-research-md-noise"
+    ],
+    "tsk-3qo": [
+      "loop-family-scheduleWakeup-self-reference-gap"
+    ],
+    "tsk-2xg": [
+      "catchup-manual-merge-fgos-write-rejected-deadlock"
+    ],
+    "tsk-26r": [
+      "return-ephemeral-worktree-fgos-strip"
+    ],
+    "tsk-vim": [
+      "noise-only-paths-truncation-guard-exemption"
+    ],
+    "tsk-tr9": [
+      "catchup-movework-reopens-fgos-divergence"
+    ],
+    "tsk-1t2": [
+      "general-verb-events-baseline-write-verified-fixed"
+    ],
+    "tsk-4s6": [
+      "write-rejected-trust-branchheadattake"
+    ],
+    "tsk-2e7": [
+      "main-checkout-lock-scope-audit"
+    ],
+    "tsk-3i6": [
+      "d3-goal-check-rationale-trace"
+    ],
+    "tsk-198": [
+      "write-rejected-no-diff-check"
+    ],
+    "tsk-52p": [
+      "branch-content-mismatch-fgos-exclusion"
+    ],
+    "tsk-os6": [
+      "restore-verifiedsha-docs-on-main"
+    ],
+    "tsk-31v": [
+      "fgos-gateway-lifecycle-verb"
+    ],
+    "tsk-2jg": [
+      "assert-plan-evidence-current-tree-fallback"
+    ],
+    "tsk-2tr": [
+      "extract-dispatch-result-normalization-ladder"
+    ],
+    "tsk-1g6": [
+      "dispatch-result-confidence-reader"
+    ],
+    "tsk-10n": [
+      "herdr-orchestrator-terminology-boundary"
+    ],
+    "tsk-1ck": [
+      "main-checkout-reset-ancestor-commit-loss-guard"
+    ],
+    "tsk-uio": [
+      "orphaned-runtime-claim-recovery-unclaim-verb"
+    ],
+    "tsk-4p6": [
+      "approve-cas-mismatch-block"
+    ],
+    "tsk-3cx": [
+      "retro-next-shared-driving"
+    ],
+    "tsk-25b": [
+      "test-suite-wallclock-file-split"
+    ],
+    "tsk-4e1": [
+      "fgos-preflight-verb"
+    ]
+  }
+}

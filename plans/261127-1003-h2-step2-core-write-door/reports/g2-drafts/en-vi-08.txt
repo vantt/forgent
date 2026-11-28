@@ -1,0 +1,1 @@
+Work a worker reports through fenced discovery blocks is untrusted data: the runner acts on at most 20 blocks per dispatch and drops the rest with a log line. A block whose title matches an item already discovered from the same parent (case and whitespace insensitive) is skipped, and new items start at todo in the clarify step with a placeholder verify.

@@ -1,0 +1,1 @@
+Each observe store writes one JSONL shard per writer under the observe directory, and lines over 1 MiB are never written. If a writer died mid-line, the next append starts on a fresh line and the torn line stays in the file, to be named and skipped on read rather than breaking the whole store. Symlinked shards are refused.

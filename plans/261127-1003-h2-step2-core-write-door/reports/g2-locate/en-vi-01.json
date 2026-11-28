@@ -1,0 +1,109 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:28:28.606Z",
+  "data_hash": "509d0caedc27b7f7f80cec779e8f4146420a26265df5aff9e8d5ff101c78cf91",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+            "title": "fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door",
+            "section": [
+              "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door"
+            ],
+            "excerpt": "`transitionWork`'s precondition refusal (`src/state/status-fsm.mjs`)\nused to build its error message from `from`/`to` alone, never consulting\nthe in-scope",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/knowledge/how-to-close-a-duplicate-superseded-or-admin-decided-work-it/handle-a-duplicate-work-item.md",
+            "title": "handle-a-duplicate-work-item",
+            "section": [
+              "How to close a duplicate, superseded, or admin-decided work item",
+              "Steps"
+            ],
+            "excerpt": "...   blocked (like the `tsk-5h4`/`tsk-2ib` case).\n\n3. **Record the closure reason in the decision log**, the same convention\n   `blocked` reasons already use — `--rea",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+            "title": "work-item-lifecycle-and-domain-model",
+            "section": [
+              "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+              "Two edges landing on the same status can still mean different things — a fix needs a positive marker, not an inference from the shared value"
+            ],
+            "excerpt": "...-fail",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/how-to-claim-an-item-that-is-still-at-stage-clarify-or-decom/claim-a-clarify-or-decompose-stage-item.md",
+            "title": "claim-a-clarify-or-decompose-stage-item",
+            "section": [
+              "How to claim an item that is still at stage `clarify` or `decompose`",
+              "Resuming an item you already claimed"
+            ],
+            "excerpt": "...moved, so there is nothing to protect against by refusing a dirty tree.\nA checkout with uncommitted work is exactly the session t",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+            "title": "why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human",
+            "section": [
+              "Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`",
+              "The remaining real gap"
+            ],
+            "excerpt": "`transitionWork` requires a non-empty `answer` for *any* exit from `awaiting-human` — but `move`'s own CLI case never exposed an `--answer` flag at all, so the `awaiting-human -> wontfix` edge was unreachable through `move` even though it e…",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/knowledge/why-a-single-done-status-split-into-delivered-retrospective/why-done-split-into-delivered-retrospective-cleanup-done.md",
+            "title": "why-done-split-into-delivered-retrospective-cleanup-done",
+            "section": [
+              "Why a single `done` status split into delivered → retrospective → cleanup → done",
+              "Why `cleanup`'s TTL delay is deliberate, not laziness"
+            ],
+            "excerpt": "...moved\nfrom the `retrospective -> cleanup` transition to the earlier `delivered`\ntransition (the actu",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 6
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

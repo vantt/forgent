@@ -1,0 +1,1 @@
+A pinned account on a seat must be written as pool/account, for example openai/work. Anything else, such as a missing slash or an empty side, is refused with `account-pin-invalid` before any candidate is ranked.

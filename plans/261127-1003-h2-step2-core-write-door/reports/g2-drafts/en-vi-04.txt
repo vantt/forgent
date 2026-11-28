@@ -1,0 +1,1 @@
+The case gate never runs a command the caller passes in. It runs the verify command the runner config declares for the named capability, and refuses with `gate-command-missing` when none is declared, so a gate cannot pass simply because there was nothing to run. It also refuses when no tested paths are given or the worktree does not exist.

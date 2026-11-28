@@ -1,0 +1,1 @@
+A friction record stays open until a later resolve record settles it, either for the same subject or, when resolved by signature, for its whole class. Reads still include the old friction shards that have not been migrated yet, so no record disappears during the switch to the new record kinds.

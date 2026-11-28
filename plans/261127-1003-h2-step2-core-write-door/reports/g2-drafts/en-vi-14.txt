@@ -1,0 +1,1 @@
+When a seat binding fails and the walk continues, the next candidates are first the rest of the failed family, then the tier fallback families if configured (which can only narrow the seat's own families), otherwise the remaining prefer order. A candidate that was already tried never comes back in the same walk.

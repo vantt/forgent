@@ -1,0 +1,765 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:28:31.943Z",
+  "data_hash": "b88c4109e49580198c5a3b73a7a45535a27f105048457211101fe6bfaf2205a6",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+            "title": "why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human",
+            "section": [
+              "Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`",
+              "The remaining real gap"
+            ],
+            "excerpt": "`transitionWork` requires a non-empty `answer` for *any* exit from `awaiting-human` — but `move`'s own CLI case never exposed an `--answer` flag at all, so the `awaiting-human -> wontfix` edge was unreachable through `move` even though it e…",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+            "title": "fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door",
+            "section": [
+              "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door",
+              "The real cost this message gap caused"
+            ],
+            "excerpt": "...awaiting-approval`/`awaiting-human`/`delivered`/`retrospective`/\n`cleanup`/`done`) all refused with a bare `prec",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          }
+        ],
+        "mentions": [
+          {
+            "term": "transitionWork",
+            "total": 14,
+            "truncated": false,
+            "sections": [
+              {
+                "path": "docs/explanation/approve-cas-mismatch-block.md",
+                "section": [],
+                "line": 2,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/approve-cas-mismatch-block.md",
+                "section": [
+                  "`fgos approve` stopped crashing when the item it was about to block had already moved"
+                ],
+                "line": 13,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/fsm-refusal-messages-now-name-a-remedy-and-wontfix-gains-an/fsm-refusal-messages-name-a-remedy-and-wontfix-gains-an-awaiting-human-door.md",
+                "section": [
+                  "FSM refusal messages now name a remedy, and `wontfix` gains an `awaiting-human` door"
+                ],
+                "line": 11,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/how-to-recover-a-stuck-doing-claim-after-a-worktree-creation/recover-a-stuck-doing-claim-after-worktree-creation-failure.md",
+                "section": [
+                  "How to recover a stuck `doing` claim after a worktree-creation failure",
+                  "Real example"
+                ],
+                "line": 129,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/judging-real-test-duplication-vs-superficially-similar-tests/judging-real-test-duplication.md",
+                "section": [
+                  "Judging real test duplication vs. superficially-similar tests",
+                  "Real examples from this audit (tsk-3wr-2)"
+                ],
+                "line": 84,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/why-approve-logs-post-success-movework-faults-outside-events/why-approve-logs-post-success-movework-faults-outside-events-lock.md",
+                "section": [
+                  "Why `approve` logs post-success `moveWork` faults outside `events.lock`",
+                  "How the call site distinguishes this from every other failure class"
+                ],
+                "line": 93,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/why-backlog-is-a-new-global-status-before-todo-not-a-domain/why-backlog-is-a-new-global-status-before-todo-not-a-domain-relabel.md",
+                "section": [
+                  "Why `backlog` is a new global status before `todo`, not a domain relabel",
+                  "Four decisions locked before implementation"
+                ],
+                "line": 39,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+                "section": [
+                  "Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`",
+                  "The remaining real gap"
+                ],
+                "line": 21,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/why-fgos-move-gained-an-answer-flag-closing-the-last-unreach/why-move-needed-an-answer-flag-to-reach-wontfix-from-awaiting-human.md",
+                "section": [
+                  "Why `move` needed an `--answer` flag to reach `wontfix` from `awaiting-human`",
+                  "The fix"
+                ],
+                "line": 36,
+                "missedBySearch": false
+              },
+              {
+                "path": "docs/knowledge/why-resolvediscovery-guards-re-parking-an-already-parked-ite/why-resolvediscovery-guards-re-parking-an-already-parked-item.md",
+                "section": [
+                  "Why `resolveDiscovery` guards re-parking an already-parked item",
+                  "The real crash and its repro"
+                ],
+                "line": 20,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.3.md",
+                "section": [
+                  "Cell P03.3 — R4-R6: The Two Live Proofs And ADR Traceability",
+                  "Red-Team",
+                  "Attacks attempted, all failed to find a defect"
+                ],
+                "line": 334,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P00.1.md",
+                "section": [
+                  "P00.1 — Baseline And Handoff Audit",
+                  "Frozen Scope — what MVP6 (and later MVP7-9) may build on",
+                  "Non-negotiable boundaries this cell independently re-confirms (not just cited)"
+                ],
+                "line": 138,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/architecture/implementation-pointers.md",
+                "section": [
+                  "Work State Implementation Pointers",
+                  "2. Implementation Pointers"
+                ],
+                "line": 31,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/platform/work-state/decisions/retired-decision-history.md",
+                "section": [
+                  "Retired Decision History: Work State",
+                  "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+                  "D-ADR0027 — Domain sở hữu vocabulary/transition status đoạn TRƯỚC `delivered` (supersede base-workflow-model)",
+                  "Audit: mọi consumer thật của `status-fsm.mjs`/`STATUSES`/`TRANSITIONS`/literal status hôm nay",
+                  "1. Nguồn sự thật (định nghĩa STATUSES/TRANSITIONS)"
+                ],
+                "line": 694,
+                "missedBySearch": true
+              }
+            ]
+          },
+          {
+            "term": "reason",
+            "total": 1101,
+            "truncated": true,
+            "sections": [
+              {
+                "path": "docs/decisions/index.md",
+                "section": [
+                  "Decisions index"
+                ],
+                "line": 26,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person (`merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person`)"
+                ],
+                "line": 454,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "How to wire an existing skill's inline-reasoning step through an agent-executor executor (`how-to-wire-an-existing-skill-s-inline-reasoning-step-through-an-agent-executor-executor`)"
+                ],
+                "line": 660,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "tsk-3mv feature summary — teaching merge-loop to self-resolve the two block reasons that already had a proven playbook (`tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook`)"
+                ],
+                "line": 1103,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning (`why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning`)"
+                ],
+                "line": 2138,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why the main-checkout-lock hook used to block worktree commits it had no reason to touch (`why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch`)"
+                ],
+                "line": 2241,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "resolve-park-reason-verb (`resolve-park-reason-verb`)"
+                ],
+                "line": 3109,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/agy-permission-denylist-not-allowlist.md",
+                "section": [
+                  "Why `agy` dispatch ended up with a denylist, not the allowlist it set out to build",
+                  "What four rounds of live proof actually found"
+                ],
+                "line": 29,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/approve-cas-mismatch-block.md",
+                "section": [
+                  "`fgos approve` stopped crashing when the item it was about to block had already moved",
+                  "What shipped"
+                ],
+                "line": 26,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/approve-cas-mismatch-block.md",
+                "section": [
+                  "`fgos approve` stopped crashing when the item it was about to block had already moved",
+                  "What the tests prove"
+                ],
+                "line": 61,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+                "section": [
+                  "The check the previous two syntheses had to work around, finally fixed",
+                  "Confirmed false positive, live, on `tsk-gb3`"
+                ],
+                "line": 24,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+                "section": [
+                  "Why `capabilities.<name>.prefer` no longer requires a matching `for` on the executor",
+                  "The general lesson"
+                ],
+                "line": 61,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-manual-merge-fgos-write-rejected-deadlock.md",
+                "section": [
+                  "A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all",
+                  "Superseded shortly after — not by a revert, but by removing the files from git entirely"
+                ],
+                "line": 50,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-manual-merge-fgos-write-rejected-deadlock.md",
+                "section": [
+                  "A real structural deadlock — two guards required two different `.fgos` values, satisfiable by no snapshot at all",
+                  "The remaining gap `tsk-4gi` couldn't reach — a genuine git *conflict*, not a clean auto-stage"
+                ],
+                "line": 143,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-movework-reopens-fgos-divergence.md",
+                "section": [
+                  "A merge that manufactured its own next conflict",
+                  "Reproduced deterministically, 12+ times"
+                ],
+                "line": 19,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-self-recovery-shared-reference.md",
+                "section": [
+                  "Three items each fixed self-recovery in one skill file — none of them shared it",
+                  "Confirmed live"
+                ],
+                "line": 30,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+                "section": [
+                  "A merge refusal git explained clearly, that the code still mishandled",
+                  "What shipped"
+                ],
+                "line": 95,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/checkpoint-commit-self-collides-own-lock-holder.md",
+                "section": [
+                  "The checkpoint commit didn't recognize its own caller as the lock holder — so it staged and silently failed, poisoning the next real merge",
+                  "The mechanism, found by direct reproduction after 7 identical failures in one night"
+                ],
+                "line": 41,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+                "section": [
+                  "Scoping a 1788-finding cleanup backlog: the calibration-slice lesson",
+                  "The general lesson"
+                ],
+                "line": 48,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md",
+                "section": [
+                  "Splitting the remaining citation-drift backlog: two disjoint scopes, two different fix rules",
+                  "Why the scope was narrowed mid-flight"
+                ],
+                "line": 18,
+                "missedBySearch": true
+              }
+            ]
+          },
+          {
+            "term": "ask",
+            "total": 1508,
+            "truncated": true,
+            "sections": [
+              {
+                "path": "docs/decisions/index.md",
+                "section": [
+                  "Decisions index"
+                ],
+                "line": 36,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "How to: label a herdr pane with the claimed task from a chrome-only fgOS skill (`how-to-label-a-herdr-pane-with-the-claimed-task-from-a-chrome-only-fgos-skill`)"
+                ],
+                "line": 214,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Fix a pre-existing item that keeps re-asking an already-answered clarify question (`fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question`)"
+                ],
+                "line": 229,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "merge-loop and merge-next self-run fgos catchup on a merge-conflict block reason instead of parking to ask a person (`merge-loop-and-merge-next-self-run-fgos-catchup-on-a-merge-conflict-block-reason-instead-of-parking-to-ask-a-person`)"
+                ],
+                "line": 454,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "How to write a task-spec (`how-to-write-a-task-spec`)"
+                ],
+                "line": 676,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why the dispatch gate widened to `kind !== 'task'` and mechanism values renamed to process location (`why-the-dispatch-gate-widened-to-kind-task-and-mechanism-values-renamed-to-process-location`)"
+                ],
+                "line": 792,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why `keywordRiskGate` now skips the heavy-risk ask when a verdict cites a locked decision (`why-keywordriskgate-now-skips-the-heavy-risk-ask-when-a-verdict-cites-a-locked-decision`)"
+                ],
+                "line": 1040,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "coding domain's role/holder axis, handoff verb, task-spec/skill/knowledge/context ontology, and workflow hierarchy design decisions (`coding-domain-s-role-holder-axis-handoff-verb-task-spec-skill-knowledge-context-ontology-and-workflow-hierarchy-design-decisions`)"
+                ],
+                "line": 1470,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why every Agent/Task-tool dispatch is enforced through a PreToolUse hook that runs dispatch.mjs decide itself, why the hook self-invokes decide instead of tracking whether the caller already did, why --needs-soul exists, why decide reports configured:true|false instead of throwing, why resolve was retired in favor of decide/execute, and why MCP tool access is a hand-back rather than a second client dispatch.mjs opens itself (`why-every-agent-task-tool-dispatch-is-enforced-through-a-pretooluse-hook-that-runs-dispatch-mjs-decide-itself-why-the-hook-self-invokes-decide-instead-of-tracking-whether-the-caller-already-did-why-needs-soul-exists-why-decide-reports-configured-true-false-instead-of-throwing-why-resolve-was-retired-in-favor-of-decide-execute-and-why-mcp-tool-access-is-a-hand-back-rather-than-a-second-client-dispatch-mjs-opens-itself`)"
+                ],
+                "line": 1548,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why src/runner/dispatch.mjs's capacity/executor layer was redesigned around \"task\" as the unifying concept, and the 12 locked decisions behind that redesign (`why-src-runner-dispatch-mjs-s-capacity-executor-layer-was-redesigned-around-task-as-the-unifying-concept-and-the-12-locked-decisions-behind-that-redesign`)"
+                ],
+                "line": 1556,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match (`why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match`)"
+                ],
+                "line": 1627,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why fgOS requires a gate/ask question to restate its own context and problem, why that requirement got real machine enforcement, and why the enforcement targets structural completeness rather than citation format (`why-fgos-requires-a-gate-ask-question-to-restate-its-own-context-and-problem-why-that-requirement-got-real-machine-enforcement-and-why-the-enforcement-targets-structural-completeness-rather-than-citation-format`)"
+                ],
+                "line": 1809,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why fgos-coding-planning and fgos-coding-validating merged their two approval gates into one, and how that one gate decides when to ask a person versus proceed (`why-fgos-coding-planning-and-fgos-coding-validating-merged-their-two-approval-gates-into-one-and-how-that-one-gate-decides-when-to-ask-a-person-versus-proceed`)"
+                ],
+                "line": 2006,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why stage-skills forbid ad hoc Task/Agent delegation for their own reasoning (`why-stage-skills-forbid-ad-hoc-task-agent-delegation-for-their-own-reasoning`)"
+                ],
+                "line": 2138,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why the Iron Law gate only runs at the trunk merge boundary, why it's ask/warn (not a bypass field), and why one /fgOS:approve skill wraps both approve and sync-root (`why-the-iron-law-gate-only-runs-at-the-trunk-merge-boundary-why-it-s-ask-warn-not-a-bypass-field-and-why-one-fgos-approve-skill-wraps-both-approve-and-sync-root`)"
+                ],
+                "line": 2217,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/approve-cas-mismatch-block.md",
+                "section": [
+                  "`fgos approve` stopped crashing when the item it was about to block had already moved",
+                  "What shipped"
+                ],
+                "line": 45,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/capabilities-prefer-symmetry-removed.md",
+                "section": [
+                  "Why `capabilities.<name>.prefer` no longer requires a matching `for` on the executor"
+                ],
+                "line": 7,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+                "section": [
+                  "Scoping a 1788-finding cleanup backlog: the calibration-slice lesson",
+                  "Why \"top 2-3 files\" from the item's own description got narrowed further"
+                ],
+                "line": 35,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/claude-executor-d4-proof-test-red.md",
+                "section": [
+                  "`tsk-1jt`: the named `claude` executor's first D4 proof-test came back RED"
+                ],
+                "line": 19,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/compound-learn-artifact-registry.md",
+                "section": [
+                  "The registry this session's own retrospective synthesis runs on, decided here"
+                ],
+                "line": 15,
+                "missedBySearch": true
+              }
+            ]
+          },
+          {
+            "term": "answer",
+            "total": 990,
+            "truncated": true,
+            "sections": [
+              {
+                "path": "docs/decisions/index.md",
+                "section": [
+                  "Decisions index"
+                ],
+                "line": 24,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Fix a pre-existing item that keeps re-asking an already-answered clarify question (`fix-a-pre-existing-item-that-keeps-re-asking-an-already-answered-clarify-question`)"
+                ],
+                "line": 229,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "Why a gate dialogue keeps the agent's checkpoint separate from the human's answer (`why-a-gate-dialogue-keeps-the-agent-s-checkpoint-separate-from-the-human-s-answer`)"
+                ],
+                "line": 955,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why fgos answer's real resume behavior is statusAtAsk rather than always todo, and why its CLI help text was corrected to match (`why-fgos-answer-s-real-resume-behavior-is-statusatask-rather-than-always-todo-and-why-its-cli-help-text-was-corrected-to-match`)"
+                ],
+                "line": 1627,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/doc-registry.md",
+                "section": [
+                  "Knowledge Registry Index",
+                  "Topics",
+                  "why fgos move gained an --answer flag, closing the last unreachable edge out of awaiting-human (`why-fgos-move-gained-an-answer-flag-closing-the-last-unreachable-edge-out-of-awaiting-human`)"
+                ],
+                "line": 1982,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+                "section": [
+                  "A heavy-risk item with no branch of its own had no path to `delivered`",
+                  "What shipped"
+                ],
+                "line": 64,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+                "section": [
+                  "A merge refusal git explained clearly, that the code still mishandled",
+                  "The scope decision"
+                ],
+                "line": 62,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/claude-executor-d4-proof-test-red.md",
+                "section": [
+                  "`tsk-1jt`: the named `claude` executor's first D4 proof-test came back RED"
+                ],
+                "line": 20,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/codex-bypass-executor.md",
+                "section": [
+                  "Why `codex` was wired as a bypass-all executor, not a sandboxed one",
+                  "What shipped"
+                ],
+                "line": 62,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/compound-learn-artifact-registry.md",
+                "section": [
+                  "The registry this session's own retrospective synthesis runs on, decided here",
+                  "The registry itself"
+                ],
+                "line": 70,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/compound-learn-artifact-registry.md",
+                "section": [
+                  "The registry this session's own retrospective synthesis runs on, decided here",
+                  "What landed as code: 12 children, this root just decomposed and locked design",
+                  "Child 2 — the docPath resolver, aliases only (`tsk-28x-2`)"
+                ],
+                "line": 139,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+                "section": [
+                  "A caching proposal whose motivating scenario the target architecture cannot support",
+                  "The scope decision"
+                ],
+                "line": 53,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+                "section": [
+                  "A caching proposal whose motivating scenario the target architecture cannot support",
+                  "What shipped"
+                ],
+                "line": 86,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/dispatch-execute-prompt-file-flag.md",
+                "section": [
+                  "`dispatch execute --prompt-file` closes the shell-round-trip friction directly",
+                  "What shipped"
+                ],
+                "line": 49,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/dispatch-plan-protocol-redesign.md",
+                "section": [
+                  "An 8-phase redesign, deliberately cut to 3 shippable pieces before any code landed",
+                  "A spike checked the deferred half and found no real consumer yet (`tsk-3rn`)"
+                ],
+                "line": 118,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/fgos-fanout-out-of-process-dispatch.md",
+                "section": [
+                  "Why `fgos-fanout` gained a real out-of-process firing path",
+                  "The bug"
+                ],
+                "line": 23,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/fgos-gateway-lifecycle-verb.md",
+                "section": [
+                  "Why the gateway needs its own CLI door, not a hand-rolled background process",
+                  "Where it lives now (2026-11-15)"
+                ],
+                "line": 85,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/fgos-preflight-verb.md",
+                "section": [
+                  "`fgos preflight` is retired; the three checks stay as repo scripts"
+                ],
+                "line": 7,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/glm-openrouter-executor.md",
+                "section": [
+                  "Giving one executor its own environment without touching the default one"
+                ],
+                "line": 30,
+                "missedBySearch": true
+              },
+              {
+                "path": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+                "section": [
+                  "Watching an agent work in a real pane, without letting the next dispatch talk to a stranger's session",
+                  "The hard constraint that made this safe"
+                ],
+                "line": 44,
+                "missedBySearch": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "group": null
+  }
+}

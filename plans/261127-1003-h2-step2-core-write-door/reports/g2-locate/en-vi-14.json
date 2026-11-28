@@ -1,0 +1,219 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:32:37.074Z",
+  "data_hash": "626825e8b9bad0f68becfcd8b0561db9f320c2c622baec2d599dd3ddcf3400be",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/runner/subcomponents/h-6979005beaf7/spec.md",
+            "title": "spec",
+            "section": [
+              "Runner Business Rules",
+              "Business Rules"
+            ],
+            "excerpt": "....<family>.<tier>[<index>]` (it read `resolveTierModel(<family>.<tier>)`). `resolveTierModel` is the model of the cell's first entry whichever pool serves it (the legacy dispatch path, the runner dry",
+            "axes": {
+              "area": "runner",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/platform/runner/decisions/h-36d872fbb0e5.md",
+            "title": "h-36d872fbb0e5",
+            "section": [
+              "Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4)",
+              "0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the next candidate"
+            ],
+            "excerpt": "Runner Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) > Lịch sử quyết định retired từ docs/decisions/ (tsk-1lv-4) > 0058 — Provider failure fails over inside Execution Core: another account of the same provider first, then the ne",
+            "axes": {
+              "area": "runner",
+              "question": "choice"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/decisions/index.md",
+            "title": "index",
+            "section": [],
+            "excerpt": "... 8190 tests on the integration tip. | 2026-10-18T14:56:09.725Z |\n| runner | D-ADR0071 (model pool B1): a seat walks its tier's declared family order after a failure (runner.tierFallback, capability prefer only narrows), cross-family fall",
+            "axes": {
+              "area": "platform",
+              "question": "choice"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/platform/runner/contracts/executor-model.md",
+            "title": "executor-model",
+            "section": [
+              "Executor Model Contract — Execution",
+              "6. The bind",
+              "6.2 Answer"
+            ],
+            "excerpt": "...the account the lease takes (`leaseAccount`) and a pinned `account` when\nan override named one, `provenance` and `bindingInput`.\n\n`provenance` names, for each of `executor`,",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+            "title": "install-fgos-in-a-project-and-use-doctor",
+            "section": [
+              "How to install fgOS in a project and use fgos doctor",
+              "5. Before your first Workflow run",
+              "5.2. Pools and independence"
+            ],
+            "excerpt": "...A panel only prefers a different family per seat:\n`bind()` gives each seat the first family in `prefer` order that no",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/seat-binding/spec.md",
+            "title": "spec",
+            "section": [
+              "Spec: Seat Binding (một authority cho câu hỏi \"ghế này chạy bằng gì\")"
+            ],
+            "excerpt": "...first, then a CLI), RUL91 (a person may pin the provider account of a unit run), RUL98 (workflow start passes --timeout and --account to each Unit), RUL102 (a tier cel",
+            "axes": {
+              "area": "seat-binding",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 7,
+            "path": "docs/platform/runner/contracts/unit-run-result.md",
+            "title": "unit-run-result",
+            "section": [
+              "Unit Run Result Contract — Execution to Workflow"
+            ],
+            "excerpt": "...Contract\nAudience: Maintainer, implementer, agent that has only `fgos run --json`\nPurpose: Fix what the Execution layer hands up when a Unit run ends, so the Workflow layer and any caller",
+            "axes": {
+              "area": "runner",
+              "question": "obligation"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 8,
+            "path": "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P05.1/redteam-report.md",
+            "title": "redteam-report",
+            "section": [
+              "P05.1 red-team report — independent adversarial pass on the hard conformance and recovery proof",
+              "Findings",
+              "F6 (high) — `aggregateBounds` on a resumed request is silently discarded, both directions (RT-10)"
+            ],
+            "excerpt": "...\nDeclaring **tighter** bounds",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 9,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P04.2.md",
+            "title": "P04.2",
+            "section": [
+              "Cell P04.2 — Independent fan-out, fan-in, evidence handling, live proofs (Phase 04 R5-R9)",
+              "Deferral Audit (AC-I003, AC-I004, AC-I006, AC-I008 -- Phase 04's own Proofs-And-Exit criteria)"
+            ],
+            "excerpt": "...families at the correct tier.\n- **AC-I006** (corre",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 10,
+            "path": "docs/platform/run-supervisor/spec.md",
+            "title": "spec",
+            "section": [],
+            "excerpt": null,
+            "axes": {
+              "area": "run-supervisor",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "runner",
+            "home": "docs/platform/runner/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 2
+          },
+          {
+            "axis": "area",
+            "value": "run-supervisor",
+            "home": "docs/platform/run-supervisor/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "seat-binding",
+            "home": "docs/platform/seat-binding/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 3
+          },
+          {
+            "axis": "question",
+            "value": "obligation",
+            "home": null,
+            "candidates": 2
+          },
+          {
+            "axis": "question",
+            "value": "choice",
+            "home": null,
+            "candidates": 2
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 2
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}

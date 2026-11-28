@@ -1,0 +1,137 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T03:28:48.022Z",
+  "data_hash": "be9a9190424b3e14c325aa6de746d9685aaaa5d8995c4b3bc7916cfc21103960",
+  "data": {
+    "partial": false,
+    "state": "ready",
+    "action": null,
+    "parts": [
+      {
+        "candidates": [
+          {
+            "rank": 1,
+            "path": "docs/platform/event-store/spec.md",
+            "title": "spec",
+            "section": [
+              "Event Store Component Specification",
+              "12. Order"
+            ],
+            "excerpt": "...he new sequence differs from the folded one, or rebuilds (section 15). A global append-only prefix would need a publication watermark or a consensus protocol, and this spec has neither.\n- O",
+            "axes": {
+              "area": "event-store",
+              "question": "current-truth"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 2,
+            "path": "docs/knowledge/how-fgos-s-event-log-is-allowed-to-evolve-without-breaking-r/event-log-evolution-discipline.md",
+            "title": "event-log-evolution-discipline",
+            "section": [
+              "How fgOS's event log is allowed to evolve without breaking replay",
+              "Concurrency at the log's write door"
+            ],
+            "excerpt": "...\nThe log's on-disk lock exists specifically to stop two concurrent writers from\nproducing a duplicated or gapped sequence number. Bec",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 3,
+            "path": "docs/knowledge/how-fgos-isolates-concurrent-sessions-and-why-the-event-log/session-isolation-and-concurrency.md",
+            "title": "session-isolation-and-concurrency",
+            "section": [
+              "How fgOS isolates concurrent sessions, and why the event log's write door blocks instead of backing off",
+              "A comment claiming lock parity with `addWork` didn't match the code (`tsk-1jp`)"
+            ],
+            "excerpt": "...a precondition against that read\n(existence for `ad",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 4,
+            "path": "docs/knowledge/why-the-work-item-lifecycle-keeps-status-and-stage-separate/work-item-lifecycle-and-domain-model.md",
+            "title": "work-item-lifecycle-and-domain-model",
+            "section": [
+              "Why the work-item lifecycle keeps status and stage separate, and what extending it costs",
+              "Two edges landing on the same status can still mean different things — a fix needs a positive marker, not an inference from the shared value"
+            ],
+            "excerpt": "...-fail",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 5,
+            "path": "docs/explanation/runtime-claim-doing-separation.md",
+            "title": "runtime-claim-doing-separation",
+            "section": [
+              "`doing` was never supposed to be durable history — it was live coordination masquerading as an event",
+              "Acceptance bar this item held itself to"
+            ],
+            "excerpt": "...\nAfter `pick`/`take`, `git status .fgos/events` shows no change; the UI\nstill shows claimed/ru",
+            "axes": {
+              "area": "platform"
+            },
+            "outsideRegion": false
+          },
+          {
+            "rank": 6,
+            "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
+            "title": "P01.1",
+            "section": [
+              "Cell P01.1 — CoordinationSession store, schema, events, direct cutover (Phase 01 R1-R4)",
+              "Fix Evidence",
+              "Fix round 2 (2026-09-01) — Red-Team's second-pass HIGH/MEDIUM/LOW, all ACCEPTED"
+            ],
+            "excerpt": "...and the crash-window-within-crash-\nwindow reasoning",
+            "axes": {
+              "area": "agent-coordination",
+              "question": "proof"
+            },
+            "outsideRegion": false
+          }
+        ],
+        "places": [
+          {
+            "axis": "area",
+            "value": "platform",
+            "home": "docs/",
+            "candidates": 4
+          },
+          {
+            "axis": "area",
+            "value": "agent-coordination",
+            "home": "docs/platform/agent-coordination/",
+            "candidates": 1
+          },
+          {
+            "axis": "area",
+            "value": "event-store",
+            "home": "docs/platform/event-store/",
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "current-truth",
+            "home": null,
+            "candidates": 1
+          },
+          {
+            "axis": "question",
+            "value": "proof",
+            "home": null,
+            "candidates": 1
+          }
+        ],
+        "mentions": []
+      }
+    ],
+    "group": null
+  }
+}
