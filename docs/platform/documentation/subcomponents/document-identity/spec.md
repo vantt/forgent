@@ -626,7 +626,7 @@ The door finds; it does not judge. These limits are recorded, not fixed here: ne
 | # | Limit | Why neither search nor scan catches it | What would close it |
 |---|---|---|---|
 | G1 | A prose claim with no names, written in a language other than the target document's | No term for the scan; search across languages scored 0% at top 3 | Translation (8.1 step 1) is the only guard; the step 2 report counts how often translated drafts still miss |
-| G2 | English queries over the Vietnamese platform specs | Never measured | A small gold set through `fgos doc locate --eval` |
+| G2 | English queries over the Vietnamese platform specs | Measured 2026-11-28 (below): a right document in the top 3 for 47% of English notes, in the top 10 for 65% | A cross-language model or translated spec sections; re-run the gold set at each pin raise |
 | G3 | Text outside the corpus: past-state folders, the reference-learning area, rule units in `core/instructions` (owned by the context engine), skills, plans, code comments | The scan uses the locate corpus on purpose; widening it would rank and list documents a writer must never grow | A writer changing a rule goes through the context engine's door; other surfaces stay out of the documentation door |
 | G4 | Completeness of the writer's mention list | The verbs see only the locate file the writer built, not the locate answer, so they cannot prove nothing was left out | The observer joins `fgos.doc.locate` records with attest and handoff events and reports omissions |
 | G5 | Whether `unaffected` is true | It is the writer's judgement | Admission's reviewer and the observer's sampling |
@@ -635,6 +635,8 @@ The door finds; it does not judge. These limits are recorded, not fixed here: ne
 | G8 | The decision after finding: found but created anyway, or grew a neighbouring wrong document | Search and scan only find; the 26-case trial showed these judgement errors remain | [Admission](../admission/spec.md) and the observer |
 
 Measured evidence behind the first two: [the 2026-11-12 recall measurement](../../../../../plans/reports/measurement-261112-1314-docos-document-identity-recall.md) sections 6.2, 6.3 and 7 (grep opened the right earlier document in 19 of 20 duplicate cases against locate's 18; grep lost on the decision, 13 of 26 right against 19 of 26; a Vietnamese note over English documents ranks a right unit in the top 3 for 0% of queries and 91.7% after translation) and [the step 2 plan](../../../../../plans/261127-1003-h2-step2-core-write-door/plan.md) for the step that measures them.
+
+- 2026-11-28, G2: 17 English developer notes, written from source code by an agent that had not read the specs, against gold sections in the Vietnamese platform specs ([gold set](../../../../../plans/261127-1003-h2-step2-core-write-door/reports/g2-gold-en-over-vi.yaml), [report](../../../../../plans/261127-1003-h2-step2-core-write-door/reports/lead-261128-1008-h2-step2-topics-per-retrospective-item.md) section 4): recall at 3 is 0.47 (8 of 17), recall at 10 is 0.65 (11 of 17), right section first in 6 of 11. Of the 6 top-10 misses, `mentions` listed a right document for 1 (an error code in backticks); 4 had no backticked name and 1 named only common words past the cap (G7). G1 waits for real retrospective items.
 
 ## 13. Open Owner Questions
 
