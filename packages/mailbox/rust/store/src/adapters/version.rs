@@ -1,11 +1,16 @@
-//! The recipient's CLI version for the delivery report (spec §4.1, plan
-//! decision 12): Claude Code records it in its session file, keyed by the
-//! head's pid; Codex records none, so the installed `codex --version` is
-//! asked, with a bound on how long it may take. Any failure is no version,
-//! never a refused send.
+//! The recipient's CLI version (spec §4.1, plan decision 12): Claude Code
+//! records it in its session file, keyed by the head's pid, and a head whose
+//! file the caller cannot see — a confined head
+//! has its own config directory and its own pid namespace — names it by the
+//! executable it runs, a versioned binary under `versions/`; Codex records
+//! none, so the installed `codex --version` is asked, with a bound on how
+//! long it may take. Any failure is no version, never a refused send. The
+//! mailbox delivery report, the mailbox typed wake and `fgos session type`
+//! all read the version here.
 use crate::head::record_of_head_text;
 use crate::record::read_regular_capped;
 use fgos_mailbox_core::Cli;
+use fgos_process::facts::{view_of, ScanFilter};
 use fgos_process::spawn::{run_bounded_command, Outcome};
 use serde_json::Value;
 use std::path::{Path, PathBuf};
@@ -32,15 +37,21 @@ pub struct VersionSources {
 /// can be read.
 pub fn recipient_version(cli: &Cli, head: &str, sources: &VersionSources) -> Option<String> {
     match cli.as_str() {
-        "claude" => claude_session_version(
-            sources.claude_sessions.as_deref()?,
-            head,
-            sources.max_read_bytes,
-        ),
+        "claude" => claude_version(head, sources),
         "codex" => codex_installed_version(&sources.codex_program, CODEX_VERSION_TIMEOUT),
         "agy" => agy_installed_version(),
         _ => None,
     }
+}
+
+/// Claude Code's version for the head `head`: what its session file records,
+/// else what the executable of the head process itself names.
+fn claude_version(head: &str, sources: &VersionSources) -> Option<String> {
+    sources
+        .claude_sessions
+        .as_deref()
+        .and_then(|sessions| claude_session_version(sessions, head, sources.max_read_bytes))
+        .or_else(|| claude_process_version(head))
 }
 
 /// agy's installed version, bounded like Codex's; an unrecognised output stays unknown.
@@ -57,11 +68,47 @@ fn agy_installed_version() -> Option<String> {
     }
     let output = String::from_utf8(output.stdout).ok()?;
     let version = output.trim().strip_prefix("agy ").unwrap_or(output.trim());
-    (version.split('.').count() == 3
-        && version
-            .split('.')
-            .all(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit())))
-    .then(|| version.to_string())
+    plain_version(version).then(|| version.to_string())
+}
+
+/// The version a head runs where its session file is out of the caller's
+/// reach: Claude Code runs a versioned binary, so the head process's own
+/// executable names its version ([`version_of_exe`]). Read only while the
+/// process is still the head the record names — a pid the system has since
+/// given to another process would otherwise lend its executable here.
+fn claude_process_version(head: &str) -> Option<String> {
+    let record = record_of_head_text(head);
+    let pid = record.pid?;
+    let wanted = record.start_time?;
+    let view = view_of(pid, &ScanFilter::default())?;
+    let same_process = view
+        .tuple
+        .as_ref()
+        .is_some_and(|tuple| tuple.start_time == wanted);
+    same_process
+        .then(|| view.exe.as_deref().and_then(version_of_exe))
+        .flatten()
+}
+
+/// The version an executable path names: its parent directory is `versions`
+/// and its own name is that version, a plain `MAJOR.MINOR.PATCH`.
+fn version_of_exe(exe: &Path) -> Option<String> {
+    let in_versions = exe
+        .parent()
+        .and_then(Path::file_name)
+        .and_then(|dir| dir.to_str())
+        == Some("versions");
+    let name = exe.file_name()?.to_str()?;
+    (in_versions && plain_version(name)).then(|| name.to_string())
+}
+
+/// Whether `text` is `MAJOR.MINOR.PATCH` in digits only.
+fn plain_version(text: &str) -> bool {
+    let parts: Vec<&str> = text.split('.').collect();
+    parts.len() == 3
+        && parts
+            .iter()
+            .all(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit()))
 }
 
 /// `version` of the session file of the head whose process record is
