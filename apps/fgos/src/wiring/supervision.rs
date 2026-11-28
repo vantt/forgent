@@ -3247,13 +3247,28 @@ fn type_into_session(
     let cli = fgos_mailbox_core::Cli::new(&session.cli)
         .ok()
         .filter(|cli| !cli.as_str().is_empty());
-    let version = cli.as_ref().and_then(|cli| {
-        let cli_session = session.ids.as_ref()?.cli_session.as_ref()?;
-        let head = json!({"pid": cli_session.pid, "startTime": cli_session.start_time});
-        let versions = super::mailbox_verbs::version_sources(MAX_VERSION_READ_BYTES);
-        fgos_mailbox::adapters::version::recipient_version(cli, &head.to_string(), &versions)
-    });
     let core = backend.core();
+    // The process to version is the one in the pane this verb types into, not the identity record's:
+    // a confined head's record carries no CLI pid.
+    let version = cli.as_ref().and_then(|cli| {
+        let foreground = core
+            .inspect_parts(
+                &pane,
+                fgos_terminal_control::core::Want {
+                    foreground: true,
+                    activity: false,
+                    detail: false,
+                },
+            )
+            .foreground?;
+        let tuple = fgos_process::facts::identity_of(fgos_process::ProcId(foreground.pid))?;
+        if tuple.start_time != foreground.start_time {
+            return None;
+        }
+        let head = tuple.to_record().to_json().to_string();
+        let versions = super::mailbox_verbs::version_sources(MAX_VERSION_READ_BYTES);
+        fgos_mailbox::adapters::version::recipient_version(cli, &head, &versions)
+    });
     let answer = PaneIo::new(&core, &pane).typed_wake(&session.cli, version.as_deref(), text);
     record_coordination(root, payload_root, "type", subject, answer.cause());
     match answer {
