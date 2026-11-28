@@ -9,8 +9,9 @@
 //! `code` (any path outside `plans/`), `plan-status` (a `plans/<dir>/plan.md` whose front matter `status` changed),
 //! `backlog`, `discussion`, `report`, `plan-note` (anything else under `plans/`).
 //!
-//! A record's subject is the trunk branch, `branch:<name>`, and its id `main-commit:<sha>`. Measures are `1` on the
-//! commit's own kind (`fgos.main.commit.<kind>`) and `fgos.main.commit.note` is `1` for the kinds that are notes
+//! A record's subject is the trunk branch, `branch:<name>`, and its id `main-commit:<sha>`. Every record carries all
+//! six kind measures (`fgos.main.commit.<kind>`: `1` on the commit's own kind, `0` on the others, so an hour with
+//! none of a kind still sums to 0) and `fgos.main.commit.note` is `1` for the kinds that are notes
 //! about work rather than work (`plan-note`, `report`, `discussion`), so a definition can `sum:` each count.
 
 use super::plan_text::plan_fields;
@@ -212,10 +213,12 @@ fn sort_paths(commit: &ChangedCommit) -> Sorted {
 
 fn record(sha: &str, ts: String, branch: &str, kind: &str) -> Record {
     let mut measures = BTreeMap::new();
-    measures.insert(
-        format!("{MAIN_COMMIT_KIND}.{kind}"),
-        serde_json::Number::from(1u64),
-    );
+    for k in KINDS {
+        measures.insert(
+            format!("{MAIN_COMMIT_KIND}.{k}"),
+            serde_json::Number::from(u64::from(k == kind)),
+        );
+    }
     measures.insert(
         format!("{MAIN_COMMIT_KIND}.note"),
         serde_json::Number::from(u64::from(NOTE_KINDS.contains(&kind))),

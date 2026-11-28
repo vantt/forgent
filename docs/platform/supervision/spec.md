@@ -85,6 +85,8 @@ Admission lives in code (the wake door and `portfolio.rs`), not in the superviso
 
 **Periodic review.** The definition `review-due` raises when the newest `fgos.review.done` record is older than `watcher.reviewIntervalSec` (default 86400, minimum 3600), unless nothing is open and nothing happened since. Its action `start-review` runs one detached, read-only review Unit (`fgos run --capability review`, no `--writes`) with the fixed brief `core/watcher/briefs/periodic-review.md`; the reviewer reports findings through `supervisor raise` and never fixes. `fgos.review.done` is recorded once, when the Unit settles; a failed Unit records nothing, so the next tick retries.
 
+**Main commit mix.** The definition `main-notes-outrun-code` counts the commits the trunk took in each UTC clock hour by kind (`fgos.main.commit`, read from git, nothing stored) and raises one event per breached hour, stamped with the hour's start, when notes, reports and discussion rounds pass `watcher.mainCommits.noteShareMax` (default 0.5) of at least `watcher.mainCommits.minForShare` (default 6) commits, or the hour's total passes `watcher.mainCommits.perHourMax` (default 12). The reason names each kind and its count; the action is the default, `wake-supervisor`. Detail: `core/watcher/README.md`.
+
 ## 2. Shared entities
 
 | Entity | Meaning | Owner |

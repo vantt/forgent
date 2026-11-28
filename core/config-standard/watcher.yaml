@@ -41,3 +41,10 @@ watcher:
   sessionIdleLimit: 0
   # @fgos:doc Consecutive runs without a result before a session-no-result row is raised. Minimum: 0. Maximum: 1000. Default: 0.
   sessionNoResultLimit: 0
+  mainCommits:
+    # @fgos:doc The share of one clock hour's commits on main that notes, reports and discussion rounds may take before main-notes-outrun-code is raised. A fraction. Minimum: 0. Maximum: 1. Default: 0.5.
+    noteShareMax: 0.5
+    # @fgos:doc Commits main may take in one clock hour before main-notes-outrun-code is raised whatever their kind. In commits. Minimum: 1. Default: 12.
+    perHourMax: 12
+    # @fgos:doc The fewest commits in a clock hour for the note share to count, so one note in a quiet hour is not a breach. In commits. Minimum: 1. Default: 6.
+    minForShare: 6
