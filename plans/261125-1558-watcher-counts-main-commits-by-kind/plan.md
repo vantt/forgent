@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The watcher counts the commits main takes by kind and raises an event when notes outrun code"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
