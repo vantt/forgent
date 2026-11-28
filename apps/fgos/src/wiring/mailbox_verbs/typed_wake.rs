@@ -60,8 +60,8 @@ impl Nudge for HostNudge {
         let backend = fgos_run_supervisor::terminal_slot::Backend::from_env(&fgos_dir);
         let core = backend.core();
         match PaneIo::new(&core, &pane).typed_wake(cli.as_str(), version.as_deref(), NUDGE_LINE) {
-            TypedWake::Typed => Ok(()),
-            TypedWake::Refused(cause) => Err(cause.into()),
+            TypedWake::Submitted => Ok(()),
+            other => Err(other.cause().into()),
         }
     }
 }

@@ -2820,12 +2820,13 @@ export const COMMAND_REGISTRY = [
         examples: ['fgos session read lead:SUPERVISOR --lines 80', 'fgos session read head:lead-demo-p1'],
       },
       type: {
-        description: 'Type text into a stuck session\'s pane. Refused target-not-stuck unless an open supervision event names the target session. The target resolves through Identity, never a raw pane id.',
+        description: 'Type text into a stuck session\'s pane and submit it, answering submitted only when the pane shows the CLI took the line; otherwise refused by name (dialog-open, busy, composer-not-empty, foreground-not-agent, no-cli-profile, unknown, delivery-unknown). --no-enter types without submitting and answers held. Refused target-not-stuck unless an open supervision event names the target session. The target resolves through Identity, never a raw pane id.',
         parameters: {
           type: 'object',
           properties: {
             target: { type: 'string', description: 'Positional: the role, handle or slot key of the session.' },
             text: { type: 'string', description: 'The text to type.' },
+            'no-enter': { type: 'boolean', description: 'Type without submitting; the answer says held.' },
           },
           positional: ['target'],
           required: ['target', 'text'],

@@ -1595,7 +1595,8 @@
         "json",
         "help",
         "target",
-        "text"
+        "text",
+        "no-enter"
       ]
     },
     "store": "none"
