@@ -23,6 +23,7 @@ footprint:
   - packages/execution/contracts/execution-routes/execution-routes.v1.json
   - docs/platform/run-supervisor/spec.md
   - packages/component-authority/model/doors/managed-timer.yaml
+  - docs/platform/component-boundary.md
 source:
   - plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md
   - p-6htu2ae64o
@@ -74,7 +75,7 @@ Re-attaching a supervisor to a running agent; automatic restart; anything alread
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/**, `apps/fgos/observe-kinds.json`, `packages/component-authority/model/doors/execution-s-node-seam.yaml`, `packages/run-supervisor/rust/src/controller/scope.rs`, `apps/fgos/src/wiring/execution_routes.rs`, `packages/execution/contracts/execution-routes/execution-routes.v1.json`, `docs/platform/run-supervisor/spec.md`, `packages/component-authority/model/doors/managed-timer.yaml` | 1 | ready |
+| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/**, `apps/fgos/observe-kinds.json`, `packages/component-authority/model/doors/execution-s-node-seam.yaml`, `packages/run-supervisor/rust/src/controller/scope.rs`, `apps/fgos/src/wiring/execution_routes.rs`, `packages/execution/contracts/execution-routes/execution-routes.v1.json`, `docs/platform/run-supervisor/spec.md`, `packages/component-authority/model/doors/managed-timer.yaml`, `docs/platform/component-boundary.md` | 1 | ready |
 
 ## Owner questions
 
