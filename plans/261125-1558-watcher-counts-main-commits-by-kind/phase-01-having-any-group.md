@@ -4,18 +4,25 @@ Capability: `code:implement`
 
 ## Inputs
 
-- `packages/observe/rust/src/query/model.rs`: `Having` (about line 319), `Filter` and its
-  `Deserialize` impl (the `any` group pattern to mirror), and `Query.having`.
-- `packages/observe/rust/src/query/exec.rs`: `passes_having` (about line 226) and the having
-  validation loop (about line 307).
-- `packages/observe/rust/tests/query_engine_test.rs`: the owning tests of the query engine.
-- `docs/platform/observe/spec.md`: read only. Add nothing unless the query grammar is listed there; if it is, note the change in the report for phase 4. Phase 4 does not own that file, so leave it unchanged.
+- `packages/observe/rust/src/query/model.rs`: `Having` (about line 319), `Filter` (about line
+  220) and its `Deserialize` impl (about line 231, the `any` group pattern to mirror), and
+  `Query.having` (about line 453).
+- `packages/observe/rust/src/query/exec.rs`: `passes_having` (about line 226), the having
+  validation loop (about line 307) and its call (about line 581).
+- `packages/observe/rust/src/metrics_cli/query.rs`: the `--having` flag reads JSON into
+  `query.having` (about line 196) and its test compares `query.having` (about line 453). These
+  are the only readers of `Query.having` outside `query/`.
+- `packages/observe/rust/tests/query_engine_test.rs`: the owning tests of the query engine;
+  one test indexes `q.having[0].rhs` (about line 762).
+- `docs/platform/observe/spec.md`: the query grammar, the `having` line (about line 144).
 
 ## Files this phase may write
 
 - `packages/observe/rust/src/query/model.rs`
 - `packages/observe/rust/src/query/exec.rs`
+- `packages/observe/rust/src/metrics_cli/query.rs`
 - `packages/observe/rust/tests/query_engine_test.rs`
+- `docs/platform/observe/spec.md`
 
 ## Steps
 
@@ -29,7 +36,12 @@ Capability: `code:implement`
 4. Move every place that walks `query.having` (validation of params and agg names, and the
    needed-aggregates collection) to walk into the groups, so a param or agg used only inside a
    branch is still resolved and computed.
-5. Add one test to `query_engine_test.rs`: "a having any group passes a group when one branch
+5. Keep the `--having` flag and its test in `metrics_cli/query.rs` compiling and green; a flag
+   value may now be an `any` group too. Adjust the existing `having[0].rhs` test only as far as
+   the new element type needs, asserting the same thing.
+6. In `docs/platform/observe/spec.md`, extend the `having` line with the `any` group, in the
+   same words the `where` line uses for its group.
+7. Add one test to `query_engine_test.rs`: "a having any group passes a group when one branch
    holds". Two groups: one passes only branch A, one passes neither. Include a param operand
    inside a branch. Add one refusal case for an empty `any`. No existing test proves this,
    because `having` had no OR before.
@@ -40,8 +52,8 @@ Capability: `code:implement`
 cargo test -p fgos-observe
 ```
 
-Pass: all green, including `definition_test.rs` (existing definitions parse unchanged) and the
-new test.
+Pass: all green, including `definition_test.rs` (existing definitions parse unchanged), the
+`metrics_cli` query flag test and the new test.
 
 ## Rollback
 

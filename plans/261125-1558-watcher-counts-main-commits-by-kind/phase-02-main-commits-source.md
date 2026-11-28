@@ -10,11 +10,13 @@ Capability: `code:implement`
 - `apps/fgos/src/wiring/observe_sources/plan_text.rs`: `plan_fields`, reused for the
   plan-status test.
 - `apps/fgos/src/wiring/observe_sources/mod.rs`, `apps/fgos/src/wiring/metrics_sources.rs`
-  (about line 68, where sources are registered), and `apps/fgos/observe-kinds.json`.
-- `packages/supervision/rust/src/land.rs` `target_branch` (about line 649): how the trunk is
+  (about line 69, where `PlanHistorySource` is registered), and `apps/fgos/observe-kinds.json`.
+- `packages/supervision/rust/src/land.rs` `target_branch` (about line 696): how the trunk is
   resolved through `resolve_trunk`. Read only.
-- `packages/git/rust/src/walk_changes.rs`: `WalkChanges`. Check whether an empty `paths`
-  means every path.
+- `packages/git/rust/src/walk_changes.rs`: `WalkChanges` (about line 28) and `walk_changes`
+  (about line 72). Check whether an empty `paths` means every path.
+- `packages/git/rust/src/inspect.rs` `resolve_trunk` (about line 268) and
+  `packages/git/rust/src/lib.rs` `read_paths_at_many` (about line 492).
 - The plan's "Decisions taken in this plan" section, for the kind order.
 
 ## Files this phase may write
@@ -64,9 +66,9 @@ Capability: `code:implement`
 
    One test owns all of this, "the main-commits source sorts each trunk commit by the most
    durable kind it touched". No existing test proves it, because the source is new.
-6. Time the source on this repository's main over a 2-hour window. Write the time to
-   `plans/261125-1558-watcher-counts-main-commits-by-kind/reports/` in the phase result, not
-   as a separate commit. It must be under 1 s.
+6. Time the source on this repository's main over a 2-hour window and put the time in the
+   phase result summary (the lead copies it into the plan's report at close). It must be
+   under 1 s.
 
 ## Verify
 
