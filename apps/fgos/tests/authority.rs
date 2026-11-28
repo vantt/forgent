@@ -374,7 +374,7 @@ mod project_without_a_model {
 
     const SESSION: &str = "00000000-0000-4000-8000-0000000000aa";
 
-    const QUESTION: &str = r#"{"stage":"planning","headline":"May the model gain a component?","blocks":"plan p","parts":{"what":"declare a component","cause":"the project has none","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","scope":{"allows":"one component","forbids":"others"}}}"#;
+    const QUESTION: &str = r#"{"stage":"planning","headline":"May the model gain a component?","blocks":"plan p","parts":{"what":"declare a component","cause":"the project has none","options":[{"label":"A","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"A","default":"Without an answer the asker declares no component and the project keeps no model","scope":{"allows":"one component","forbids":"others"}}}"#;
 
     fn git(dir: &Path, args: &[&str]) {
         let out = Command::new("git")
