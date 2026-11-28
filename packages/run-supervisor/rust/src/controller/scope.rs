@@ -8,8 +8,10 @@
 //! [`end_dead_attempt`] is the one authority that ends a live domain whose supervisor is dead, and it
 //! is bounded three ways: it runs only for an explicit stop, only when the binding's supervisor is
 //! provably dead by pid and start identity, and only against the one unit the binding names (which
-//! must be this attempt's own `fgos-run-<attemptId>`). Adopt's own rule, that a live domain is never
-//! ended, stays as it is (section 8 of the run-supervisor spec).
+//! must be this attempt's own `fgos-run-<attemptId>`). The only processes it signals are the binding's
+//! own scope unit and the binding's own gate record, the gate by pid and start identity (a head's gate
+//! and agent live in the herdr pane's cgroup, not in the scope). Adopt's own rule, that a live domain
+//! is never ended, stays as it is (section 8 of the run-supervisor spec).
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -157,6 +159,10 @@ pub trait EndDeadPorts {
     fn dead(&self, record: &Value) -> bool;
     /// Stop the one unit through its manager: `SIGTERM` (`kill` false), then `SIGKILL` (`kill` true).
     fn stop_unit(&mut self, unit: &str, kill: bool) -> Result<(), String>;
+    /// Signal exactly the binding's gate record, `SIGTERM` (`kill` false) or `SIGKILL` (`kill` true), only if that
+    /// exact process (pid and start identity) still runs. A gate that is gone, or is no longer that process, is
+    /// nothing of ours to reach and answers `Ok`.
+    fn signal_gate(&mut self, gate: &Value, kill: bool) -> Result<(), String>;
     /// Wait `ms` milliseconds before looking again.
     fn sleep(&mut self, ms: u64);
     /// Adopt the attempt directory, answering the adopt verdict line for it.
@@ -243,6 +249,36 @@ impl EndDeadPorts for SystemEndDead {
         }
     }
 
+    fn signal_gate(&mut self, gate: &Value, kill: bool) -> Result<(), String> {
+        let signal = if kill {
+            fgos_process::control::Signal::Kill
+        } else {
+            fgos_process::control::Signal::Term
+        };
+        match fgos_process::control::signal_record(
+            &fgos_process::facts::Record::from_json(gate),
+            signal,
+        ) {
+            // Sent: reached. NotFound, IdentityMismatch: nothing of ours is left under that pid, or it is not
+            // the recorded process any more, so nothing was sent and nothing is owed.
+            fgos_process::control::SignalOutcome::Sent
+            | fgos_process::control::SignalOutcome::NotFound
+            | fgos_process::control::SignalOutcome::IdentityMismatch => Ok(()),
+            fgos_process::control::SignalOutcome::IdentityUnknown => {
+                Err("the gate's identity could not be checked, so it was not signalled".to_string())
+            }
+            fgos_process::control::SignalOutcome::Denied => {
+                Err("the gate refused the signal (permission denied)".to_string())
+            }
+            fgos_process::control::SignalOutcome::Unsupported => {
+                Err("this platform cannot send that signal to the gate".to_string())
+            }
+            fgos_process::control::SignalOutcome::Failed(code) => {
+                Err(format!("signalling the gate failed with error {code}"))
+            }
+        }
+    }
+
     fn sleep(&mut self, ms: u64) {
         std::thread::sleep(std::time::Duration::from_millis(ms));
     }
@@ -283,12 +319,15 @@ fn wait_until_dead(record: &Value, budget_ms: u64, ports: &mut dyn EndDeadPorts)
 /// The invariant: ending a live domain without its supervisor is allowed only here, only for an explicit
 /// stop, only when the binding's supervisor is provably dead (pid and start identity, never pid alone), and
 /// only against the one unit the binding names, which must be this attempt's own `fgos-run-<attemptId>`.
-/// Nothing else is signalled, and adopt's own rule (a live domain is never ended) is not changed: adopt is
-/// called after the domain is proven empty.
+/// The only processes signalled are that scope unit and the binding's own gate record, the gate by pid and
+/// start identity (a head's gate and agent live in the herdr pane's cgroup, not in the scope, so the gate is
+/// asked to end alongside it). Nothing else is signalled, and adopt's own rule (a live domain is never ended)
+/// is not changed: adopt is called after the domain is proven empty.
 ///
 /// Order: `closed.json` (adopt answers `closed` for one stat, nothing is stopped) → a readable binding →
-/// supervisor dead → the domain is a systemd scope → the unit is this attempt's own → stop the unit and wait
-/// for the gate, kill it after [`SCOPE_STOP_WAIT_MS`] and wait [`SCOPE_KILL_WAIT_MS`] more → adopt.
+/// supervisor dead → the domain is a systemd scope → the unit is this attempt's own → stop the unit and ask the
+/// gate to end, waiting for the gate, kill the unit and the gate after [`SCOPE_STOP_WAIT_MS`] and wait
+/// [`SCOPE_KILL_WAIT_MS`] more → adopt.
 pub fn end_dead_attempt_with(run_dir: &Path, ports: &mut dyn EndDeadPorts) -> Value {
     if run_dir.join("closed.json").exists() {
         return json!({ "ended": true, "adopt": ports.adopt(run_dir) });
@@ -363,8 +402,14 @@ pub fn end_dead_attempt_with(run_dir: &Path, ports: &mut dyn EndDeadPorts) -> Va
     if let Err(message) = ports.stop_unit(unit, false) {
         trouble = Some(message);
     }
+    if let Err(message) = ports.signal_gate(&gate, false) {
+        trouble = Some(message);
+    }
     if !wait_until_dead(&gate, SCOPE_STOP_WAIT_MS, ports) {
         if let Err(message) = ports.stop_unit(unit, true) {
+            trouble = Some(message);
+        }
+        if let Err(message) = ports.signal_gate(&gate, true) {
             trouble = Some(message);
         }
         if !wait_until_dead(&gate, SCOPE_KILL_WAIT_MS, ports) {
@@ -626,12 +671,14 @@ mod tests {
         binding(json!({ "kind": "systemd-scope", "unit": "fgos-run-att-1" }))
     }
 
-    /// The machine, answering as told: the supervisor's verdict, the moment the gate ends, and the stops and
-    /// sleeps that were asked for.
+    /// The machine, answering as told: the supervisor's verdict, the moment the gate ends, and the stops, gate
+    /// signals and sleeps that were asked for.
     struct FakePorts {
         supervisor_dead: bool,
         gate_alive_until_slept_ms: u64,
         stops: Vec<(String, bool)>,
+        gate_signals: Vec<bool>,
+        gate_signal_error: Option<String>,
         slept_ms: u64,
         adopted: usize,
     }
@@ -642,6 +689,8 @@ mod tests {
                 supervisor_dead,
                 gate_alive_until_slept_ms,
                 stops: Vec::new(),
+                gate_signals: Vec::new(),
+                gate_signal_error: None,
                 slept_ms: 0,
                 adopted: 0,
             }
@@ -662,6 +711,19 @@ mod tests {
             Ok(())
         }
 
+        fn signal_gate(&mut self, gate: &Value, kill: bool) -> Result<(), String> {
+            assert_eq!(
+                gate.get("role").and_then(Value::as_str),
+                Some("gate"),
+                "only the binding's own gate record is signalled: {gate}"
+            );
+            self.gate_signals.push(kill);
+            match &self.gate_signal_error {
+                Some(message) => Err(message.clone()),
+                None => Ok(()),
+            }
+        }
+
         fn sleep(&mut self, ms: u64) {
             self.slept_ms += ms;
         }
@@ -679,6 +741,10 @@ mod tests {
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("supervisor-alive"));
         assert!(ports.stops.is_empty(), "a live supervisor's domain is its own");
+        assert!(
+            ports.gate_signals.is_empty(),
+            "a live supervisor's gate is its own"
+        );
         assert_eq!(ports.adopted, 0);
     }
 
@@ -694,6 +760,10 @@ mod tests {
         let message = answer["refused"]["message"].as_str().unwrap();
         assert!(message.contains("no-user-manager"), "{message}");
         assert!(ports.stops.is_empty(), "an inherited domain is never signalled");
+        assert!(
+            ports.gate_signals.is_empty(),
+            "an inherited domain's gate is never signalled"
+        );
         assert_eq!(ports.adopted, 0);
     }
 
@@ -707,6 +777,10 @@ mod tests {
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("scope-mismatch"));
         assert!(ports.stops.is_empty(), "only the named attempt's own scope is stopped");
+        assert!(
+            ports.gate_signals.is_empty(),
+            "nothing is signalled when the scope is not this attempt's own"
+        );
         assert_eq!(ports.adopted, 0);
     }
 
@@ -721,6 +795,10 @@ mod tests {
         let message = answer["refused"]["message"].as_str().unwrap();
         assert!(message.contains("gate"), "{message}");
         assert!(ports.stops.is_empty(), "nothing is signalled without a gate to judge");
+        assert!(
+            ports.gate_signals.is_empty(),
+            "nothing is signalled without a gate record"
+        );
         assert_eq!(ports.adopted, 0);
     }
 
@@ -734,6 +812,7 @@ mod tests {
         assert_eq!(answer["unit"], json!("fgos-run-att-1"));
         assert_eq!(answer["adopt"]["state"], json!("closed"));
         assert_eq!(ports.stops, vec![("fgos-run-att-1".to_string(), false)]);
+        assert_eq!(ports.gate_signals, vec![false]);
         assert_eq!(ports.slept_ms, 2 * SCOPE_POLL_MS);
         assert_eq!(ports.adopted, 1);
     }
@@ -752,7 +831,22 @@ mod tests {
                 ("fgos-run-att-1".to_string(), true),
             ]
         );
+        assert_eq!(ports.gate_signals, vec![false, true]);
         assert_eq!(ports.slept_ms, SCOPE_STOP_WAIT_MS + SCOPE_POLL_MS);
+        assert_eq!(ports.adopted, 1);
+    }
+
+    #[test]
+    fn a_gate_signal_that_fails_still_ends_the_attempt_when_the_gate_dies() {
+        let dir = scratch_run_dir("gate-signal-failed", dead_scoped());
+        // The gate ends a moment after SIGTERM, so the failing signal changes no verdict: the attempt is ended.
+        let mut ports = FakePorts::new(true, 2 * SCOPE_POLL_MS);
+        ports.gate_signal_error =
+            Some("the gate refused the signal (permission denied)".to_string());
+        let answer = end_dead_attempt_with(&dir, &mut ports);
+        assert_eq!(answer["ended"], json!(true));
+        assert_eq!(answer["adopt"]["state"], json!("closed"));
+        assert_eq!(ports.gate_signals, vec![false]);
         assert_eq!(ports.adopted, 1);
     }
 
@@ -762,6 +856,7 @@ mod tests {
         let mut ports = FakePorts::new(true, u64::MAX);
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("domain-not-ended"));
+        assert_eq!(ports.gate_signals, vec![false, true]);
         assert_eq!(ports.slept_ms, SCOPE_STOP_WAIT_MS + SCOPE_KILL_WAIT_MS);
         assert_eq!(ports.adopted, 0, "an attempt is adopted only once its domain is empty");
     }
@@ -775,5 +870,6 @@ mod tests {
         assert_eq!(answer["ended"], json!(true));
         assert_eq!(answer["adopt"]["state"], json!("closed"));
         assert!(ports.stops.is_empty());
+        assert!(ports.gate_signals.is_empty());
     }
 }
