@@ -1,0 +1,24 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-11-28T06:42:09.036Z",
+  "data_hash": "49db722fe371ab356f89c99e59a6cc41120a0bd8f0631055b1d808f440ceb832",
+  "data": {
+    "ok": true,
+    "definitions": [
+      {
+        "name": "main-notes-outrun-code",
+        "row": {
+          "kind": "main-notes-outrun-code",
+          "reason": "main took {count} commits this hour: {sum:fgos.main.commit.note} notes ({sum:fgos.main.commit.plan-note} plan notes, {sum:fgos.main.commit.report} reports, {sum:fgos.main.commit.discussion} discussion rounds), {sum:fgos.main.commit.backlog} backlog rows, {sum:fgos.main.commit.plan-status} plan status changes, {sum:fgos.main.commit.code} code or config",
+          "nextCommand": "fgos metrics query --kind fgos.main.commit --since -1h@hour --until @hour --by fgos.main.commit.kind --agg count"
+        },
+        "rows": [],
+        "coverage": {
+          "matched": 6,
+          "missing": {}
+        },
+        "skipped": 0
+      }
+    ]
+  }
+}

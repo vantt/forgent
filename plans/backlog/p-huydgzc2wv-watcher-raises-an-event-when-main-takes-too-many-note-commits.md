@@ -1,7 +1,7 @@
 ---
 id: p-huydgzc2wv
 title: "The watcher counts the commits main takes by kind and raises an event when notes outrun code (supervision; source: owner, 2026-11-25)"
-status: proposed
+status: done
 priority: P1
 area: supervision
 created: 2026-11-25
