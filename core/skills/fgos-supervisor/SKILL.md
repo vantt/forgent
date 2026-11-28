@@ -179,6 +179,6 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 
 ## Reports
 
-At most 10 lines, in the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report`.
+In the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report`.
 Do not land a wake report on main: Rule: writes-to-main (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Record what you
 learned that will repeat as a backlog row, never only in a report.

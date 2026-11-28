@@ -92,4 +92,4 @@ never SIGKILL a test run.
 
 ## Reports
 
-At most 10 lines, in the status-report shape of `../_shared/owner-communication.md`. Put the full report in the plan's `reports/` directory, named with `fgos convention path --kind report`.
+In the status-report shape of `../_shared/owner-communication.md`. Put the full report in the plan's `reports/` directory, named with `fgos convention path --kind report`.

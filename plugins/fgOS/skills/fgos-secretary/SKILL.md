@@ -124,7 +124,7 @@ Friction you meet or an owner reports (a workaround, conflicting rules, a missin
 
 ## Reports
 
-At most 10 lines, in the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report` and link it.
+In the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report` and link it.
 
 ## Owner questions
 
