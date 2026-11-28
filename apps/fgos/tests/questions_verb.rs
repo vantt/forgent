@@ -210,7 +210,11 @@ fn a_blank_default_is_refused_by_the_ask_door_and_nothing_is_stored() {
     let listed = scene.run(&["questions"], b"");
     assert!(listed.status.success(), "list: {listed:?}");
     // Nothing was stored: the only needs-you count left is the work section's own two rows.
-    assert!(text(&listed).starts_with("needs you: 2\n"), "{}", text(&listed));
+    assert!(
+        text(&listed).starts_with("needs you: 2\n"),
+        "{}",
+        text(&listed)
+    );
 }
 
 #[test]
@@ -337,7 +341,10 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
     assert!(!shown.contains("B. rewrite"), "{shown}");
     assert!(!shown.contains("C. C."), "{shown}");
     // The recommendation carries the letter too, so the owner never reads two letters for one option.
-    assert!(!shown.contains("Recommendation: fold into one\n"), "{shown}");
+    assert!(
+        !shown.contains("Recommendation: fold into one\n"),
+        "{shown}"
+    );
 
     let answered = scene.run(&["questions", "answer", &id, "--option", "A"], b"");
     if under_an_agent() {
