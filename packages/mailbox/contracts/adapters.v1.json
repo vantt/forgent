@@ -43,12 +43,12 @@
     },
     "codex": {
       "channel": "typed",
-      "versions": ["0.163.0"],
+      "versions": ["0.166.0"],
       "source": "packages/agent-protocol/contracts/fixtures/terminal/codex/: composer vectors; raw text and Enter, never the prompt door"
     },
     "agy": {
       "channel": "typed",
-      "versions": ["1.4.2"],
+      "versions": ["1.5.18"],
       "source": "packages/agent-protocol/contracts/fixtures/terminal/agy/: composer vectors; this channel does not enable the deferred agy hooks"
     }
   },

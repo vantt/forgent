@@ -555,6 +555,23 @@
       }
     },
     {
+      "name": "composer-state-half-typed-real-frame",
+      "step": "composer-state",
+      "version": "2.1.332",
+      "source": "real half-typed screen recorded at claude 2.1.332 with `fgos session read`",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "half-typed-2.1.332"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
       "name": "composer-state-dialog-blocked",
       "step": "composer-state",
       "version": "2.1.332",

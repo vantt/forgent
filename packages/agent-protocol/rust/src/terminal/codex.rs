@@ -7,7 +7,7 @@ use crate::Inspection;
 /// brief goes through the prompt door (bracketed paste plus submit) instead.
 pub const PROFILE: Profile = Profile {
     cli: "codex",
-    pinned_version: "0.163.0",
+    pinned_version: "0.166.0",
     version_marker: Some("codex (v"),
     exit: ExitCommand::Text("/quit"),
     enter_gap_ms: 600,

@@ -9,7 +9,7 @@ use crate::Inspection;
 /// "esc to dismiss" without holding focus, so only a banner's title is a marker.
 pub const PROFILE: Profile = Profile {
     cli: "agy",
-    pinned_version: "1.4.2",
+    pinned_version: "1.5.18",
     version_marker: Some("antigravity cli "),
     exit: ExitCommand::Text("/exit"),
     enter_gap_ms: 300,

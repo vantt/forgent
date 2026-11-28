@@ -749,12 +749,13 @@
     {
       "name": "composer-state-empty-ready",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real idle screen recorded at codex 0.166.0 with `fgos session read`: placeholder composer",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "ready"
+            "file": "idle-empty-0.166.0"
           }
         ]
       },
@@ -765,12 +766,13 @@
     {
       "name": "composer-state-empty-turn-finished",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real turn-finished screen recorded at 0.163.0 with the banner line rewritten to 0.166.0 (no 0.166.0 turn-finished frame was captured)",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "turn-finished"
+            "file": "turn-finished-banner-updated"
           }
         ]
       },
@@ -781,12 +783,13 @@
     {
       "name": "composer-state-half-typed",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real half-typed screen recorded at codex 0.166.0 with `fgos session read`",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "half-typed"
+            "file": "half-typed-0.166.0"
           }
         ]
       },
@@ -797,7 +800,7 @@
     {
       "name": "composer-state-blank-first-line-draft",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
       "source": "synthesized: short multiline draft below a blank prompt, before the model footer",
       "script": {
         "frames": [
@@ -819,7 +822,7 @@
     {
       "name": "composer-state-draft-ending-in-bare-greater-than",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
       "source": "synthesized: a draft continuation is not the prompt line",
       "script": {
         "frames": [
@@ -841,7 +844,7 @@
     {
       "name": "composer-state-empty-with-another-model-name",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
       "source": "synthesized: an empty ready screen with a non-GPT model status",
       "script": {
         "frames": [
@@ -863,12 +866,13 @@
     {
       "name": "composer-state-draft-in-composer",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real screen recorded at 0.163.0 with the banner line rewritten to 0.166.0 (no 0.166.0 frame was captured)",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "draft-in-composer"
+            "file": "draft-in-composer-banner-updated"
           }
         ]
       },
@@ -879,12 +883,13 @@
     {
       "name": "composer-state-draft-expanded-composer",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real screen recorded at 0.163.0 with the banner line rewritten to 0.166.0 (no 0.166.0 frame was captured)",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "draft-expanded-composer"
+            "file": "draft-expanded-composer-banner-updated"
           }
         ]
       },
@@ -895,7 +900,7 @@
     {
       "name": "composer-state-dialog-blocked",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
       "script": {
         "frames": [
           {
@@ -911,7 +916,7 @@
     {
       "name": "composer-state-hooks-review",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
       "script": {
         "frames": [
           {
@@ -927,12 +932,13 @@
     {
       "name": "composer-state-busy-working",
       "step": "composer-state",
-      "version": "0.163.0",
+      "version": "0.166.0",
+      "source": "real working screen recorded at codex 0.166.0 (`• Working (1s • esc to interrupt)` above a placeholder composer); unknown comes from the shared working gate",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "working"
+            "file": "working-0.166.0"
           }
         ]
       },
