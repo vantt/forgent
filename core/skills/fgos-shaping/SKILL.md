@@ -87,7 +87,7 @@ the hand-off block are required.
 
 Ask the owner only with `fgos questions ask --input <file|-> --ref <origin>` (five-part form of `../_shared/owner-communication.md#decision-question`). Inside a head the
 CLI goes through the request socket, which carries `questions ask`, `questions ack` and `questions cancel` for every
-head and `questions answer` for the secretary only. A shaper never answers; the owner does, through the secretary or
+head and `questions answer` for the secretary only. Every question with options carries `parts.default` in the input file: what you do, and when, if no answer comes. A shaper never answers; the owner does, through the secretary or
 S04.
 
 - Write the `q-` id into the origin (the §1 open list and the §3 row it belongs to), then keep shaping whatever the

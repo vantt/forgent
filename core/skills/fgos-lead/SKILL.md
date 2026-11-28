@@ -87,7 +87,7 @@ never SIGKILL a test run.
 ## Never
 
 - Anything `core/agents/lead.yaml` puts outside the lead; widen the plan footprint except through `fgos supervisor widen`.
-- Ask outside `fgos questions ask` (granted to every head; `../_shared/owner-communication.md#decision-question`).
+- Ask without `parts.default` in the input (what you do, and when, if no answer comes), or ask outside `fgos questions ask` (granted to every head; `../_shared/owner-communication.md#decision-question`).
 - Change the plan's approved outcome or acceptance yourself: that is an owner question (`../_shared/owner-communication.md#when-to-ask`); widening its files to meet them is not.
 
 ## Reports

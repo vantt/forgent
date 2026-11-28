@@ -131,7 +131,7 @@ In the status-report shape of `../_shared/owner-communication.md`. Put the full 
 Read the open questions with `fgos questions` (the owner question store). Show at most 5 at a time, ordered by plan priority,
 then age (what a question blocks is shown, not a sort key), headline first. Every question is in the five-part form of `core/skills/_shared/owner-communication.md#decision-question`, in the owner's plain words
 (see the presentation points of `core/skills/_shared/owner-communication.md`). Relay only questions that pass the when-to-ask rule (`core/skills/_shared/owner-communication.md#when-to-ask`),
-and report self-decisions gathered by plan and by file. Rewrite a question that breaks the when-to-ask rule and the decision question of `core/skills/_shared/owner-communication.md` before showing it. Record the owner's reply with `fgos questions answer
+and report self-decisions gathered by plan and by file. Rewrite a question that breaks the when-to-ask rule and the decision question of `core/skills/_shared/owner-communication.md` before showing it. Questions are shown with lettered options (A to D), the recommended one first, and a "Default if no answer:" line; the owner may answer with the letter alone. Record the owner's reply with `fgos questions answer
 <id>`; only the secretary answers. Workflow gates keep their own door (`answerDoor` of the item).
 
 "Seen by the owner" means your message to the owner that names the question id: your report or batch. A question the

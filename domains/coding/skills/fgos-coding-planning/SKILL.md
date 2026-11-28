@@ -112,7 +112,7 @@ Where the project has no model, `locate` answers `authority: inactive`: record
 Write (or enrich) `plan.md` scaled to the mode — a direct note for
 `tiny`, a fuller map for `high-risk`. End with the exact `## Outstanding
 questions` heading; its body is `None`, or the `q-` ids (each with its headline) of questions asked with
-`fgos questions ask`, never prose questions. Full
+`fgos questions ask` (each with `parts.default`: what you do, and when, if no answer comes), never prose questions. Full
 mechanics: `references/approach-and-shape.md`.
 
 ### Step 4: Decide the split, if any
