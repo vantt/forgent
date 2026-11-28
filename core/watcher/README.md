@@ -12,11 +12,14 @@ Named Observe queries the watcher runs (`fgos metrics query --def <dir>`). Detec
 
 | Event field | Read from the answer row |
 |---|---|
-| `kind`, `reason`, `nextCommand` | the answer's `row` template |
+| `kind`, `nextCommand` | the answer's `row` template |
+| `reason` | the template's `reason`, with each `{<agg>}` placeholder (`{count}`, `{sum:<measure>}`) filled from the row's aggregate values; a placeholder whose aggregate the definition does not list stays as written, and a reason with no `{` is unchanged |
 | `subject` | the group's `origin.host` when it has one (`lane-freed`), else its `subject.id` |
-| `ts` | the row's `min:ts` when it has one (a run of point records: `supervisor-wake-failed`, `supervisor-stuck`, the run's first record), else `max:end` (a span's end: `lane-freed`), else `max:ts` |
+| `ts` | the row's bucket start when the definition buckets (`main-notes-outrun-code`), else its `min:ts` when it has one (a run of point records: `supervisor-wake-failed`, `supervisor-stuck`, the run's first record), else `max:end` (a span's end: `lane-freed`), else `max:ts` |
 
 The id is derived from `kind|subject|ts`, so a re-run over an overlapping window gives the same id.
+
+`main-notes-outrun-code` counts the commits the trunk took, per UTC clock hour (`bucket: hour`), from the `fgos.main.commit` records (one per first-parent commit, read from git). Its instant is the hour's start, which never moves as the window slides, so one breached hour raises one event; the definition still lists `min:ts` because every raised row must carry an aggregate instant. Its window is its own (`"window": "own"`, `since` `-2h`), so the hour before the current one is wholly inside it and is judged once it has closed. A commit counts once, under the first match of: `code` (any path outside `plans/`), `plan-status` (a plan's `status` changed), `backlog`, `discussion`, `report`, `plan-note`. The share's numerator is notes, reports and discussion rounds (`fgos.main.commit.note`); backlog rows are counted and named in the reason but are not in it. An hour raises when it has at least `watcher.mainCommits.minForShare` commits and that numerator is over `watcher.mainCommits.noteShareMax` of the count, or when its count is over `watcher.mainCommits.perHourMax`. It takes the default action; set `watcher.actions.main-notes-outrun-code` to change it.
 
 `lane-freed` answers one row per host (`origin.host`, newest attempt per run) with `max:end`: the end of the host's newest ended attempt.
 

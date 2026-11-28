@@ -1,0 +1,17 @@
+{
+  "now": "2026-11-18T12:00:00Z",
+  "group": {
+    "subject.id": "branch:main"
+  },
+  "since": "2026-11-18T10:00:00Z",
+  "ts": "2026-11-18T10:05:00Z",
+  "config": {
+    "watcher.mainCommits.noteShareMax": 0.5,
+    "watcher.mainCommits.perHourMax": 12,
+    "watcher.mainCommits.minForShare": 6
+  },
+  "later": {
+    "now": "2026-11-18T12:04:00Z",
+    "since": "2026-11-18T10:06:00Z"
+  }
+}

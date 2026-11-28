@@ -1,5 +1,6 @@
 {
   "contract": "observe-kinds.v1",
+  "subjectKinds": ["branch"],
   "attrs": {
     "fgos.head.state": { "type": "string", "values": ["live", "gone", "unknown", "retired", "ended"] },
     "fgos.head.identity": { "type": "string", "values": ["alive", "unknown", "remote", "absent"] },

@@ -1,0 +1,92 @@
+{
+  "name": "main-notes-outrun-code",
+  "requires": [
+    "fgos.main.commit"
+  ],
+  "window": "own",
+  "params": {
+    "share": {
+      "configKey": "watcher.mainCommits.noteShareMax"
+    },
+    "rate": {
+      "configKey": "watcher.mainCommits.perHourMax"
+    },
+    "min": {
+      "configKey": "watcher.mainCommits.minForShare"
+    }
+  },
+  "query": {
+    "since": "-2h",
+    "kind": [
+      "fgos.main.commit"
+    ],
+    "by": [
+      "subject.id"
+    ],
+    "bucket": "hour",
+    "agg": [
+      "count",
+      "min:ts",
+      "sum:fgos.main.commit.note",
+      "sum:fgos.main.commit.code",
+      "sum:fgos.main.commit.plan-status",
+      "sum:fgos.main.commit.backlog",
+      "sum:fgos.main.commit.discussion",
+      "sum:fgos.main.commit.report",
+      "sum:fgos.main.commit.plan-note"
+    ],
+    "having": [
+      {
+        "any": [
+          [
+            {
+              "lhs": {
+                "agg": {
+                  "agg": "count"
+                }
+              },
+              "op": "ge",
+              "rhs": {
+                "param": "min"
+              }
+            },
+            {
+              "lhs": {
+                "agg": {
+                  "agg": "sum:fgos.main.commit.note"
+                }
+              },
+              "op": "gt",
+              "rhs": {
+                "agg": {
+                  "agg": "count",
+                  "k": {
+                    "param": "share"
+                  }
+                }
+              }
+            }
+          ],
+          [
+            {
+              "lhs": {
+                "agg": {
+                  "agg": "count"
+                }
+              },
+              "op": "gt",
+              "rhs": {
+                "param": "rate"
+              }
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "row": {
+    "kind": "main-notes-outrun-code",
+    "reason": "main took {count} commits this hour: {sum:fgos.main.commit.note} notes ({sum:fgos.main.commit.plan-note} plan notes, {sum:fgos.main.commit.report} reports, {sum:fgos.main.commit.discussion} discussion rounds), {sum:fgos.main.commit.backlog} backlog rows, {sum:fgos.main.commit.plan-status} plan status changes, {sum:fgos.main.commit.code} code or config",
+    "nextCommand": "fgos supervisor queue --json"
+  }
+}

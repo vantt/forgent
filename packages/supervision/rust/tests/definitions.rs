@@ -11,7 +11,8 @@ use fgos_observe::{ObserveRequest, RecordSource};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-const RAISED: [&str; 13] = [
+const RAISED: [&str; 14] = [
+    "main-notes-outrun-code",
     "plan-became-ready",
     "plan-done",
     "plan-drafted",
@@ -460,6 +461,55 @@ fn the_failure_limits_come_from_config_and_a_count_at_the_limit_raises_nothing()
             unset["unmeasured"],
             format!("config-unset: {key}"),
             "{name}"
+        );
+    }
+}
+
+fn main_commit_line(id: usize, ts: &str, kind: &str, note: u32) -> String {
+    json!({
+        "v": 2, "id": format!("main-commit:{id}"), "kind": "fgos.main.commit", "ts": ts,
+        "subject": { "kind": "branch", "id": "branch:main" },
+        "attrs": { "fgos.main.commit.kind": kind },
+        "measures": { format!("fgos.main.commit.{kind}"): 1, "fgos.main.commit.note": note },
+        "basis": "observed", "origin": { "source": "fixture" }
+    })
+    .to_string()
+}
+
+#[test]
+fn a_main_commits_hour_over_the_rate_alone_raises_one_row_and_an_unset_threshold_key_is_unmeasured()
+{
+    // Thirteen code commits in one clock hour: a note share of 0, so only the rate branch holds.
+    let lines: Vec<String> = (0..13)
+        .map(|i| main_commit_line(i, &format!("2026-11-18T10:{:02}:00Z", 5 + i), "code", 0))
+        .collect();
+    let root = project("main-commits-rate", &lines, true);
+    let keys = [
+        "watcher.mainCommits.noteShareMax",
+        "watcher.mainCommits.perHourMax",
+        "watcher.mainCommits.minForShare",
+    ];
+    let config = |rate: f64| [(keys[0], 0.5), (keys[1], rate), (keys[2], 6.0)];
+    let at = |config: &[(&str, f64)]| {
+        answer(
+            &root,
+            "main-notes-outrun-code",
+            "2026-11-18T12:00:00Z",
+            Some("2026-11-18T10:00:00Z"),
+            &environment(config),
+        )
+    };
+    assert_eq!(rows(&at(&config(12.0))).len(), 1, "over the rate");
+    assert_eq!(rows(&at(&config(13.0))).len(), 0, "at the rate");
+    for unset in keys {
+        let kept: Vec<(&str, f64)> = config(12.0)
+            .into_iter()
+            .filter(|(k, _)| *k != unset)
+            .collect();
+        assert_eq!(
+            at(&kept)["unmeasured"],
+            format!("config-unset: {unset}"),
+            "{unset}"
         );
     }
 }
