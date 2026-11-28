@@ -1,6 +1,6 @@
 # Phase 1: Spec first
 
-The component-authority spec states the layering model, against CAS-D1..D24, before any code
+The component-authority spec states the layering model and the four owners, against CAS-D1..D26, before any code
 changes (hand-off constraint: "spec docs/platform/component-authority/spec.md cập nhật trước
 code"). It reuses branch `component-authority-layerings/p01` (123eaf5f07, reviewed against
 CAS-D1..D13, not landed) in worktree
@@ -11,7 +11,7 @@ Capability: `code:implement` (prose only).
 ## Inputs
 
 - `plans/discussions/ds-zfqskcns7j-component-authority-scope-and-levels/DISCUSSION.md`: the
-  hand-off block (lines 12-23), §4 CAS-D1..CAS-D24, §6 `#design`.
+  hand-off block (lines 12-23), §4 CAS-D1..CAS-D26, §6 `#design`.
 - `git diff main...component-authority-layerings/p01` (what is already written).
 - `docs/platform/governance.md#decision-scope-to-holder-table` (where the narrative goes).
 
@@ -38,7 +38,7 @@ Capability: `code:implement` (prose only).
      port callbacks.
    - `sameAs` and `distinctFrom` on values (CAS-D15 (3)) and the pairs of plan.md.
    - §2.2: drop `source` (merged into `paths`, CAS-D17 (1)); add the rule that a component owns
-     at least one of code under `coverage.roots`, a decision kind, a contract it provides, a door,
+     at least one of code under `coverage.roots`, a contract it provides, a door,
      or is designed/planned and points to the plan or backlog row that makes it (CAS-D20); a
      `retired` row is deleted, its id goes to the successor's `aliases` (CAS-D21); layering values
      apply only to live/designed rows, status is verified against real code (CAS-D19).
@@ -50,9 +50,20 @@ Capability: `code:implement` (prose only).
      (CAS-D14, D15, D20, D21). `locate`: answers four layerings, resolves an old id by `aliases`.
    - §4 lifecycle item 4: new rules run in report mode until clean, then block (CAS-D23); step B
      shape is CAS-D24, stated as future.
-   - §7: retitle the history entry "CAS-D1 đến CAS-D24", and add what D14..D24 decided and which
+   - CAS-D25: a short "Four owners" subsection: structure (this component), rules (ACE, which
+     points here for machine-checked rules, never the reverse), decision history (D-ADR records;
+     an ADR's scope is the id of the component holding the topic), documentation (renders and
+     reading paths, no hand-written authority). Remove decision kinds from the header, §2 and §3
+     (`--kind decision-kind` gone); add the component field `decisions` (narrative home,
+     default the row's `spec`); old scope ids resolve through `aliases`. CAS-D20's owns-something
+     list drops "a decision kind".
+   - CAS-D26: add the component field `summary` (one sentence, written once at declare and again
+     when the responsibility changes); `architecture-map.md` and `component-boundary.md` are
+     renders with a short hand-written head; the layout of the layering sections (CAS-D26 (2));
+     render writes no prose and calls no model.
+   - §7: retitle the history entry "CAS-D1 đến CAS-D26", and add what D14..D26 decided and which
      earlier parts they replaced (CAS-D15 over D11/D12/D13 parts, D16 over ring parts, D22 over the
-     `work-driver` parts).
+     `work-driver` parts, D25 over the decision-kind part of D20).
 3. Run `fgos doc locate` per the documentation write door before adding the coverage subsection,
    to confirm the spec is the unit that carries the claim.
 
@@ -60,7 +71,7 @@ Capability: `code:implement` (prose only).
 
 `node scripts/doc-health.mjs` and `node --test test/report/decision-index.test.mjs` (the spec's
 history section feeds the decision index); and `rg -n "T8-work|T4-supervisor|\bdebt\b|fromLayering" docs/platform/component-authority/spec.md`
-prints only history-section lines. Pass: the doc checks are green and every CAS-D14..D24 point
+prints only history-section lines. Pass: the doc checks are green and every CAS-D14..D26 point
 above has a sentence in the spec.
 
 ## Rollback

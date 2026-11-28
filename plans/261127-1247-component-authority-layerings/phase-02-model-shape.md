@@ -8,7 +8,7 @@ Capability: `code:implement`.
 ## Inputs
 
 - The landed spec `docs/platform/component-authority/spec.md` (phase 1).
-- DISCUSSION §4 CAS-D6..D9, D12, D13, D15 (2)(3), D16, D17 (1)(2), D18, D19, and the §7 scan
+- DISCUSSION §4 CAS-D6..D9, D12, D13, D15 (2)(3), D16, D17 (1)(2), D18, D19, D26 (5), and the §7 scan
   table `#scan-layerings` (draft values per row).
 - `packages/component-authority/model/{layers,components,contracts}.yaml`,
   `contracts/model.v1.json`, `rust/src/{model,declare,locate,render}.rs`,
@@ -57,6 +57,9 @@ Its footprint row in plan.md: the model directory, the schema, the crate's `src/
    bootstrap model has no layering; `locate.rs` and `render.rs` read the new fields (render's
    tables show `hexagon`, `stack`, `orchestration-ring`; "Source links" reads `paths`). Move every
    fixture and test (`model_checks.rs`, crate unit tests, `apps/fgos/tests/authority.rs`).
+   Add the optional component field `summary` (one sentence, CAS-D26 (5)) to the schema and
+   `model.rs`, and let `declare` accept it on a component row, with a declare test. Phase 3
+   writes it on every row and makes it required.
 7. `test/architecture.test.mjs`: the model reader (lines ~60-120) builds file → value maps from
    the new fields; the one-directional and tier tests read the value order from the model instead
    of their own lists; meaning unchanged. `test/report/decision-index.test.mjs` fixture model in
