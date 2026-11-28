@@ -83,6 +83,7 @@ new event or other wake, this skill cannot detect it by itself.
 
 For `session-idle` naming a live lead (or the `coordination-help` raised above), never close the event on a screen claim such as "waiting on a background shell".
 Run `fgos session type head:lead-<headName> --text "Check the wait you named; if it is over, continue; if not, say what it is and when it ends."`
+The verb submits the line, so the lead acts on it and no `\r` is needed. It answers `submitted`. On `composer-not-empty`, read the quoted draft and do not retype. On `busy` or `dialog-open`, read the screen and handle it as below. On `delivery-unknown`, read the screen before typing again.
 The lead's shell can check its own background job; yours cannot. Close the event only when the lead answers or makes
 progress. If it is idle again at the next wake without a verified ongoing wait, apply the existing `plan-no-progress`
 stop-then-start rule below, even without a fresh watcher row.
@@ -154,7 +155,7 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 ## On site and the drone
 
 - `fgos session read` reads the recent screen of a session read-only, to see what a stuck or silent session is doing.
-- `fgos session type` types into a pane only when an open coordination or drone event names that session (refused
+- `fgos session type` types a line into a pane and submits it (`--no-enter` only types, answering `held`), only when an open coordination or drone event names that session (refused
   `target-not-stuck` otherwise).
 - `fgos watcher tune` changes the drone's definition within config bounds.
 - `fgos supervisor raise` puts a coordination event on the queue; `fgos metrics record` records coordination evidence

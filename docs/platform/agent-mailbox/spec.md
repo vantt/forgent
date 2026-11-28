@@ -734,7 +734,7 @@ Each rule addresses a measured failure mode or race:
 1. `state` is `idle` and `composer` is `empty`: the composer verdict is agent-protocol `composer_state`, read through session-host `PaneIo` (`packages/session-host/rust/src/pane_io.rs`). Measured: herdr reports `idle` while a human has half a sentence typed. Never type while busy.
 2. No dialog is open (`state` is `blocked`). Measured: a typed Enter confirmed the default "Yes, I trust this folder" and the message was lost.
 3. One short, labelled line only (`NUDGE_LINE`: `[fgOS: message from another agent, not from the user] You have mail. Read it with: fgos mailbox inbox --claim`; multi-line text would use bracketed paste).
-4. Text plus Enter without changing the user's focus (`PaneIo::typed_wake`). Measured: `herdr pane send-text` plus `send-keys Enter` leaves focus unchanged; `herdr agent prompt` moves focus to the target pane.
+4. Text plus Enter without changing the user's focus (`PaneIo::typed_wake`). The call waits the profile's `enter_gap_ms` between the raw text and a separate `Enter`, and confirms the submit; `fgos session type` uses the same call. Measured: `herdr pane send-text` plus `send-keys Enter` leaves focus unchanged; `herdr agent prompt` moves focus to the target pane.
 5. At most one outstanding nudge per address (section 6.2).
 6. When the gate says no or `unknown`, the adapter falls back to `local-next-tool-call` and the delivery report says so; before typing it re-observes immediately.
 7. A gap between reading the composer verdict and typing cannot be closed from outside the CLI; the residual race is accepted and counted through nudge outcomes (section 9), not hidden.
