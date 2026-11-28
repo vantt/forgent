@@ -174,8 +174,9 @@ it. Phase 6 measures the first two that can be measured now.
    `fgos internal context-engine compile --protocol 1`, contains the rule `documentation-door`.
 4. `rg -n "future area|instruction registry renders" docs/platform/documentation` returns nothing;
    `node scripts/doc-health.mjs` passes on `docs/platform/**`.
-5. The build order table in documentation spec section 4 has a plan column; the proposal (section 0 and 9.2), the
-   H1 plan (12.1), `docs/reading-map.md` and ledger row PF-I006 each link to it.
+5. The build order table in documentation spec section 4 has a plan column; the proposal (section 0 and 9.2),
+   `docs/reading-map.md` and ledger row PF-I006 each link to it. (The H1 plan is left out: its documentation work
+   finished long ago; owner, q-fzcovlnz5u, 2026-11-28.)
 6. A report at `fgos convention path --kind report --slug h2-step2-topics-per-retrospective-item` gives the
    baseline and the after count of new topics per retrospective item, with the queries used.
 7. `npm test` and `cargo test --workspace` are green on the merged tree, apart from tests that fail the same way on
@@ -250,7 +251,9 @@ Capability: phases 1, 2, 4 and 7 are `code:implement`; phase 3 is `code:implemen
 
 ## Owner questions
 
-Open, each blocking only one legacy-plan edit: q-lb3rw5lo4u (the H1 plan's 12.1 link in criterion 5) and q-iwoehdmzfj (withdrawing the draft plan, phase 5 step 4). The pre-commit gate refuses any staged legacy plan without a `contract: plan-v1` marker. Phases 3 and 5 landed everything else.
+Open: q-iwoehdmzfj (withdrawing the draft plan, phase 5 step 4); the pre-commit gate refuses any staged legacy plan
+without a `contract: plan-v1` marker. Answered 2026-11-28: q-fzcovlnz5u = A, the H1 plan's 12.1 link is dropped from
+criterion 5, which q-lb3rw5lo4u also asked about; the p03x edit is not needed.
 
 Earlier: none open. The owner set the plan going on 2026-11-27 without waiting for the plans that share files (see the
 footprint check). Validating proof point, run on `ac171967a`: `fgos doc locate` on a real retrospective-style draft
