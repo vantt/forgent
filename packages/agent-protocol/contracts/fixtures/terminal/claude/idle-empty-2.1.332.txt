@@ -1,0 +1,60 @@
+✻ Cogitated for 12s · done 4:35 PM
+
+※ recap: We're shaping the backlog-to-ready discussion, working bottom-up on status, step and stage, and
+  I've proposed a five-point structure: one base set of statuses, fixed categories, domain labels, base
+  stages, and steps per workflow. Next you approve or adjust those five points, then I stress-test the base
+  sets on marketing and council.
+
+❯ với cách tiếp cận này thì có 1 bộ status với tất cả mọi option có thể rồi domain dùng cái nào thì dùng.
+  không dùng thì sao?
+
+  Searched for 1 pattern, ran 1 shell command
+
+● Đúng, cách tiếp cận này là một bộ status gốc gồm mọi lựa chọn, mỗi domain dùng phần nào cần. Domain không
+  dùng một status thì item không bao giờ vào status đó, nên không tốn gì. Lý do là item không tự nhảy vào
+  một status: nó chỉ vào khi có một sự kiện cụ thể xảy ra. Ví dụ có claim thì vào doing, có câu hỏi cho
+  người thì vào awaiting-human. Domain không có sự kiện đó thì không bao giờ đi tới đó.
+
+  Em vừa đọc bảng chuyển trạng thái (src/state/status-fsm.mjs). 11 status hôm nay chia làm hai loại:
+
+  ┌───────────────┬───────────────────────────────────────────┬───────────────────────────────────────┐
+  │     Loại      │                  Status                   │       Domain không dùng thì sao       │
+  ├───────────────┼───────────────────────────────────────────┼───────────────────────────────────────┤
+  │ Trục bắt      │                                           │ Không bỏ được. Bước nào domain không  │
+  │ buộc: mọi     │ todo, doing, delivered, retrospective,    │ có việc thì item đi qua ngay, ví dụ   │
+  │ item đi tới   │ cleanup, done                             │ cleanup ở domain không có worktree    │
+  │ done đều qua  │                                           │ thì không có gì để thu hồi.           │
+  ├───────────────┼───────────────────────────────────────────┼───────────────────────────────────────┤
+  │ Tuỳ chọn: chỉ │ backlog (ý tưởng chưa cam kết), blocked   │ Không bao giờ vào, item đi đường      │
+  │  vào khi có   │ (lỗi hệ thống), awaiting-human (câu hỏi), │ khác. Ví dụ không có cổng duyệt thì   │
+  │ sự kiện       │  awaiting-approval (cổng duyệt), wontfix  │ đi thẳng doing → delivered (cạnh này  │
+  │               │ (huỷ)                                     │ đã có).                               │
+  └───────────────┴───────────────────────────────────────────┴───────────────────────────────────────┘
+
+  Lời khuyên của em là thêm một điều nhỏ vào cấu trúc: mỗi domain khai rõ những status tuỳ chọn nó dùng.
+  Việc khai này cho ba lợi ích:
+  - Board chỉ hiện cột của trục bắt buộc cộng với các status đã khai, nên không có cột trống.
+  - Bắt lỗi: một lần chuyển vào status mà domain không khai sẽ bị từ chối. Ví dụ domain không khai cổng
+    duyệt mà có item rơi vào awaiting-approval thì đó là lỗi, và máy báo ra.
+  - Nhãn (lớp b, c) chỉ gắn được lên những status domain đã khai.
+
+  Cách này có một cái giá: bộ gốc càng nhiều lựa chọn thì càng khó hiểu. Vì vậy luật "chỉ thêm status gốc
+  khi nó có tác dụng riêng lên cơ chế" vẫn cần giữ.
+
+  Có một điều em chưa kiểm trong code: các bước đuôi ở domain không có việc có thực sự tự đi qua ngay
+  không, hay hôm nay đang chờ. Theo thiết kế D5 thì cleanup không có worktree là không làm gì, còn
+  retrospective chạy skill của domain. Em sẽ kiểm điều này trong bước thử sức.
+
+  Nếu anh đồng ý, cấu trúc thành 6 điểm: 5 điểm trước, cộng "domain khai các status tuỳ chọn nó dùng".
+
+✻ Brewed for 32s · done 4:54 PM
+
+※ recap: Mình đang chốt cấu trúc status, category, stage, step cho mọi domain. Cấu trúc hiện có 6 điểm: một
+  bộ status gốc, category cố định, nhãn theo domain, stage gốc, step theo workflow, và mỗi domain khai các
+  status tuỳ chọn nó dùng. Việc tiếp theo là anh duyệt 6 điểm này để em ghi vào DISCUSSION.
+                                                                   new task? /clear to save 124.5k tokens
+───────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯
+───────────────────────────────────────────────────────────────────────────────────────────────────────────
+  🤖 Opus 5.5 - 12%  ⌛ wk 61% (1d)  📁 ~/projects/forgent  🌿 main
+  ⏵⏵ bypass permissions on (shift+tab to cycle)

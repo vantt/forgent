@@ -35,7 +35,7 @@ impl Nudge for Attempt {
 fn typed_versions_are_separate_from_push_versions_and_never_enable_deferred_hooks() {
     let tested = TestedClis::embedded();
     for (cli, version) in [
-        ("claude", "2.1.302"),
+        ("claude", "2.1.332"),
         ("codex", "0.163.0"),
         ("agy", "1.4.2"),
     ] {

@@ -5,7 +5,7 @@ use crate::Inspection;
 /// project is one the person created or trusts.
 pub const PROFILE: Profile = Profile {
     cli: "claude",
-    pinned_version: "2.1.302",
+    pinned_version: "2.1.332",
     version_marker: Some("claude code v"),
     exit: ExitCommand::Text("/exit"),
     enter_gap_ms: 300,
