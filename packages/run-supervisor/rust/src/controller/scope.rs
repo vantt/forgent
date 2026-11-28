@@ -377,7 +377,10 @@ pub fn end_dead_attempt_with(run_dir: &Path, ports: &mut dyn EndDeadPorts) -> Va
         .get("attemptId")
         .and_then(Value::as_str)
         .unwrap_or_default();
-    let unit = domain.get("unit").and_then(Value::as_str).unwrap_or_default();
+    let unit = domain
+        .get("unit")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
     let owned = scope_unit_name(attempt_id);
     if unit != owned {
         return refused(
@@ -626,10 +629,8 @@ mod tests {
 
     /// A run dir under the temp directory holding one `supervisor-binding.json`.
     fn scratch_run_dir(name: &str, binding: Value) -> ScratchDir {
-        let dir = std::env::temp_dir().join(format!(
-            "rs-scope-end-dead-{name}-{}",
-            std::process::id()
-        ));
+        let dir =
+            std::env::temp_dir().join(format!("rs-scope-end-dead-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(
@@ -749,7 +750,10 @@ mod tests {
         let mut ports = FakePorts::new(false, 0);
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("supervisor-alive"));
-        assert!(ports.stops.is_empty(), "a live supervisor's domain is its own");
+        assert!(
+            ports.stops.is_empty(),
+            "a live supervisor's domain is its own"
+        );
         assert!(
             ports.gate_signals.is_empty(),
             "a live supervisor's gate is its own"
@@ -768,7 +772,10 @@ mod tests {
         assert_eq!(answer["refused"]["code"], json!("domain-not-scope"));
         let message = answer["refused"]["message"].as_str().unwrap();
         assert!(message.contains("no-user-manager"), "{message}");
-        assert!(ports.stops.is_empty(), "an inherited domain is never signalled");
+        assert!(
+            ports.stops.is_empty(),
+            "an inherited domain is never signalled"
+        );
         assert!(
             ports.gate_signals.is_empty(),
             "an inherited domain's gate is never signalled"
@@ -785,7 +792,10 @@ mod tests {
         let mut ports = FakePorts::new(true, 0);
         let answer = end_dead_attempt_with(&dir, &mut ports);
         assert_eq!(answer["refused"]["code"], json!("scope-mismatch"));
-        assert!(ports.stops.is_empty(), "only the named attempt's own scope is stopped");
+        assert!(
+            ports.stops.is_empty(),
+            "only the named attempt's own scope is stopped"
+        );
         assert!(
             ports.gate_signals.is_empty(),
             "nothing is signalled when the scope is not this attempt's own"
@@ -803,7 +813,10 @@ mod tests {
         assert_eq!(answer["refused"]["code"], json!("no-binding"));
         let message = answer["refused"]["message"].as_str().unwrap();
         assert!(message.contains("gate"), "{message}");
-        assert!(ports.stops.is_empty(), "nothing is signalled without a gate to judge");
+        assert!(
+            ports.stops.is_empty(),
+            "nothing is signalled without a gate to judge"
+        );
         assert!(
             ports.gate_signals.is_empty(),
             "nothing is signalled without a gate record"
@@ -866,7 +879,11 @@ mod tests {
         );
         assert_eq!(seen.last().copied(), Some("adopt"), "adopt is last");
         assert_eq!(
-            ports.events.iter().filter(|event| event.as_str() == "adopt").count(),
+            ports
+                .events
+                .iter()
+                .filter(|event| event.as_str() == "adopt")
+                .count(),
             1,
             "one adopt"
         );
@@ -894,7 +911,10 @@ mod tests {
         assert_eq!(answer["refused"]["code"], json!("domain-not-ended"));
         assert_eq!(ports.gate_signals, vec![false, true]);
         assert_eq!(ports.slept_ms, SCOPE_STOP_WAIT_MS + SCOPE_KILL_WAIT_MS);
-        assert_eq!(ports.adopted, 0, "an attempt is adopted only once its domain is empty");
+        assert_eq!(
+            ports.adopted, 0,
+            "an attempt is adopted only once its domain is empty"
+        );
     }
 
     #[test]
