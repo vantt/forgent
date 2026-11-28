@@ -70,3 +70,47 @@ Caused by:
 Caused by:
   can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
 exit=101 elapsed=.313706009s
+
+## Private-HOME rerun (homeEnv: HOME condition emulated with HOME=$(mktemp -d))
+
+# Same confined unit as above, run on 2026-11-28. Each step ran in its own shell, so
+# the exported HOME never leaked between steps. Nothing was edited.
+
+### Step 4
+$ export HOME=$(mktemp -d); echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT ORT_LIB_PATH=$ORT_LIB_PATH"; ls -A "$HOME"
+HOME=/tmp/tmp.bwewtcoOgm CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0 ORT_LIB_PATH=/home/vantt/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/02aac0d3b4927026292088986d7a377c657c88761b1c068be217a67b35447678
+# (ls -A printed nothing: the private HOME starts empty)
+exit=0
+
+### Step 5
+$ export HOME=$(mktemp -d); export CARGO_TARGET_DIR=$(mktemp -d); s=$(date +%s.%N); timeout 600 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -15; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.30s
+  Executable unittests src/lib.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/fgos_agent_context_engine-08f73b4e57e55cb6)
+  Executable tests/check.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/check-6bc47e5f4cad6cad)
+  Executable tests/compose.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/compose-f255d6e026e79024)
+  Executable tests/repository_units.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/repository_units-b1904805e74cdb4f)
+  Executable tests/rule_unit.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/rule_unit-a4a70e4087a3717a)
+  Executable tests/set.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/set-6db0e0a26ff08e8e)
+  Executable tests/store.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/store-811b778081902330)
+  Executable tests/vectors.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/vectors-dc5dee7ba25b0e34)
+exit=0 elapsed=14.335838305s
+
+### Step 6
+$ export HOME=$(mktemp -d); s=$(date +%s.%N); CARGO_HOME=$(mktemp -d) timeout 120 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -12; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+error: failed to get `pkm-core` as a dependency of package `fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)`
+
+Caused by:
+  failed to load source for dependency `pkm-core`
+
+Caused by:
+  unable to update https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb
+
+Caused by:
+  can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
+exit=101 elapsed=.059629804s
