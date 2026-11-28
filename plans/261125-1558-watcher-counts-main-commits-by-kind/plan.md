@@ -161,11 +161,13 @@ as the event instant.
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [An any group in a query having](phase-01-having-any-group.md) | - | packages/observe/rust/src/query/model.rs, packages/observe/rust/src/query/exec.rs, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/tests/query_engine_test.rs, docs/platform/observe/spec.md | 1 | ready |
-| 2 | [A main-commits Observe source](phase-02-main-commits-source.md) | - | apps/fgos/src/wiring/observe_sources/main_commits.rs, apps/fgos/src/wiring/observe_sources/mod.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/src/wiring/metrics_sources.rs, apps/fgos/observe-kinds.json | 1 | ready |
-| 3 | [Counts in the event reason and a bucket instant](phase-03-row-reason-and-bucket.md) | - | apps/fgos/src/wiring/supervision.rs | 1 | ready |
+| 1 | [An any group in a query having](phase-01-having-any-group.md) | - | packages/observe/rust/src/query/model.rs, packages/observe/rust/src/query/exec.rs, packages/observe/rust/src/metrics_cli/query.rs, packages/observe/rust/tests/query_engine_test.rs, docs/platform/observe/spec.md | 1 | done |
+| 2 | [A main-commits Observe source](phase-02-main-commits-source.md) | - | apps/fgos/src/wiring/observe_sources/main_commits.rs, apps/fgos/src/wiring/observe_sources/mod.rs, apps/fgos/src/wiring/observe_sources/tests/mod.rs, apps/fgos/src/wiring/metrics_sources.rs, apps/fgos/observe-kinds.json | 1 | done |
+| 3 | [Counts in the event reason and a bucket instant](phase-03-row-reason-and-bucket.md) | - | apps/fgos/src/wiring/supervision.rs | 1 | done |
 | 4 | [The definition, its thresholds and docs](phase-04-definition-config-docs.md) | 1, 2, 3 | core/watcher/definitions/main-notes-outrun-code.query.json, core/watcher/README.md, core/config-standard/watcher.yaml, core/config-schema/watcher.schema.yaml, packages/supervision/rust/tests/definitions.rs, packages/supervision/rust/tests/fixtures/definitions/main-notes-outrun-code/, docs/platform/supervision/spec.md, changelog.d/261128-1139-watcher-counts-main-commits-by-kind.md | 2 | ready |
 | 5 | [Integration and full gate](phase-05-integration.md) | 4 | plans/261125-1558-watcher-counts-main-commits-by-kind/reports/ | 3 | ready |
+
+Wave 1 landed on 2026-11-28: phase 3 at 3b70270ebf, phase 2 at 338642eeca, phase 1 at 034fac4be5. Proof commands of criteria 2 and 3: the `fgos` crate has no lib target, so they run as `cargo test -p fgos --bin fgos observe_sources` and `cargo test -p fgos --bin fgos supervision::` (the owning row test is `a_definition_answer_maps_to_one_row_per_group_with_the_readme_precedence`). For phase 4: `{count}` in a row reason reads `aggs.count`, so the definition's `agg` list must name `count`.
 
 The three phases in wave 1 own disjoint files. Phase 4 owns every hot file
 (`core/watcher/README.md`, config standard and schema, the definitions test) alone, in wave 2.
