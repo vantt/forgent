@@ -455,7 +455,11 @@ fn show_text(question: &Question) -> String {
         ));
     }
     out.push(format!("Recommendation: {}", parts.recommendation));
-    if let Some(default) = &parts.default {
+    if let Some(default) = parts
+        .default
+        .as_deref()
+        .filter(|text| !text.trim().is_empty())
+    {
         out.push(format!("Default if no answer: {default}"));
     }
     out.push(format!(

@@ -3,7 +3,7 @@
 
 mod store_support;
 use fgos_questions::store::{LoggedEvent, State};
-use fgos_questions::usecase::Which;
+use fgos_questions::usecase::{shown_label, shown_options, Which};
 use serde_json::{json, Value};
 use store_support::*;
 
@@ -385,12 +385,7 @@ fn asked_with_the_recommendation_second(log: &MemLog, checkout: &Checkout) -> St
     ]);
     value["parts"]["recommendation"] = json!("fold into one");
     value["parts"]["default"] = json!("fold into one");
-    ask_as(
-        log,
-        head("m-1/a", "head:coder-x"),
-        checkout,
-        &value,
-    )
+    ask_as(log, head("m-1/a", "head:coder-x"), checkout, &value)
 }
 
 #[test]
@@ -411,6 +406,68 @@ fn an_answer_by_the_letter_of_a_place_stores_the_label_of_that_place_recommended
     assert_eq!(
         q.show(&second).unwrap().value.answer.unwrap().option,
         Some("keep two stores".into())
+    );
+}
+
+#[test]
+fn a_hand_lettered_label_is_shown_with_the_letter_of_its_place_and_answered_by_that_place() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    // The shape askers write today: each label lettered by hand, and the recommended one written second.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("A. Wait for the keeper", false),
+        option("B. Keeper's lead takes it", true),
+    ]);
+    value["parts"]["recommendation"] = json!("B. Keeper's lead takes it");
+    value["parts"]["default"] = json!("B. Keeper's lead takes it");
+    let id = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    let asked = q.show(&id).unwrap().value.asked;
+    let shown: Vec<String> = shown_options(&asked.parts.options)
+        .iter()
+        .map(shown_label)
+        .collect();
+    // Each hand letter is replaced by the letter of the place its option holds now, so the recommended option is
+    // `A` although the asker lettered it `B`, and no label carries a place it no longer holds.
+    assert_eq!(
+        shown,
+        [
+            "A. Keeper's lead takes it".to_owned(),
+            "B. Wait for the keeper".to_owned()
+        ]
+    );
+    q.answer(&id, Some("A"), None, None).unwrap();
+    assert_eq!(
+        q.show(&id).unwrap().value.answer.unwrap().option,
+        Some("B. Keeper's lead takes it".into()),
+        "the first place is the recommended option, not the label hand-lettered A"
+    );
+}
+
+#[test]
+fn an_exact_label_that_is_one_letter_names_its_own_option_and_the_letter_names_the_place() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    // Options whose labels are the single letters `A` and `B`, the recommended one written second.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([option("A", false), option("B", true)]);
+    value["parts"]["recommendation"] = json!("B");
+    value["parts"]["default"] = json!("B");
+    let exact = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let place = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // `B` is the label of the recommended option, so it names that option, not the second place.
+    q.answer(&exact, Some("B"), None, None).unwrap();
+    assert_eq!(
+        q.show(&exact).unwrap().value.answer.unwrap().option,
+        Some("B".into())
+    );
+    // A letter that matches no label still names a place: `b` is the second place, the option labelled `A`.
+    q.answer(&place, Some("b"), None, None).unwrap();
+    assert_eq!(
+        q.show(&place).unwrap().value.answer.unwrap().option,
+        Some("A".into())
     );
 }
 

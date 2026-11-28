@@ -87,8 +87,8 @@ process.stdin.on('end', () => {
 const BRIDGE_THAT_FAILS: &str = "process.stderr.write('bridge broke\\n'); process.exit(3);\n";
 
 /// A decided question whose options reveal the display: the recommended one is not the first the asker wrote, and
-/// one label is lettered by hand with the letter its own place on screen gives it.
-const QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"plan p phase 3","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"keep both","does":"d","gain":"g","harm":"h","cost":"c"},{"label":"fold into one","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"C. rewrite","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"fold into one","default":"fold into one after two days","scope":{"allows":"one store for this plan","forbids":"changing other plans"}}}"#;
+/// one label is lettered by hand with a letter that is not the letter of its place on screen.
+const QUESTION: &str = r#"{"stage":"planning","headline":"Which store do we use?","blocks":"plan p phase 3","parts":{"what":"choose a store","cause":"two stores exist","options":[{"label":"keep both","does":"d","gain":"g","harm":"h","cost":"c"},{"label":"fold into one","does":"d","gain":"g","harm":"h","cost":"c","recommended":true},{"label":"B. rewrite","does":"d","gain":"g","harm":"h","cost":"c"}],"recommendation":"fold into one","default":"fold into one after two days","scope":{"allows":"one store for this plan","forbids":"changing other plans"}}}"#;
 
 /// A repository with one commit holding `plans/p/plan.md`, a private state root with a machine id, and a release.
 struct Scene {
@@ -190,6 +190,25 @@ fn under_an_agent() -> bool {
 }
 
 #[test]
+fn a_question_whose_default_is_blank_is_shown_with_no_default_line() {
+    // The display test above carries a stated default, so only a blank one can prove the line is left out.
+    let scene = Scene::new("blank-default", BRIDGE_WITH_WORK);
+    let blank = QUESTION.replace("fold into one after two days", "   ");
+    let asked = scene.run(
+        &["questions", "ask", "--ref", "plan:p", "--input", "-"],
+        blank.as_bytes(),
+    );
+    assert!(asked.status.success(), "ask: {asked:?}");
+    let id = text(&asked).trim().to_owned();
+    let shown = scene.run(&["questions", "show", &id], b"");
+    assert!(shown.status.success(), "show: {shown:?}");
+    let shown = text(&shown);
+    assert!(shown.contains("Recommendation: fold into one"), "{shown}");
+    // A default that says nothing is not a default: the line is left out rather than printed empty.
+    assert!(!shown.contains("Default if no answer:"), "{shown}");
+}
+
+#[test]
 fn the_list_puts_the_needs_you_count_first_then_the_store_rows_then_the_work_section() {
     let scene = Scene::new("list", BRIDGE_WITH_WORK);
     let id = scene.ask();
@@ -285,7 +304,7 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
         "What is happening: choose a store",
         "Cause: two stores exist",
         // The options in the order the owner reads them (recommended first), each with the letter of its place; a
-        // label the asker already lettered with that very letter is shown as it is, never doubled.
+        // label the asker lettered by hand is shown with the letter of the place that option holds now.
         "  A. fold into one (recommended): d",
         "  B. keep both: d",
         "  C. rewrite: d",
@@ -306,7 +325,9 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
             && position("  B. keep both") < position("  C. rewrite"),
         "{shown}"
     );
-    // A label whose hand-written letter is the letter of its own place on screen is shown as it is, never doubled.
+    // The hand letter the asker wrote in front of the last label is replaced by the letter of its place, so it is
+    // never doubled (`B. C. rewrite`) and never keeps the place it no longer holds (`B. rewrite` is at C).
+    assert!(!shown.contains("B. rewrite"), "{shown}");
     assert!(!shown.contains("C. C."), "{shown}");
 
     let answered = scene.run(&["questions", "answer", &id, "--option", "A"], b"");

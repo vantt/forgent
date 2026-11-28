@@ -74,26 +74,42 @@ pub fn shown_options(options: &[QuestionOption]) -> Vec<ShownOption<'_>> {
         .collect()
 }
 
-/// A shown option's label: the option's own label, prefixed with its letter and a dot unless the label already
-/// starts with that letter and a dot (askers write `B. Keeper's lead ...` by hand today), so it is never doubled.
+/// The words of a label an asker lettered by hand (`B. Keeper's lead ...`): the letter `A` to `D`, a dot and an
+/// optional space are dropped, so the display can give the label the letter of its place instead.
+fn hand_lettered(label: &str) -> Option<&str> {
+    let mut characters = label.chars();
+    let letter = characters.next()?;
+    if !matches!(letter, 'A'..='D') {
+        return None;
+    }
+    let rest = characters.as_str().strip_prefix('.')?;
+    let words = rest.strip_prefix(' ').unwrap_or(rest);
+    (!words.trim().is_empty()).then_some(words)
+}
+
+/// A shown option's label: the letter of its place on screen, a dot and the option's own words. A letter the asker
+/// wrote by hand in front of the label is replaced by the letter of the place the option holds now, so a label is
+/// never lettered twice and never carries a place it no longer holds.
 pub fn shown_label(shown: &ShownOption<'_>) -> String {
-    let label = shown.option.label.as_str();
     let prefix = format!("{}.", shown.letter);
-    if label.starts_with(&prefix) {
-        label.to_owned()
-    } else {
-        format!("{prefix} {label}")
+    let label = shown.option.label.as_str();
+    match hand_lettered(label) {
+        Some(words) => format!("{prefix} {}", words.trim()),
+        None => format!("{prefix} {label}"),
     }
 }
 
-/// The option a `--option` value names: the option at the place on screen a single letter `A` to `D` names (in
-/// either case), or an option whose label is exactly the value. The letter comes first because the display and
-/// the answer command speak in letters, so a label that is itself one letter cannot shadow the place it names;
-/// an exact label is the way to name an option whose label is longer. A letter past the last option names nothing.
+/// The option a `--option` value names: an option whose label is exactly the value, or the option at the place on
+/// screen a single letter `A` to `D` (in either case) names. An exact label is matched first, so a label that is
+/// itself one letter (`B`) names its own option, and the letter is the way to name a place. A letter past the last
+/// option names nothing.
 pub fn resolve_option<'a>(
     options: &'a [QuestionOption],
     value: &str,
 ) -> Option<&'a QuestionOption> {
+    if let Some(named) = options.iter().find(|option| option.label == value) {
+        return Some(named);
+    }
     let mut characters = value.trim().chars();
     let letter = characters.next()?.to_ascii_uppercase();
     if characters.next().is_none() && letter.is_ascii_uppercase() {
@@ -101,7 +117,7 @@ pub fn resolve_option<'a>(
             return Some(shown.option);
         }
     }
-    options.iter().find(|option| option.label == value)
+    None
 }
 
 /// The wiring of one call.

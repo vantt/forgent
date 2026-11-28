@@ -106,7 +106,8 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 
 **The letters are one order.** `questions list`, `show`, the answer command and the gateway dashboard all show the
 options recommended first, then the rest as the asker wrote them, each prefixed with the letter of its place (`A.` to
-`D.`). A label that already starts with its own letter and a dot is shown as is, never doubled. The same order gives
+`D.`). A letter the asker wrote by hand in front of a label is replaced by the letter of the place the option holds,
+so a label is never lettered twice and never carries a place it no longer holds. The same order gives
 the display and the letter an answer names, so the two cannot drift: `show` prints the command with that letter,
 `fgos questions answer <id> --option A`. The dashboard shows the same letters, order and default line.
 
@@ -124,10 +125,11 @@ the store.
 | answer | only the owner: refused with `answer-not-owner` when an agent CLI is among the caller's process ancestors (a walk of the process tree matching the kernel names of the known agent CLIs; env is never read). Exceptions: the secretary head answers through its socket with `--source secretary`, and `by` is the owner; the detached gateway and a terminal with no agent ancestor pass as the owner |
 | ack, cancel | the asker session; any session holding the same `head:` role (a rotated successor, or a successor started with the gone asker's role); any head session for a question whose asker held no `head:` role or which is `migrated` |
 
-**How an answer names its option.** `--option` takes the exact label of an option, or the letter (`A` to `D`, in
-either case) of its place on screen. The letter comes first, so a label that is itself one letter cannot shadow the
-place it names. A letter past the last option names no option and is refused `question-unclear` on `option`, as an
-unknown label is. The record keeps the option's own label, not the letter.
+**How an answer names its option.** `--option` takes an exact label first, then a single letter (`A` to `D`, in
+either case) names the place on screen. A letter past the last option names no option and is refused
+`question-unclear` on `option`, as an unknown label is. A hand letter an asker wrote in front of a label (`B. Keeper
+...`) is replaced by the letter of the place that option holds on display, so a label is never lettered twice and
+never carries a place it no longer holds. The record keeps the option's own label, not the letter.
 
 **The owner rule guards against mistakes, not attack.** It stops an agent answering in the owner's place by accident. It
 is not a security boundary: a determined local process can still reach the store.
