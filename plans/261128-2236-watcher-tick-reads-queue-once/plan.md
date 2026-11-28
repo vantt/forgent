@@ -82,7 +82,7 @@ its event-store stream"` on 2026-11-28 (`supervision` and `event-store`, matched
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Measure one live tick before the change](phase-01-measure-before.md) | - | plans/261128-2236-watcher-tick-reads-queue-once/reports/measure-before.md | 1 | draft |
+| 1 | [Measure one live tick before the change](phase-01-measure-before.md) | - | plans/261128-2236-watcher-tick-reads-queue-once/reports/measure-before.md | 1 | done |
 | 2 | [Batch raise with one fold](phase-02-batch-raise.md) | 1 | packages/supervision/rust/src/queue.rs, packages/supervision/rust/src/watcher.rs, packages/supervision/rust/tests/queue.rs, packages/supervision/rust/tests/watcher.rs, apps/fgos/src/wiring/supervision.rs, docs/platform/supervision/spec.md, changelog.d/261128-2236-watcher-tick-reads-queue-once.md | 2 | draft |
 | 3 | [The fold reads through the checkpointed read](phase-03-checkpointed-fold.md) | 2 | packages/supervision/rust/src/queue.rs, packages/supervision/rust/tests/queue.rs | 3 | draft |
 | 4 | [Integrate, release and measure live](phase-04-integrate-release-measure.md) | 2, 3 | plans/261128-2236-watcher-tick-reads-queue-once/reports/measure-after.md | 4 | draft |
