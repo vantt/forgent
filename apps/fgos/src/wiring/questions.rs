@@ -291,6 +291,18 @@ fn recommended(question: &Question) -> Option<ShownOption<'_>> {
         .find(|shown| shown.option.recommended == Some(true))
 }
 
+/// The words of the `Recommendation:` line: the recommended option as the owner reads it, under the letter of its
+/// place on screen (always `A`, since it is shown first) and with no hand letter of the asker's left in front. The
+/// owner must never see two letters for one option, so the asker's own recommendation string is not printed beside a
+/// lettered option. A question that recommends no option (a discovery question, or one stored before options
+/// existed) has no place to name, and keeps the asker's words.
+fn recommendation_text(question: &Question) -> String {
+    match recommended(question) {
+        Some(shown) => shown_label(&shown),
+        None => question.asked.parts.recommendation.clone(),
+    }
+}
+
 /// The command that answers a store question: the recommended option when there is one, named by its letter.
 fn answer_command(question: &Question) -> String {
     let id = &question.asked.id;
@@ -454,7 +466,7 @@ fn show_text(question: &Question) -> String {
             option.cost
         ));
     }
-    out.push(format!("Recommendation: {}", parts.recommendation));
+    out.push(format!("Recommendation: {}", recommendation_text(question)));
     if let Some(default) = parts
         .default
         .as_deref()

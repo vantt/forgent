@@ -58,7 +58,8 @@ pub struct ShownOption<'a> {
 
 /// The options in the order the owner reads them: the recommended one first, then the rest as the asker wrote
 /// them. This one order gives both the display and the letter the owner answers with, so the two cannot drift.
-/// The contract allows at most four options; a longer list read from an older record wraps the letter.
+/// The contract allows at most four options, so the places an answer can name are `A` to `D`; a longer list read
+/// from an older record wraps the letter.
 pub fn shown_options(options: &[QuestionOption]) -> Vec<ShownOption<'_>> {
     let (recommended, rest): (Vec<_>, Vec<_>) = options
         .iter()
@@ -102,7 +103,7 @@ pub fn shown_label(shown: &ShownOption<'_>) -> String {
 /// The option a `--option` value names: an option whose label is exactly the value, or the option at the place on
 /// screen a single letter `A` to `D` (in either case) names. An exact label is matched first, so a label that is
 /// itself one letter (`B`) names its own option, and the letter is the way to name a place. A letter past the last
-/// option names nothing.
+/// option, and any letter past `D`, names nothing.
 pub fn resolve_option<'a>(
     options: &'a [QuestionOption],
     value: &str,
@@ -112,7 +113,7 @@ pub fn resolve_option<'a>(
     }
     let mut characters = value.trim().chars();
     let letter = characters.next()?.to_ascii_uppercase();
-    if characters.next().is_none() && letter.is_ascii_uppercase() {
+    if characters.next().is_none() && matches!(letter, 'A'..='D') {
         if let Some(shown) = shown_options(options).get((letter as u8 - b'A') as usize) {
             return Some(shown.option);
         }

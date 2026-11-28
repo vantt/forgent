@@ -271,6 +271,26 @@ fn a_decision_question_without_the_default_is_refused_naming_parts_default() {
 }
 
 #[test]
+fn a_blank_default_is_refused_even_where_the_default_is_optional() {
+    // The contract gives the field `minLength: 1`, always: a default of spaces says nothing to the owner, so it is
+    // refused at every stage, and the discovery exception that lets the field be absent does not let it be blank.
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    for stage in ["planning", "discovery", "exploring"] {
+        let mut value = input("plan:p");
+        value["parts"]["default"] = json!("   \n\t ");
+        value["stage"] = json!(stage);
+        let refusal = refused(wired(&log, &who, &checkout).ask(&value));
+        assert_eq!(
+            (refusal.code.as_str(), refusal.field.as_deref()),
+            ("question-unclear", Some("parts.default")),
+            "{stage}"
+        );
+    }
+    assert!(log.events.borrow().is_empty(), "nothing was written");
+}
+
+#[test]
 fn a_discovery_question_needs_no_default_because_it_offers_no_option_to_default_to() {
     let (log, checkout) = (MemLog::default(), checkout());
     let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
@@ -477,6 +497,7 @@ fn the_last_place_is_a_letter_that_answers_and_the_place_past_it_is_refused_ques
     let (log, checkout) = (MemLog::default(), checkout());
     let last = asked_with_the_recommendation_second(&log, &checkout);
     let past = asked_with_the_recommendation_second(&log, &checkout);
+    let beyond = asked_with_the_recommendation_second(&log, &checkout);
     let who = Fixed(Ok(owner()));
     let q = wired(&log, &who, &checkout);
     // B is the last place of a two-option question; C is one past it and names nothing.
@@ -489,6 +510,29 @@ fn the_last_place_is_a_letter_that_answers_and_the_place_past_it_is_refused_ques
     assert_eq!(
         (refusal.code.as_str(), refusal.field.as_deref()),
         ("question-unclear", Some("option"))
+    );
+    // E is past `D`, the last letter a place can have, so it names nothing even when a fourth place exists.
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("A", true),
+        option("B", false),
+        option("C", false),
+        option("D", false),
+    ]);
+    let four = ask_as(&log, head("m-1/a", "head:coder-x"), &checkout, &value);
+    let refusal = refused(q.answer(&four, Some("E"), None, None));
+    assert_eq!(
+        (refusal.code.as_str(), refusal.field.as_deref()),
+        ("question-unclear", Some("option")),
+        "a letter past D names no place"
+    );
+    let refusal = refused(q.answer(&beyond, Some("e"), None, None));
+    assert_eq!(refusal.code, "question-unclear", "in either case");
+    // The four places before it are named, so the refusal is about the letter and not about the count.
+    q.answer(&four, Some("D"), None, None).unwrap();
+    assert_eq!(
+        q.show(&four).unwrap().value.answer.unwrap().option,
+        Some("D".into())
     );
     assert_eq!(
         q.show(&past).unwrap().value.state,

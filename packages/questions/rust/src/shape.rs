@@ -270,6 +270,14 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
             missing,
         ));
     }
+    // A default that says nothing is not a default, whatever the stage: the contract gives the field
+    // `minLength: 1`, and text of spaces passes a length check while saying nothing to the owner.
+    if default.is_some_and(|text| text.trim().is_empty()) {
+        return Err(Refusal::unclear(
+            "parts.default",
+            "must not be empty",
+        ));
+    }
     let (stage, reference, headline) = (
         stage.unwrap_or_default(),
         reference.unwrap_or_default(),
@@ -326,7 +334,6 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
             ));
         }
         match default {
-            Some("") => return Err(Refusal::unclear("parts.default", "must not be empty")),
             Some(_) => {}
             None => {
                 return Err(Refusal::unclear(

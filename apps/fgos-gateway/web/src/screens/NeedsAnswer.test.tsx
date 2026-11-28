@@ -179,7 +179,7 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     expect(labels).toEqual(['A. Wait for phase 9', 'B. Ship the store now', 'C. Cancel the phase'])
 
     const detailText = screen.getByTestId('detail-q-abc').textContent ?? ''
-    expect(detailText).toContain('Recommendation: Wait for phase 9')
+    expect(detailText).toContain('Recommendation: A. Wait for phase 9')
     expect(detailText.indexOf('Default if no answer:')).toBeGreaterThan(detailText.indexOf('Recommendation:'))
     expect(screen.getByTestId('default-q-abc').textContent).toBe(
       'Default if no answer: wait until phase 9 opens, then ship',
@@ -208,6 +208,41 @@ describe('NeedsAnswer (S04: store questions, ask items and gates from /v1/questi
     fireEvent.click(screen.getByTestId('option-q-abc-A. Wait for Keeper'))
     fireEvent.click(screen.getByTestId('question-submit-q-abc'))
     await waitFor(() => expect(body).toEqual({ option: 'A. Wait for Keeper' }))
+  })
+
+  it('names the recommended option on the recommendation line the way the option list does, never twice', async () => {
+    stubGateway(undefined, list, handLetteredDetail)
+    renderScreen()
+    await waitFor(() => expect(screen.getByTestId('expand-q-abc')).toBeTruthy())
+    fireEvent.click(screen.getByTestId('expand-q-abc'))
+    await waitFor(() => expect(screen.getByTestId('detail-q-abc')).toBeTruthy())
+    const labels = Array.from(screen.getByTestId('options-q-abc').querySelectorAll('strong')).map((node) => node.textContent)
+    expect(labels).toContain('A. Keeper carries')
+    const detailText = screen.getByTestId('detail-q-abc').textContent ?? ''
+    // The recommended option is shown first, so its place letter is always A, and the hand letter the asker wrote in
+    // front of the label is replaced: the owner never reads a second letter for one option.
+    expect(detailText).toContain('Recommendation: A. Keeper carries')
+    expect(detailText).not.toContain('Recommendation: B. Keeper carries')
+    expect(detailText).not.toContain('Recommendation: Keeper carries')
+  })
+
+  it('shows the asker recommendation as written when the question offers no option to letter', async () => {
+    // A discovery question (or one stored before options were lettered) offers no place to name, so the words the
+    // asker wrote are the whole recommendation.
+    stubGateway(undefined, list, {
+      question: {
+        ...detail.question,
+        asked: {
+          ...detail.question.asked,
+          parts: { ...detail.question.asked.parts, options: [], recommendation: 'ask the release owner first' },
+        },
+      },
+    })
+    renderScreen()
+    await waitFor(() => expect(screen.getByTestId('expand-q-abc')).toBeTruthy())
+    fireEvent.click(screen.getByTestId('expand-q-abc'))
+    await waitFor(() => expect(screen.getByTestId('detail-q-abc')).toBeTruthy())
+    // There is no place to name, so the words the asker wrote are the whole recommendation.    expect(screen.getByTestId('detail-q-abc').textContent).toContain('Recommendation: ask the release owner first')
   })
 
   it('shows no default line when the question states none', async () => {

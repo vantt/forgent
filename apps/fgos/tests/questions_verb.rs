@@ -190,22 +190,27 @@ fn under_an_agent() -> bool {
 }
 
 #[test]
-fn a_question_whose_default_is_blank_is_shown_with_no_default_line() {
-    // The display test above carries a stated default, so only a blank one can prove the line is left out.
+fn a_blank_default_is_refused_by_the_ask_door_and_nothing_is_stored() {
+    // The shape check refuses a default that says nothing, at every stage, so no question can reach the store with
+    // one and the `Default if no answer:` line is never printed empty. The refusal itself, stage by stage, is owned
+    // by the crate test `a_blank_default_is_refused_even_where_the_default_is_optional`; this proves the door
+    // carries it out to the caller.
     let scene = Scene::new("blank-default", BRIDGE_WITH_WORK);
     let blank = QUESTION.replace("fold into one after two days", "   ");
     let asked = scene.run(
         &["questions", "ask", "--ref", "plan:p", "--input", "-"],
         blank.as_bytes(),
     );
-    assert!(asked.status.success(), "ask: {asked:?}");
-    let id = text(&asked).trim().to_owned();
-    let shown = scene.run(&["questions", "show", &id], b"");
-    assert!(shown.status.success(), "show: {shown:?}");
-    let shown = text(&shown);
-    assert!(shown.contains("Recommendation: fold into one"), "{shown}");
-    // A default that says nothing is not a default: the line is left out rather than printed empty.
-    assert!(!shown.contains("Default if no answer:"), "{shown}");
+    assert_eq!(asked.status.code(), Some(4), "ask: {asked:?}");
+    assert!(
+        stderr(&asked).contains("[question-unclear]") && stderr(&asked).contains("parts.default"),
+        "{}",
+        stderr(&asked)
+    );
+    let listed = scene.run(&["questions"], b"");
+    assert!(listed.status.success(), "list: {listed:?}");
+    // Nothing was stored: the only needs-you count left is the work section's own two rows.
+    assert!(text(&listed).starts_with("needs you: 2\n"), "{}", text(&listed));
 }
 
 #[test]
@@ -309,7 +314,9 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
         "  B. keep both: d",
         "  C. rewrite: d",
         "cost: c",
-        "Recommendation: fold into one",
+        // The recommendation names the recommended option the way the option list does: the letter of its place on
+        // screen, then its own words, never the asker's raw recommendation string beside a lettered option.
+        "Recommendation: A. fold into one",
         "Default if no answer: fold into one after two days",
         "Scope of the answer: allows one store for this plan; forbids changing other plans",
     ] {
@@ -329,6 +336,8 @@ fn a_question_is_asked_and_shown_through_the_binary_and_answered_and_acknowledge
     // never doubled (`B. C. rewrite`) and never keeps the place it no longer holds (`B. rewrite` is at C).
     assert!(!shown.contains("B. rewrite"), "{shown}");
     assert!(!shown.contains("C. C."), "{shown}");
+    // The recommendation carries the letter too, so the owner never reads two letters for one option.
+    assert!(!shown.contains("Recommendation: fold into one\n"), "{shown}");
 
     let answered = scene.run(&["questions", "answer", &id, "--option", "A"], b"");
     if under_an_agent() {

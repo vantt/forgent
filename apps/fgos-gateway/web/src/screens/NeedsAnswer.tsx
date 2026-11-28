@@ -73,6 +73,17 @@ function shownLabel({ letter, option }: ShownOption): string {
   return letteredLabel(letter, option.label)
 }
 
+/**
+ * The recommended option as the owner reads it: the letter of its place on screen (always `A`, since the recommended
+ * option is shown first) and the option's own words, with any hand letter the asker wrote replaced. The owner must
+ * never see two letters for one option, so the asker's recommendation string is not printed beside a lettered option.
+ * Null when no option is recommended; the caller then keeps the asker's words.
+ */
+function recommendedLabel(options: QuestionOptionDetail[]): string | null {
+  const shown = shownOptions(options).find((candidate) => candidate.option.recommended === true)
+  return shown === undefined ? null : shownLabel(shown)
+}
+
 /** What the asker does, and when, if no answer comes. */
 function statedDefault(parts: QuestionParts): string | null {
   const value = parts.default
@@ -228,6 +239,9 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
         {questions.map((q) => {
           const detail = details[q.id]
           const defaultLine = detail ? statedDefault(detail.asked.parts as QuestionParts) : null
+          const recommendation = detail
+            ? (recommendedLabel(detail.asked.parts.options) ?? detail.asked.parts.recommendation)
+            : null
           return (
             <div key={q.id} data-testid={`row-${q.id}`} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
               <span className="text-sm font-semibold text-ink">{q.headline}</span>
@@ -280,7 +294,7 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
                     ))}
                   </fieldset>
                   <p>
-                    <strong>Recommendation:</strong> {detail.asked.parts.recommendation}
+                    <strong>Recommendation:</strong> {recommendation}
                   </p>
                   {defaultLine && (
                     <p data-testid={`default-${q.id}`}>
