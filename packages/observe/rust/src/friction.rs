@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::Path;
+use std::sync::OnceLock;
 
 /// The declaration of both friction kinds, for the composition root's embedded list.
 pub const FRICTION_DECLARATION: EmbeddedDeclaration = EmbeddedDeclaration {
@@ -38,37 +39,43 @@ const DOC_TYPE_ATTR: &str = "fgos.friction.doc_type";
 const REASON_ATTR: &str = "fgos.friction.reason";
 const ATTEMPTS_MEASURE: &str = "fgos.friction.attempts";
 
-/// The component layers a friction names: the layers of the platform's parts, then the layers older records carry.
-pub const PUBLISHED_LAYERS: &[&str] = &[
-    "skill",
-    "tool",
-    "runner",
-    "workflow",
-    "git",
-    "provider",
-    "config",
-    "docs",
-    "state",
-    "verification",
-    "environment",
-    "spec",
-    "context",
-    "task",
-    "task-spec",
-    "executor",
-    "attestation",
-];
+/// The friction declaration merged once into the same registry the record door validates against, so the accepted
+/// kinds, layers and dispositions are read from `friction-kinds.json` and never restated here: adding a value edits
+/// that file only.
+fn registry() -> Result<&'static Registry, String> {
+    static REGISTRY: OnceLock<Result<Registry, String>> = OnceLock::new();
+    match REGISTRY.get_or_init(|| {
+        Registry::from_embedded(&[FRICTION_DECLARATION])
+            .map_err(|e| format!("the embedded friction declaration does not merge: {e}"))
+    }) {
+        Ok(registry) => Ok(registry),
+        Err(message) => Err(message.clone()),
+    }
+}
 
-pub const PUBLISHED_KINDS: &[&str] = &["bug", "instability", "missing", "awkward", "doc"];
+/// The values a closed attr of the friction declaration accepts.
+fn published_values(attr: &str) -> Result<&'static BTreeSet<String>, String> {
+    match registry()?.attr(attr).filter(|def| !def.values.is_empty()) {
+        Some(def) => Ok(&def.values),
+        None => Err(format!(
+            "the embedded friction declaration closes no values for '{attr}'"
+        )),
+    }
+}
 
-pub const PUBLISHED_DISPOSITIONS: &[&str] = &["advisory", "blocked", "parked", "halted"];
+/// The accepted values of a closed attr, written the way a refusal lists them.
+fn listed(allowed: &BTreeSet<String>) -> String {
+    allowed
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>()
+        .join(", ")
+}
 
 pub const VALID_REASONS: &[&str] = &["answer", "done", "wontfix", "clarify-pass", "migrated"];
 
 /// A resolve reason may also be `filed:<backlog-id>`: the friction became that backlog row.
 const FILED_PREFIX: &str = "filed:";
-
-pub const VALID_DOC_TYPES: &[&str] = &["tutorial", "how-to", "reference", "explanation"];
 
 /// What a friction may point at besides its subject.
 pub const REF_KINDS: &[&str] = &[
@@ -131,18 +138,20 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
     if input.subject.id.trim().is_empty() {
         return Err(invalid_input("subject id must not be empty"));
     }
-    if !one_of(&input.layer, PUBLISHED_LAYERS) {
+    let layers = published_values(LAYER_ATTR)?;
+    if !layers.contains(&input.layer) {
         return Err(invalid_input(format!(
             "invalid layer \"{}\". Published layers: {}",
             input.layer,
-            PUBLISHED_LAYERS.join(", ")
+            listed(layers)
         )));
     }
     if let Some(kind) = &input.kind {
-        if !one_of(kind, PUBLISHED_KINDS) {
+        let kinds = published_values(KIND_ATTR)?;
+        if !kinds.contains(kind) {
             return Err(invalid_input(format!(
                 "invalid kind \"{kind}\". Allowed kinds: {}",
-                PUBLISHED_KINDS.join(", ")
+                listed(kinds)
             )));
         }
     }
@@ -156,11 +165,12 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
             )));
         }
     }
-    if !one_of(&input.disposition, PUBLISHED_DISPOSITIONS) {
+    let dispositions = published_values(DISPOSITION_ATTR)?;
+    if !dispositions.contains(&input.disposition) {
         return Err(invalid_input(format!(
             "invalid disposition \"{}\". Allowed dispositions: {}",
             input.disposition,
-            PUBLISHED_DISPOSITIONS.join(", ")
+            listed(dispositions)
         )));
     }
     if input.error_class.trim().is_empty() {
@@ -170,11 +180,12 @@ pub fn validate_record_input(input: &FrictionInput) -> Result<(), String> {
         return Err(invalid_input("producer must not be empty"));
     }
     if let Some(dt) = &input.doc_type {
-        if !one_of(dt, VALID_DOC_TYPES) {
+        let doc_types = published_values(DOC_TYPE_ATTR)?;
+        if !doc_types.contains(dt) {
             return Err(invalid_input(format!(
                 "invalid docType \"{}\". Allowed docTypes: {}",
                 dt,
-                VALID_DOC_TYPES.join(", ")
+                listed(doc_types)
             )));
         }
     }
@@ -1171,7 +1182,7 @@ pub fn rank_by_bucket(
         .into_iter()
         .filter_map(Event::projected)
         .collect();
-    let registry = Registry::from_embedded(&[FRICTION_DECLARATION]).map_err(|e| e.to_string())?;
+    let registry = registry()?;
     let source = UnsettledSource(records.clone());
     let sources: [&dyn RecordSource; 1] = [&source];
     let now_millis = parse_rfc3339_millis(&now_iso()).unwrap_or_default();
@@ -1185,7 +1196,7 @@ pub fn rank_by_bucket(
     let result = run(
         &query,
         &QueryContext {
-            registry: &registry,
+            registry,
             sources: &sources,
             root,
             now_millis,
@@ -1336,6 +1347,22 @@ mod tests {
             refusal.starts_with("friction-invalid-input: invalid layer"),
             "{refusal}"
         );
+
+        // A layer the declaration publishes is accepted: the check reads the declaration, not a copy of it
+        let input_owner = FrictionInput {
+            subject: Subject::parse("work:tsk-owner").unwrap(),
+            layer: "owner-communication".to_string(),
+            error_class: "permission-asking".to_string(),
+            disposition: "advisory".to_string(),
+            detail: "asked for a permission the frame already granted".to_string(),
+            producer: "test".to_string(),
+            attempts: None,
+            doc_type: None,
+            kind: Some("awkward".to_string()),
+            refs: Vec::new(),
+        };
+        let accepted = record(&tmp, input_owner).unwrap();
+        assert_eq!(accepted["ok"], true, "{accepted}");
 
         // Invalid docType
         let input_doctype = FrictionInput {

@@ -7,7 +7,8 @@
       "type": "string",
       "values": [
         "skill", "tool", "runner", "workflow", "git", "provider", "config", "docs", "state", "verification",
-        "environment", "spec", "context", "task", "task-spec", "executor", "attestation"
+        "environment", "spec", "context", "task", "task-spec", "executor", "attestation",
+        "owner-communication"
       ]
     },
     "fgos.friction.class": { "type": "string" },

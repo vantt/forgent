@@ -1,6 +1,6 @@
 {
   "schema": "mutation-census.v1",
-  "payloadDigest": "417e0db6c48c558911fbd15141f7f0a9718b51522eadb097eb0322c8ae86e78c",
+  "payloadDigest": "092e8c3dee951c4dd9a554e23b4c158d25699dfcdc931e801b622e8c18a80d23",
   "files": {
     ".agents/skills/_shared/capability-catalog.md": "84c821bf6d815ab67be4026875a6917f505fa10044be8415352b989c8135ea17",
     ".agents/skills/_shared/capability-matching.md": "a7028bed08d01abe9bf4828f6c88f68710d5b8244da2512acbd68c1df0f2dd32",
@@ -1063,7 +1063,7 @@
     "packages/observe/rust/src/definition/mod.rs": "523fafd2596773070ff36053fe33c5e3b807c7a06cdb4c01e78ceeb250fed027",
     "packages/observe/rust/src/eval_journal.rs": "ffe997154de882250f59d9eb10b4f66d5676bfdbe31bba334f39fd2393b4f508",
     "packages/observe/rust/src/flags.rs": "b64ca40450334b970171609030adb196bd6a11e7f1f65c452fe7872c4f5ae268",
-    "packages/observe/rust/src/friction.rs": "dfb8701ed5f6015ac24ef8b24c671dcd55b9ae0b9d16fac165dcc0d89b42f77e",
+    "packages/observe/rust/src/friction.rs": "5b0a9195b6a636acdae38629ffec513992a76b05964d3258658f00808ccd5272",
     "packages/observe/rust/src/friction_cli.rs": "2a3cc4ec0238c83f3db382e669e989b641115f3292124269dbb994f6db8a864d",
     "packages/observe/rust/src/invocation_fault.rs": "8ee288ee008805bf4d7f00c79a7df0d150da56139454ecacb75d97b171fab197",
     "packages/observe/rust/src/lib.rs": "ecbdb423dfe3130ce944e3cbfd729a58151136178a77ed215973a62eb86cc069",
