@@ -375,6 +375,71 @@ fn an_answer_needs_a_known_open_question_an_option_label_that_exists_and_some_co
     );
 }
 
+/// A question whose recommended option is written second, so the letter of a place on screen and the asker's
+/// own order disagree: the owner answers the place, not the label the asker happened to write first.
+fn asked_with_the_recommendation_second(log: &MemLog, checkout: &Checkout) -> String {
+    let mut value = input("plan:p");
+    value["parts"]["options"] = json!([
+        option("keep two stores", false),
+        option("fold into one", true),
+    ]);
+    value["parts"]["recommendation"] = json!("fold into one");
+    value["parts"]["default"] = json!("fold into one");
+    ask_as(
+        log,
+        head("m-1/a", "head:coder-x"),
+        checkout,
+        &value,
+    )
+}
+
+#[test]
+fn an_answer_by_the_letter_of_a_place_stores_the_label_of_that_place_recommended_first() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let first = asked_with_the_recommendation_second(&log, &checkout);
+    let second = asked_with_the_recommendation_second(&log, &checkout);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // A is the place the recommended option holds, even though the asker wrote it second.
+    q.answer(&first, Some("A"), None, None).unwrap();
+    assert_eq!(
+        q.show(&first).unwrap().value.answer.unwrap().option,
+        Some("fold into one".into())
+    );
+    // A lower-case letter names the same place: b is the second place, which is the asker's first option.
+    q.answer(&second, Some("b"), None, None).unwrap();
+    assert_eq!(
+        q.show(&second).unwrap().value.answer.unwrap().option,
+        Some("keep two stores".into())
+    );
+}
+
+#[test]
+fn the_last_place_is_a_letter_that_answers_and_the_place_past_it_is_refused_question_unclear_on_option(
+) {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let last = asked_with_the_recommendation_second(&log, &checkout);
+    let past = asked_with_the_recommendation_second(&log, &checkout);
+    let who = Fixed(Ok(owner()));
+    let q = wired(&log, &who, &checkout);
+    // B is the last place of a two-option question; C is one past it and names nothing.
+    q.answer(&last, Some("B"), None, None).unwrap();
+    assert_eq!(
+        q.show(&last).unwrap().value.answer.unwrap().option,
+        Some("keep two stores".into())
+    );
+    let refusal = refused(q.answer(&past, Some("C"), None, None));
+    assert_eq!(
+        (refusal.code.as_str(), refusal.field.as_deref()),
+        ("question-unclear", Some("option"))
+    );
+    assert_eq!(
+        q.show(&past).unwrap().value.state,
+        State::Open,
+        "nothing was written"
+    );
+}
+
 #[test]
 fn an_agent_ancestor_blocks_an_answer_except_the_secretary_head_through_its_route() {
     let (log, checkout) = (MemLog::default(), checkout());
