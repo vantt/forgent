@@ -45,10 +45,10 @@ test('the RUL11 decision narrative (D-ADR0036) is present in the "Lịch sử qu
   assert.match(spec, /^### (?:D-ADR)?0036 — Khoá RUL11/m, 'a "### 0036 — Khoá RUL11..." heading must exist in the decision history section');
 });
 
-test('AGENTS.md carries the decision-question template law and points at its shared fragment', () => {
+test('AGENTS.md carries the communication standard law and points at its shared fragment', () => {
   const agents = fs.readFileSync(AGENTS_MD, 'utf8');
-  assert.ok(agents.includes('Every question asking the owner to choose a direction carries five parts'), 'AGENTS.md must carry the decision-question law (projected from core/instructions/decision-question.md)');
-  assert.ok(agents.includes('core/skills/_shared/decision-question.md'), 'the law must point at the full template');
+  assert.ok(agents.includes('Every question asking the owner to choose a direction carries five parts'), 'AGENTS.md must carry the decision-question sentence of the communication standard (projected from core/instructions/owner-communication.md)');
+  assert.ok(agents.includes('core/skills/_shared/owner-communication.md'), 'the law must point at the full standard');
   assert.ok(agents.includes('Ask the owner only to set or change a direction.'), 'the law must carry the when-to-ask stop point');
 });
 

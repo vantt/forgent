@@ -25,7 +25,8 @@ that case — this skill never moves it. See
 
 - When asking questions (`fgos ask`, `AskUserQuestion`, chat), use
   self-contained citations (see `../_shared/citation-format.md`) and the
-  decision-question template (`../_shared/decision-question.md`); the engine
+  decision question of the communication standard
+  (`../_shared/owner-communication.md#decision-question`); the engine
   refuses an `ask` missing its parts.
 - Call `fgos` subcommands directly:
 

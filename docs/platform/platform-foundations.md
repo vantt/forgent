@@ -874,7 +874,7 @@ Thảo luận gốc rễ phình to (2026-10-08, `plans/reports/prompt-261008-blo
 
 #### Quyết định
 
-Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom phần tùm lum trong phạm vi việc đang làm, tới khi hết; tùm lum thấy ngoài phạm vi thì ghi item riêng; gom mà phải xây công cụ mới là một câu hỏi quyết định. Điểm dừng chung cho các luật đẩy về phía "nhiều hơn" là **khung đã duyệt** (phạm vi + ngân sách ghi lúc owner duyệt), định nghĩa trong `core/skills/_shared/decision-question.md`.
+Giữ nguyên ý và phát biểu gốc của 0036; thêm vế phạm vi: gom phần tùm lum trong phạm vi việc đang làm, tới khi hết; tùm lum thấy ngoài phạm vi thì ghi item riêng; gom mà phải xây công cụ mới là một câu hỏi quyết định. Điểm dừng chung cho các luật đẩy về phía "nhiều hơn" là **khung đã duyệt** (phạm vi + ngân sách ghi lúc owner duyệt), định nghĩa trong `core/skills/_shared/owner-communication.md#when-to-ask`.
 
 #### Hệ quả
 

@@ -12,6 +12,9 @@ changes your work, and a failed recording is not your problem.
 - a doc or skill was wrong or stale
 - you waited or retried
 - a verb was refused (heads record workarounds, retries, waits and refused verbs too)
+- the owner's reaction shows a message of yours fell short (the signal table of `owner-communication.md`), or your
+  own reflection shows it. Layer `owner-communication`; the signature (`--error-class`) names the kind of fault
+  (permission-asking, unexplained-id, too-long, wrong-language, ...)
 
 ## Record how
 
@@ -23,5 +26,10 @@ changes your work, and a failed recording is not your problem.
 3. A worker inside a Unit run that cannot run the command lists the same facts under `frictions` in its result claim
    (`kind`, `layer`, `errorClass`, `detail`), at most five; the run's settle step records each one with refs to the
    run, plan and phase.
+4. A communication shortfall takes layer `owner-communication` and a fault signature as `--error-class`. Put a short
+   redacted paraphrase of the owner's reaction and of your own message in `--detail`, never the owner's words
+   verbatim, no names and no private details: friction records sit in a git-tracked path. If the door refuses, write
+   the same facts into your own working file (the discussion or the plan report) and record it once the door works;
+   never lost, never blocking.
 
 Never block on a refusal, never retry in a loop, and never record the same obstacle twice.

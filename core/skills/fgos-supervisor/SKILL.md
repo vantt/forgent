@@ -171,14 +171,14 @@ past `secretary.help.staleMinutes` makes the secretary take the work over.
 
 - Edit portfolio files outside `fgos land --paths` and `fgos session write`; land a branch; review a diff; type into a pane
   of a session no event names as stuck.
-- Ask the owner except through `fgos questions ask`, in the five-part form of `core/skills/_shared/decision-question.md`,
+- Ask the owner except through `fgos questions ask`, in the five-part form of `core/skills/_shared/owner-communication.md#decision-question`,
   batched (Rule: product-priority-order, in AGENTS.md; set in .fgos/instructions/effective/rules.json, priority 2),
   only after its three questions.
-- Decide outside the approved frame (`core/skills/_shared/decision-question.md#when-to-ask`).
+- Decide outside the approved frame (`core/skills/_shared/owner-communication.md#when-to-ask`).
 - Start a session before checking that its role is not already live.
 
 ## Reports
 
-At most 10 lines. Put the full report in a file named with `fgos convention path --kind report`.
+At most 10 lines, in the status-report shape of `../_shared/owner-communication.md`. Put the full report in a file named with `fgos convention path --kind report`.
 Do not land a wake report on main: Rule: writes-to-main (in AGENTS.md; set in .fgos/instructions/effective/rules.json). Record what you
 learned that will repeat as a backlog row, never only in a report.

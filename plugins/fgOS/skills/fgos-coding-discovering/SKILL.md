@@ -157,7 +157,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
      dẫn lại bằng chứng đã có (để người ở `exploring` không phải scout lại
      từ đầu) — không hỏi chung chung. Định dạng `--question` theo self-contained
      citations (`../_shared/citation-format.md`) và mẫu câu hỏi quyết định
-     (`../_shared/decision-question.md`; ở stage này chỉ cần Chuyện gì đang
+     (`../_shared/owner-communication.md#decision-question`; ở stage này chỉ cần Chuyện gì đang
      xảy ra, Nguyên nhân, Phạm vi của câu trả lời).
 
    **Chỉ khi `clear`: phán luôn `size`/`rigor`/`kind`/`risk`** (Phase 3) —

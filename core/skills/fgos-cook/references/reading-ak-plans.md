@@ -48,7 +48,7 @@ is an owner question, not something to patch around.
 ## The frame
 
 The frame is set once, when the owner accepts the plan (RUL-WF-12); afterwards it is
-narrowed, never widened (`../../_shared/decision-question.md`). You do not size it: `fgos workflow propose` computes it
+narrowed, never widened (`../../_shared/owner-communication.md#when-to-ask`). You do not size it: `fgos workflow propose` computes it
 from the slices and prints it in the owner's question (see
 [`propose.md`](propose.md)). Your part is the judgment it cannot make: where to cut
 the slices, what really depends on what, the narrow `verify` of each, the outcome,

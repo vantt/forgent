@@ -300,7 +300,8 @@ export function transitionWork({ work, to, expectedStatus, reason, ask, answer }
         `transitionWork: "ask" is required and must be a non-empty string when moving work "${work.id}" into awaiting-human.`,
       );
     }
-    // Decision-question template (core/skills/_shared/decision-question.md):
+    // Decision question of the communication standard
+    // (core/skills/_shared/owner-communication.md#decision-question):
     // discovery-shaped stages need the 3 shared parts, every other stage all
     // 5. The same check guards the AskUserQuestion hook.
     const required = requiredPartsForStage(work.workflowStep);

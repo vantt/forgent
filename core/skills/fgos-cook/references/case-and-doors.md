@@ -134,7 +134,7 @@ slice, one read-only diagnosis (`code:debug`), one rigor raise; then park a ques
 ## 8. Questions
 
 Park each owner question in the notebook with its five parts
-(`../../_shared/decision-question.md`). Ask when nothing else can progress, or at the
+(`../../_shared/owner-communication.md#decision-question`). Ask when nothing else can progress, or at the
 frame's checkpoints, all together. Slices independent of a parked question go on.
 
 ## 9. Integrate and hand off

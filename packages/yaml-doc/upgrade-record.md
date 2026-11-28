@@ -296,7 +296,7 @@ Vendoring layouts (spec section 9; sizes are the exact `cargo vendor` output of 
 | Releases in last 30 days | 5 | 11 | 3 |
 | Own span rules needed | 5 (+1 for tag position) | 0 for scalars, but needs token rescan for the facts in 5.1 | trims for props, comments, blank lines |
 
-## 11. Decision question (core/skills/_shared/decision-question.md)
+## 11. Decision question (core/skills/_shared/owner-communication.md#decision-question)
 
 **What is happening.** Slice A needs one YAML parser crate under `fgos-yaml-doc`. Three candidates were measured on the same golden fixtures and on 53 real YAML files of this repo. Nothing downstream (parse, edits, merge, fuzz, migration of the three `serde_yaml` users) starts until the owner chooses.
 

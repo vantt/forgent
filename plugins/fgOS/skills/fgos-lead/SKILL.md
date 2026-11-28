@@ -78,7 +78,7 @@ never SIGKILL a test run.
 
 | Code | Do |
 |---|---|
-| `write-outside-footprint` | when the path serves an approved acceptance criterion, call `fgos supervisor widen <your plan dir> --phase <id> --path <p> [--path <p> ...] --criterion <n>` (the item's number), read its ticket with `fgos request result <id> --wait 50`, then retry the run; otherwise ask the owner in the five-part form (`../_shared/decision-question.md`). Both footprint copies are written and landed; overlap is advice, not a hold. Another plan is `plan-not-own`. |
+| `write-outside-footprint` | when the path serves an approved acceptance criterion, call `fgos supervisor widen <your plan dir> --phase <id> --path <p> [--path <p> ...] --criterion <n>` (the item's number), read its ticket with `fgos request result <id> --wait 50`, then retry the run; otherwise ask the owner in the five-part form (`../_shared/owner-communication.md#decision-question`). Both footprint copies are written and landed; overlap is advice, not a hold. Another plan is `plan-not-own`. |
 | `land-gate-missing` | the project has no `land.gates`: ask the owner with `fgos questions ask` |
 | `land-outside-footprint` | the branch changed a path outside the footprint: fix the branch; if the path is needed to meet the plan's acceptance, widen it with `fgos supervisor widen` as above, never the owner |
 | `land-conflict-aborted` | rebase onto the trunk tip, resolve, land again |
@@ -88,9 +88,9 @@ never SIGKILL a test run.
 ## Never
 
 - Anything `core/agents/lead.yaml` puts outside the lead; widen the plan footprint except through `fgos supervisor widen`.
-- Ask outside `fgos questions ask` (granted to every head; `../_shared/decision-question.md`).
-- Change the plan's approved outcome or acceptance yourself: that is an owner question (`../_shared/decision-question.md#when-to-ask`); widening its files to meet them is not.
+- Ask outside `fgos questions ask` (granted to every head; `../_shared/owner-communication.md#decision-question`).
+- Change the plan's approved outcome or acceptance yourself: that is an owner question (`../_shared/owner-communication.md#when-to-ask`); widening its files to meet them is not.
 
 ## Reports
 
-At most 10 lines. Put the full report in the plan's `reports/` directory, named with `fgos convention path --kind report`.
+At most 10 lines, in the status-report shape of `../_shared/owner-communication.md`. Put the full report in the plan's `reports/` directory, named with `fgos convention path --kind report`.

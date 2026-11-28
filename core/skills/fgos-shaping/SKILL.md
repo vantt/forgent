@@ -33,7 +33,7 @@ below is shared and lives only here.
 ## Hard rules
 
 - Questions use self-contained citations (`../_shared/citation-format.md`) and
-  the decision-question template (`../_shared/decision-question.md`); early
+  the decision question of the communication standard (`../_shared/owner-communication.md#decision-question`); early
   steps need only its shared parts (what is happening, cause, scope of the
   answer), later steps all five.
 - Never lock a point into a D-ID from a single answer. A D-ID is minted only
@@ -85,7 +85,7 @@ the hand-off block are required.
 
 ## Owner questions
 
-Ask the owner only with `fgos questions ask --input <file|-> --ref <origin>` (five-part form of `../_shared/decision-question.md`). Inside a head the
+Ask the owner only with `fgos questions ask --input <file|-> --ref <origin>` (five-part form of `../_shared/owner-communication.md#decision-question`). Inside a head the
 CLI goes through the request socket, which carries `questions ask`, `questions ack` and `questions cancel` for every
 head and `questions answer` for the secretary only. A shaper never answers; the owner does, through the secretary or
 S04.
