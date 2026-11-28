@@ -12,6 +12,7 @@ import { fgosDirFromRoot } from '../util/fgos-file-registry.mjs';
 import { writeHandoff } from '../session-rotation/handoff-store.mjs';
 import { latestContextFraction } from '../session-rotation/rotate.mjs';
 import { requestCancel } from '../run-supervisor/cancel-registry.mjs';
+import { judge } from '../native/process-identity.mjs';
 import { createSessionHost } from './client.mjs';
 import { headRoleOf, identityHolder, lineageDirOf, readHeadPlacement, writeHeadPlacement } from './head-start.mjs';
 
@@ -43,6 +44,42 @@ function validWakeAt(value) {
 const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
 
 /**
+ * Whether the run supervisor of the attempt in `runDir` is alive: the same judgement as `supervisor_alive` in
+ * `apps/fgos/src/wiring/observe_sources/head_state.rs`, on the same file. `closed.json` or `receipt.json` is the
+ * supervisor's own end of the run, so the attempt is not waiting on a live supervisor; a missing or unreadable
+ * binding, or a missing supervisor record, proves nothing and counts as alive. Only the process door's `dead`
+ * verdict (pid and start identity, never pid alone) makes it gone.
+ */
+function defaultSupervisorAlive(runDir) {
+  if (fs.existsSync(path.join(runDir, 'closed.json')) || fs.existsSync(path.join(runDir, 'receipt.json'))) return true;
+  let supervisor;
+  try {
+    supervisor = JSON.parse(fs.readFileSync(path.join(runDir, 'supervisor-binding.json'), 'utf8'))?.supervisor;
+  } catch {
+    return true;
+  }
+  if (supervisor === null || typeof supervisor !== 'object') return true;
+  try {
+    return judge(supervisor) !== 'dead';
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Ends the attempt of a head whose run supervisor is gone: the run supervisor's `end-dead-attempt` op signals only the one
+ * systemd scope the attempt's binding names and the binding's own gate record (by pid and start identity, `SIGTERM` then
+ * `SIGKILL`: a head's gate and agent live in the herdr pane's cgroup, not in the scope), waits for the gate to be judged
+ * dead, and adopts the run dir (`closed.json`). `runDir` is `<fgos>/assignments/<id>/runs/<NN>`. A refusal
+ * (`{ refused: { code, message } }`) is returned as it is: the attempt was not ended. A throw means the op did not answer
+ * (the host died mid-op), so what it already signalled is unknown.
+ */
+async function defaultEndAttempt(runDir, projectRoot) {
+  const { executionOp } = await import('../native/execution-door.mjs');
+  return executionOp('end-dead-attempt', { runDir: path.resolve(runDir) }, { cwd: projectRoot });
+}
+
+/**
  * Stops the live head of `persona` and `name`, or the live lead that holds the short role `role` (`lead:<LANE>`). Returns
  * `{ stopped: true }`, or `{ stopped: false, reason: 'not-live' }` when no live session holds the role (nothing is ended or
  * written). A plain pane close is refused while an agent is the pane's foreground (session-host spec section 8.2), so the
@@ -52,6 +89,15 @@ const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
  * written (`stop-not-ended`); after a request it stays, and a head that does not end in time (`stop-not-ended`) or a pane
  * that will not close (`retire-refused`) is reported with the stamp kept.
  *
+ * A supervisor judged gone can neither answer a stop request nor close the attempt, so that head is never asked to stop:
+ * its attempt is ended through the run supervisor's `end-dead-attempt` op (only the attempt's own systemd scope and the
+ * binding's own gate record are signalled, the gate by pid and start identity; the gate is then waited on, the empty
+ * domain adopted and `closed.json` published) and its pane is retired only once the attempt is closed. A refusal
+ * that signalled nothing (no-binding, supervisor-alive, domain-not-scope, scope-mismatch) is `stop-not-ended` with the
+ * stamp put back; `domain-not-ended`, an op that threw (the scope and the gate may already have been signalled), or an
+ * answer whose adopt did not close the attempt, is `stop-not-ended` with the stamp kept and the pane left alone. The next
+ * generation starts through `fgos session start`.
+ *
  * A short role is resolved through Identity to its live session, and its lineage (run directory, pane and `retiredAt`
  * stamp) is the head its record names (`ids.head`), ended exactly as a head is. A lead whose record names no lineage with
  * a run directory has no supervisor to ask and its pane is never closed plain: `{ stopped: false, reason: 'no-supervisor' }`,
@@ -60,7 +106,10 @@ const SHORT_LEAD_ROLE = /^lead:[A-Za-z0-9_-]{1,64}$/;
  * `ports` (for a test): `host` (Session Host client: `retireAsync(placement, 'close', { groupKey })`),
  * `identity({ role, projectRoot }) -> { live, record? }`, `now() -> Date`, `groupKeyOf(record) -> string`,
  * `end(runDir) -> boolean` (asks the head's supervisor to stop it), `closed(runDir) -> boolean`, `sleep(ms)`, `waitMs`,
- * `config(projectRoot)` (sessionRotation config) and `writeHandoff(args)` (the existing handoff writer).
+ * `supervisorAlive(runDir) -> boolean` (the attempt's supervisor is not proven dead), `endAttempt(runDir) -> { ended } |
+ * { refused }` (ends the attempt of a gone supervisor; a throw is `stop-not-ended` with the stamp kept, because the op may
+ * have signalled before it died), `config(projectRoot)` (sessionRotation config) and
+ * `writeHandoff(args)` (the existing handoff writer).
  * A sleep requires wakeAt, stamps its wake/plan/phase/context/CLI binding in that same first write, and writes its
  * handoff before asking for the stop. A handoff failure restores the placement and ends nothing.
  */
@@ -123,14 +172,37 @@ export async function stopHeadSession({ persona, name, role: shortRole = null, p
       }
     }
     if (record.runDir) {
-      const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
-      if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
-      requested = true;
-      const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
-      const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
-      const until = Date.now() + (ports.waitMs ?? CLOSE_WAIT_MS);
-      while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
-      if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
+      if ((ports.supervisorAlive ?? defaultSupervisorAlive)(record.runDir)) {
+        const end = ports.end ?? ((runDir) => requestCancel(runDir, 'session-stop'));
+        if (!end(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} could not be asked to stop: no stop request could be written for ${record.runDir}`);
+        requested = true;
+        const closed = ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json')));
+        const sleep = ports.sleep ?? ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+        const until = Date.now() + (ports.waitMs ?? CLOSE_WAIT_MS);
+        while (!closed(record.runDir) && Date.now() < until) await sleep(POLL_MS);
+        if (!closed(record.runDir)) throw new HeadStopError('stop-not-ended', `${role} did not end within ${ports.waitMs ?? CLOSE_WAIT_MS} ms of its stop request`);
+      } else {
+        let ended;
+        try {
+          ended = await (ports.endAttempt ?? ((runDir) => defaultEndAttempt(runDir, projectRoot)))(record.runDir);
+        } catch (err) {
+          // An op that did not answer may already have signalled the scope and its gate, so the stamp stays.
+          requested = true;
+          throw new HeadStopError('stop-not-ended', `${role} could not be ended: end-dead-attempt did not answer (${err.message})`);
+        }
+        if (ended?.refused) {
+          // Only `domain-not-ended` signalled the scope and its gate; every other refusal signalled nothing, so the stamp is put back.
+          if (ended.refused.code === 'domain-not-ended') requested = true;
+          throw new HeadStopError('stop-not-ended', `${role} could not be ended: ${ended.refused.code} (${ended.refused.message})`);
+        }
+        // The scope was stopped and its gate signalled, so the stamp stays; the pane is retired only once the attempt is closed.
+        requested = true;
+        const state = ended?.adopt?.state;
+        if (state !== 'closed' && !(ports.closed ?? ((runDir) => fs.existsSync(path.join(runDir, 'closed.json'))))(record.runDir)) {
+          const why = ended?.adopt?.reason;
+          throw new HeadStopError('stop-not-ended', `${role} did not close: adopt answered ${state}${why ? ` (${why})` : ''}`);
+        }
+      }
     }
     const host = ports.host ?? createSessionHost();
     const groupKey = (ports.groupKeyOf ?? ((r) => r.placement.groupKey ?? r.placement.key))({ ...record, placement });

@@ -1,0 +1,1 @@
+- Fixed: a head's run supervisor now runs in its own systemd scope, so one OOM kill no longer takes down other heads; a head whose supervisor died is raised as session-gone and `fgos session stop` ends it.

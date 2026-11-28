@@ -37,6 +37,11 @@
       "payload": { "runDir": "string", "signal": "string, e.g. session-stop" },
       "result": { "requested": "boolean: a cancel request is on disk for the attempt afterwards" }
     },
+    "end-dead-attempt": {
+      "payload": { "runDir": "string: the attempt directory <fgos>/assignments/<id>/runs/<NN>" },
+      "result": { "ended": "boolean: true once the gate is judged dead and adopt ran", "unit": "string?: the scope stopped", "adopt": "the adopt verdict line ({ v, protocol, attemptDir, state, outcome?, pendingStep?, reason? })", "refused": "{ code: no-binding|supervisor-alive|domain-not-scope|scope-mismatch|domain-not-ended, message }: instead of ended; the only processes ever signalled are the attempt's own scope unit and the binding's own gate record (by pid and start identity)" },
+      "implementation": "end_dead_attempt in packages/run-supervisor/rust/src/controller/scope.rs; meant only for an explicit `fgos session stop` (src/session-host/head-stop.mjs is its one caller)"
+    },
     "stale-runs": {
       "payload": { "fgosDir": "string", "reconcile": "boolean" },
       "result": { "orphans": "[{ runId, runDir, startedAt, wouldBecome, hasWorkerResult, reconciled? }]: the runs still marked running whose dispatch process is gone, each with the verdict a reader that cannot probe liveness gives it; written into run.json when reconcile is true" }

@@ -128,6 +128,9 @@ allowed:
   - path: src/session-host/head-request.mjs
     count: 1
     reason: "S7: the head request reads the assignment directory, the stored unit summary and the unit-run facts"
+  - path: src/session-host/head-stop.mjs
+    count: 1
+    reason: "S7: stopping a head whose run supervisor is dead ends its attempt through the end-dead-attempt op (the scope and gate signal, then the adopt door)"
   - path: src/runner/dispatch/assignment-layout.mjs
     count: 1
     reason: "plan 261122-0118 tail: a facade for the session-host callers (head request), removed when they import the door"
