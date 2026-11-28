@@ -1,4 +1,4 @@
-use super::{common::has_paste_chip, ComposerState, ExitCommand, Profile};
+use super::{ComposerState, ExitCommand, Profile};
 use crate::Inspection;
 
 /// Ctrl-D on an empty input leaves. No folder-trust dialog was observed. A
@@ -17,15 +17,20 @@ pub const PROFILE: Profile = Profile {
     composer_state,
 };
 
-/// A line of the rule that frames pi's composer (the top one can carry a
-/// status label such as `── ⠹ Working ──`).
+/// A line of the rule that frames pi's composer. The top rule can carry a status
+/// label (`── ⠹ Working ──`), so two box-drawing horizontals at the start of the
+/// line make a rule, not the full-width run a box border draws.
 fn is_rule(line: &str) -> bool {
-    line.trim_start().starts_with("────")
+    line.trim_start().starts_with("──")
 }
 
-/// pi draws the composer between two rules, with its cwd and token footer
-/// below the lower one. Text between the last two rules is the draft; fewer
-/// than two rules means the composer is not on screen, which stays unknown.
+/// pi draws the composer between two rules, with its cwd and token footer below
+/// the lower one. Text between the last two rules is the draft; fewer than two
+/// rules means the composer is not on screen, which stays unknown.
+///
+/// Only that footer follows the lower rule, so a last rule further up the screen
+/// is a transcript rule (a markdown rule, a table border) and not the composer's
+/// frame: two adjacent transcript rules then never read as an empty composer.
 fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     if !inspection.prompt_text.trim().is_empty() {
         // Any text the detector reads out of the composer is a draft or chip.
@@ -41,10 +46,17 @@ fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
     let (Some(bottom), Some(top)) = (rules.next(), rules.next()) else {
         return ComposerState::Unknown;
     };
+    let footer = lines[bottom + 1..]
+        .iter()
+        .filter(|line| !line.trim().is_empty())
+        .count();
+    if footer > 2 {
+        return ComposerState::Unknown;
+    }
     let draft = lines[top + 1..bottom].join("\n");
-    if has_paste_chip(&draft) || !draft.trim().is_empty() {
-        ComposerState::NotEmpty
-    } else {
+    if draft.trim().is_empty() {
         ComposerState::Empty
+    } else {
+        ComposerState::NotEmpty
     }
 }

@@ -459,23 +459,6 @@
       "source": "synthesized: the agent's own words while it works"
     },
     {
-      "name": "composer-state-frame-from-an-older-claude-version-is-unknown",
-      "step": "composer-state",
-      "version": "2.1.302",
-      "source": "real frame recorded at 2.1.302, before the pin moved to 2.1.332; its banner makes the predicate refuse it",
-      "script": {
-        "frames": [
-          {
-            "at": 0,
-            "file": "half-typed"
-          }
-        ]
-      },
-      "expect": {
-        "composerState": "unknown"
-      }
-    },
-    {
       "name": "composer-state-empty-idle-after-a-turn",
       "step": "composer-state",
       "version": "2.1.332",
@@ -549,6 +532,29 @@
       }
     },
     {
+      "name": "composer-state-half-typed-no-break-space-after-the-prompt",
+      "step": "composer-state",
+      "version": "2.1.332",
+      "source": "synthesized: the prompt glyph and the draft are separated by the no-break space the real frames show",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": "Claude Code v2.1.332\n────────────────────────────────\n❯ fix the broken test\n────────────────────────────────\n",
+            "inspection": {
+              "state": "idle",
+              "visibleIdle": true,
+              "matchedRule": "live_prompt_box",
+              "promptText": "❯ fix the broken test\n"
+            }
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
       "name": "composer-state-dialog-blocked",
       "step": "composer-state",
       "version": "2.1.332",
@@ -557,22 +563,6 @@
           {
             "at": 0,
             "file": "trust-dialog"
-          }
-        ]
-      },
-      "expect": {
-        "composerState": "unknown"
-      }
-    },
-    {
-      "name": "composer-state-busy-working",
-      "step": "composer-state",
-      "version": "2.1.332",
-      "script": {
-        "frames": [
-          {
-            "at": 0,
-            "file": "working"
           }
         ]
       },

@@ -620,6 +620,20 @@
         "frames": [{ "at": 0, "screen": "x\n", "inspection": { "state": "idle", "visibleIdle": true, "promptText": "draft" } }]
       },
       "expect": { "composerState": "not-empty" }
+    },
+    {
+      "name": "composer-state-two-transcript-rules-with-no-composer-at-the-bottom-is-unknown",
+      "step": "composer-state",
+      "version": "1.3.0",
+      "source": "synthesized: two adjacent rule lines in the transcript (a markdown rule or a table border) with no composer frame above the footer",
+      "script": {
+        "frames": [{
+          "at": 0,
+          "screen": "● Reading the diff\n────────────────────────────\n────────────────────────────\n\nBoth runs wrote their receipt.\nNothing else to add.\nThe diff is two lines long.\n",
+          "inspection": { "state": "idle", "visibleIdle": true, "promptText": "" }
+        }]
+      },
+      "expect": { "composerState": "unknown" }
     }
   ]
 }
