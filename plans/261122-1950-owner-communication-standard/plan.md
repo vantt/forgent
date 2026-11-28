@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "Communication standard (tiêu chuẩn giao tiếp): one always-loaded standard for how every agent talks to the owner, and cheap answers in the question door"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 footprint:
