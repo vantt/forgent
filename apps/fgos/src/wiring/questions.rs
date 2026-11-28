@@ -24,7 +24,7 @@ use fgos_identity::shared::EntryLog;
 use fgos_questions::caller::{CallerSource, IdentityCaller};
 use fgos_questions::record::STREAM;
 use fgos_questions::store::{LogOpener, LoggedEvent, Question, QuestionLog, State};
-use fgos_questions::usecase::{Done, Questions, Which};
+use fgos_questions::usecase::{shown_label, shown_options, Done, Questions, ShownOption, Which};
 use fgos_questions::Refusal;
 use serde_json::{json, Value};
 
@@ -282,21 +282,20 @@ pub(crate) fn now_ms() -> i64 {
         .map_or(0, |elapsed| elapsed.as_millis() as i64)
 }
 
-fn recommended(question: &Question) -> Option<&str> {
-    question
-        .asked
-        .parts
-        .options
-        .iter()
-        .find(|option| option.recommended == Some(true))
-        .map(|option| option.label.as_str())
+/// The option the owner reads first, with the letter of its place on screen: the recommended one when there is
+/// one. The order and the letter come from the crate's `shown_options`, which the answer door also reads, so the
+/// command printed for the owner and the letter it accepts cannot drift.
+fn recommended(question: &Question) -> Option<ShownOption<'_>> {
+    shown_options(&question.asked.parts.options)
+        .into_iter()
+        .find(|shown| shown.option.recommended == Some(true))
 }
 
-/// The command that answers a store question: the recommended option when there is one.
+/// The command that answers a store question: the recommended option when there is one, named by its letter.
 fn answer_command(question: &Question) -> String {
     let id = &question.asked.id;
     match recommended(question) {
-        Some(label) => format!("fgos questions answer {id} --option \"{label}\""),
+        Some(shown) => format!("fgos questions answer {id} --option {}", shown.letter),
         None => format!("fgos questions answer {id} --text \"<answer>\""),
     }
 }
@@ -359,6 +358,7 @@ fn one_line(text: &str) -> String {
 
 fn question_row(question: &Question, now: i64) -> Value {
     let asked = &question.asked;
+    let recommended = recommended(question).map(|shown| shown.option.label.clone());
     let mut row = json!({
         "id": asked.id,
         "state": state_word(question.state),
@@ -369,7 +369,7 @@ fn question_row(question: &Question, now: i64) -> Value {
         "askedAt": asked.asked_at,
         "age": age(&asked.asked_at, now),
         "asker": { "handle": asked.asker.handle, "roles": asked.asker.roles },
-        "recommended": recommended(question),
+        "recommended": recommended,
     });
     if let Some(to) = &asked.to {
         row["to"] = json!(to);
@@ -389,7 +389,7 @@ fn question_line(question: &Question, now: i64) -> String {
         "{}  {}  [recommended: {}]  blocks: {}  age: {}",
         asked.id,
         one_line(&asked.headline),
-        recommended(question).unwrap_or("none"),
+        recommended(question).map_or_else(|| "none".to_owned(), |shown| shown_label(&shown)),
         one_line(&asked.blocks),
         age(&asked.asked_at, now),
     );
@@ -437,18 +437,27 @@ fn show_text(question: &Question) -> String {
         format!("Cause: {}", parts.cause),
         "Options:".to_owned(),
     ];
-    for option in &parts.options {
+    for shown in shown_options(&parts.options) {
+        let option = shown.option;
         let mark = if option.recommended == Some(true) {
             " (recommended)"
         } else {
             ""
         };
         out.push(format!(
-            "  - {}{}: {}\n      gain: {}\n      harm: {}\n      cost: {}",
-            option.label, mark, option.does, option.gain, option.harm, option.cost
+            "  {}{}: {}\n      gain: {}\n      harm: {}\n      cost: {}",
+            shown_label(&shown),
+            mark,
+            option.does,
+            option.gain,
+            option.harm,
+            option.cost
         ));
     }
     out.push(format!("Recommendation: {}", parts.recommendation));
+    if let Some(default) = &parts.default {
+        out.push(format!("Default if no answer: {default}"));
+    }
     out.push(format!(
         "Scope of the answer: allows {}; forbids {}",
         parts.scope.allows, parts.scope.forbids
