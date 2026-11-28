@@ -231,7 +231,14 @@ fn spawn_named_copy(dir: &std::path::Path, parent: &str, name: &str) -> Child {
     let folder = dir.join(parent);
     std::fs::create_dir_all(&folder).unwrap();
     let copy = folder.join(name);
-    std::fs::copy("/bin/sleep", &copy).unwrap();
+    // `install` writes the executed copy in its own process: a file this process writes can be
+    // held open by a child another test thread forks, and exec then fails with ETXTBSY.
+    let installed = std::process::Command::new("install")
+        .args(["-m", "700", "/bin/sleep"])
+        .arg(&copy)
+        .status()
+        .unwrap();
+    assert!(installed.success());
     Child(std::process::Command::new(copy).arg("60").spawn().unwrap())
 }
 

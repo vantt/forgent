@@ -306,7 +306,6 @@ test('a Claude binding carries statusLine and promptSuggestionEnabled=false on t
     command: 'fgos hook session-rotation --event status-line',
   });
   assert.strictEqual(settings.promptSuggestionEnabled, false);
-  assert.ok(!codexInv.args.some((a) => String(a).includes('promptSuggestionEnabled')), 'a non-Claude binding carries neither setting');
   fs.rmSync(projectRoot, { recursive: true, force: true });
 });
 

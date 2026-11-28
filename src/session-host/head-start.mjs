@@ -305,7 +305,7 @@ export function isClaudeCodeBinding(binding, runnerConfig) {
   return executorId === 'claude';
 }
 
-export function mergeStatusLineSettings(args = []) {
+export function mergeClaudeLaunchSettings(args = []) {
   const result = [...args];
   const STATUS_LINE = {
     type: 'command',
@@ -362,7 +362,7 @@ export function withHeadSettings(runnerConfig, binding) {
   const targetExec = cfg.executors[executorId];
   for (const inv of targetExec.invocations) {
     if (!invocationId || inv?.id === invocationId) {
-      inv.args = mergeStatusLineSettings(inv.args);
+      inv.args = mergeClaudeLaunchSettings(inv.args);
     }
   }
   return cfg;

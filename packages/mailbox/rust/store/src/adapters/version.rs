@@ -1,4 +1,4 @@
-//! The recipient's CLI version (spec §4.1, plan decision 12): Claude Code
+//! The recipient's CLI version (spec §4.1): Claude Code
 //! records it in its session file, keyed by the head's pid, and a head whose
 //! file the caller cannot see — a confined head
 //! has its own config directory and its own pid namespace — names it by the
@@ -10,7 +10,7 @@
 use crate::head::record_of_head_text;
 use crate::record::read_regular_capped;
 use fgos_mailbox_core::Cli;
-use fgos_process::facts::{view_of, ScanFilter};
+use fgos_process::facts::{judge_here, view_of, ScanFilter, Verdict};
 use fgos_process::spawn::{run_bounded_command, Outcome};
 use serde_json::Value;
 use std::path::{Path, PathBuf};
@@ -78,16 +78,11 @@ fn agy_installed_version() -> Option<String> {
 /// given to another process would otherwise lend its executable here.
 fn claude_process_version(head: &str) -> Option<String> {
     let record = record_of_head_text(head);
-    let pid = record.pid?;
-    let wanted = record.start_time?;
-    let view = view_of(pid, &ScanFilter::default())?;
-    let same_process = view
-        .tuple
-        .as_ref()
-        .is_some_and(|tuple| tuple.start_time == wanted);
-    same_process
-        .then(|| view.exe.as_deref().and_then(version_of_exe))
-        .flatten()
+    if judge_here(&record) != Verdict::Alive {
+        return None;
+    }
+    let view = view_of(record.pid?, &ScanFilter::default())?;
+    view.exe.as_deref().and_then(version_of_exe)
 }
 
 /// The version an executable path names: its parent directory is `versions`
