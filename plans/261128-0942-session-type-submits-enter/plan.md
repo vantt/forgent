@@ -32,6 +32,7 @@ footprint:
   - .agents/skills/fgos-supervisor/SKILL.md
   - plugins/fgOS/skills/fgos-supervisor/SKILL.md
   - changelog.d/261128-0942-session-type-submits.md
+  - packages/agent-protocol/rust/src/terminal/mod.rs
 base: 95f46f9b464538cc0cfd02e33097e47f5139e5a3
 source:
   - plans/discussions/ds-itzp2debmh-session-type-submits-enter/DISCUSSION.md
@@ -123,7 +124,7 @@ submit. It re-proves existing profiles and adds no mechanism (RUL104).
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Re-prove the terminal profiles on the installed CLIs](phase-01-reprove-terminal-profiles.md) | - | packages/agent-protocol/rust/src/terminal/claude.rs, packages/agent-protocol/rust/src/terminal/codex.rs, packages/agent-protocol/rust/src/terminal/agy.rs, packages/agent-protocol/rust/src/terminal/pi.rs, packages/agent-protocol/rust/src/terminal/omp.rs, packages/agent-protocol/rust/tests/terminal_vectors.rs, packages/agent-protocol/contracts/fixtures/terminal/**, packages/mailbox/contracts/adapters.v1.json, packages/mailbox/rust/store/tests/nudge_typed.rs, plans/261128-0942-session-type-submits-enter/reports/phase-01-capture.md | 1 | ready |
-| 2 | [Session type submits through the shared pane call](phase-02-session-type-submits.md) | - | packages/session-host/rust/src/pane_io.rs, packages/session-host/rust/tests/typed_wake.rs, apps/fgos/src/wiring/mailbox_verbs/typed_wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-route-annotations.json, plans/261128-0942-session-type-submits-enter/reports/phase-02-impact.md | 1 | ready |
+| 2 | [Session type submits through the shared pane call](phase-02-session-type-submits.md) | - | packages/session-host/rust/src/pane_io.rs, packages/session-host/rust/tests/typed_wake.rs, apps/fgos/src/wiring/mailbox_verbs/typed_wake.rs, apps/fgos/src/wiring/supervision.rs, apps/fgos/tests/supervision_verbs.rs, packages/run-supervisor/rust/tests/fixtures/fake-herdr-pane.py, src/cli/command-registry.mjs, packages/host-runtime/contracts/command-routes.json, packages/host-runtime/contracts/command-manifest.json, packages/host-runtime/contracts/command-route-annotations.json, plans/261128-0942-session-type-submits-enter/reports/phase-02-impact.md, `packages/agent-protocol/rust/src/terminal/mod.rs` | 1 | ready |
 | 3 | [Docs, supervisor skill and changelog](phase-03-docs-skill-changelog.md) | - | docs/platform/supervision/spec.md, docs/platform/session-host/spec.md, docs/platform/agent-mailbox/spec.md, core/skills/fgos-supervisor/SKILL.md, .agents/skills/fgos-supervisor/SKILL.md, plugins/fgOS/skills/fgos-supervisor/SKILL.md, changelog.d/261128-0942-session-type-submits.md | 1 | ready |
 | 4 | [Integration, gates and live check](phase-04-integration-live-check.md) | 1, 2, 3 | plans/261128-0942-session-type-submits-enter/reports/integration.md, plans/261128-0942-session-type-submits-enter/reports/live-check.md, plans/261128-0942-session-type-submits-enter/reports/closing.md | 2 | ready |
 
