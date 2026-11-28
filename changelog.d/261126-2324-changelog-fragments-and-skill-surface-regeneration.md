@@ -1,1 +1,0 @@
-- Added: a change records its changelog entry as one file under `changelog.d/`; the release step assembles the fragments into the new version section and deletes them, and the land door regenerates the generated skill surfaces when two branches conflict on them.
