@@ -16,6 +16,7 @@ footprint:
   - docs/platform/session-host/spec.md
   - packages/supervision/rust/tests/definitions.rs
   - changelog.d/261127-0018-dead-supervisor-head-stop.md
+  - apps/fgos/observe-kinds.json
 source:
   - plans/discussions/ds-rig5dsai5l-head-run-own-failure-domain/DISCUSSION.md
   - p-6htu2ae64o
@@ -67,7 +68,7 @@ Re-attaching a supervisor to a running agent; automatic restart; anything alread
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
-| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/** | 1 | ready |
+| 1 | [Stop a head with a dead supervisor](phase-01-stop-dead-supervisor-head.md) | - | src/session-host/head-stop.mjs, test/session-host/head-stop.test.mjs, docs/platform/session-host/spec.md, packages/supervision/rust/tests/definitions.rs, changelog.d/261127-0018-dead-supervisor-head-stop.md, plans/261127-0018-dead-supervisor-head-stop/reports/**, `apps/fgos/observe-kinds.json` | 1 | ready |
 
 ## Owner questions
 
