@@ -108,6 +108,10 @@ pub struct Parts {
     pub cause: String,
     pub options: Vec<QuestionOption>,
     pub recommendation: String,
+    /// What the asker does, and when, if no answer comes. Absent on a question asked before the field
+    /// existed and on a discovery question, which has no options to default to.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub default: Option<String>,
     pub scope: Scope,
 }
 

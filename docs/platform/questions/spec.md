@@ -51,7 +51,7 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 
 | Entity | Fields | Contract |
 |---|---|---|
-| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `questions.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
+| Question | `id` (`q-...`, minted by `fgos identity mint question`), `askedAt`, `asker{sessionId, handle, roles, persona?, pane?, machine}`, `stage`, `ref{value, branch, commit}`, `headline`, `blocks`, `parts{what, cause, options[{label, does, gain, harm, cost, recommended?}], recommendation, default?, scope{allows, forbids}}`, `migrated`, `supersedes?` | payload of `questions.asked`: `packages/questions/contracts/question-event-payloads.v1.json` |
 | Answer | `id`, `option?`, `text?` (at least one), `by`, `via?`, `answeredAt` | payload of `questions.answered` |
 | Ack | `id`, `by`, `at` | payload of `questions.acked` |
 | Cancel | `id`, `by`, `reason`, `at` | payload of `questions.cancelled` |
@@ -60,6 +60,10 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
   door: every measurable limit is data there (headline one line, at most 120 characters; `what` and `cause` at most
   600 characters each; 2-4 options; a `label` of at most 60 characters; exactly one option recommended; `scope.allows`
   and `scope.forbids`; `blocks` present). The guide carries the rules a program cannot measure.
+- **The stated default.** A decision question also states `parts.default`: what the asker does, and when, if no answer
+  comes. It is required exactly when the options are, so a decision question without it is refused `question-unclear`
+  naming `parts.default`; it is optional under the discovery exception, which offers no option to default to. The
+  field is optional on read, so a question asked before it existed still folds.
 - Discovery exception: options and the recommendation may be empty when `stage` is `discovery` or `exploring`, when the
   ref is a `discussion:` ref and `stage` is `shaping`, or when the question is `--migrated`. Never on a caller flag.
 - `--ref` is one of `discussion:<topic>#Q<n>`, `plan:<dir>[#phase-<nn>]`, `case:<runId>[#<gate>]`. It is checked in the
@@ -95,7 +99,7 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 |---|---|
 | `fgos questions [list] [--all] [--answered] [--json]` | One line per question: headline, recommended option, `blocks`, age, answer command; a "needs you" count first. Open gates and `fgos ask` items appear beside the store's questions through the doctor bridge request `work-questions`, fail-open (`work-sources: unavailable <reason>`). `--open` is not accepted. |
 | `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. |
-| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
+| `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. A decision question states `parts.default` (section 2), refused `question-unclear` naming the field when absent. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
 | `answer <id> [--option <label>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
 | `ack <id>` | Appends `questions.acked`. |
 | `cancel <id> --reason <t>` | Appends `questions.cancelled`. |

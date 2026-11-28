@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://fgos.invalid/questions/questions-input.v1.json",
   "title": "fgos questions ask --input v1",
-  "description": "The shape of `fgos questions ask --input <file|->`. This file is the rule authority for the door; every measurable limit of the question's shape is data here (`maxLength` counts characters, `minItems` and `maxItems` count options). The asker is never an input field: it is filled from Identity or from the head's envelope. A violation is refused as `question-unclear`, naming the field and the rule (`refusals.v1.json`). Discovery exception: options and the recommendation may be empty when `stage` is `discovery` or `exploring`, when the ref is a `discussion:` ref and `stage` is `shaping`, or when `migrated` is true; never on a caller flag.",
+  "description": "The shape of `fgos questions ask --input <file|->`. This file is the rule authority for the door; every measurable limit of the question's shape is data here (`maxLength` counts characters, `minItems` and `maxItems` count options). The asker is never an input field: it is filled from Identity or from the head's envelope. A violation is refused as `question-unclear`, naming the field and the rule (`refusals.v1.json`). Discovery exception: options and the recommendation may be empty when `stage` is `discovery` or `exploring`, when the ref is a `discussion:` ref and `stage` is `shaping`, or when `migrated` is true; never on a caller flag. A decision question (the `decided` shape) also states `parts.default`: what the asker does, and when, if no answer comes. It is required exactly when the options are, and is optional under the discovery exception, which has no options to default to.",
   "type": "object",
   "additionalProperties": false,
   "required": ["stage", "ref", "headline", "blocks", "parts"],
@@ -42,6 +42,11 @@
           }
         },
         "recommendation": { "type": "string", "minLength": 1 },
+        "default": {
+          "type": "string",
+          "minLength": 1,
+          "description": "required once the question offers options: what the asker does, and when, if no answer comes"
+        },
         "scope": {
           "type": "object",
           "additionalProperties": false,
@@ -56,10 +61,10 @@
   },
   "$defs": {
     "decided": {
-      "description": "A decision question: 2-4 options, exactly one recommended, and a recommendation.",
+      "description": "A decision question: 2-4 options, exactly one recommended, a recommendation, and the default the asker takes if no answer comes.",
       "properties": {
         "parts": {
-          "required": ["options", "recommendation"],
+          "required": ["options", "recommendation", "default"],
           "properties": {
             "options": {
               "minItems": 2,

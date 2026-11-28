@@ -29,6 +29,8 @@ struct Limits {
     label_max: usize,
     options_max: usize,
     options_min_decided: usize,
+    /// The rule `parts.default` breaks when a decision question omits it, worded by the contract itself.
+    default_rule: String,
     discovery_stages: Vec<String>,
 }
 
@@ -59,6 +61,12 @@ fn limits() -> &'static Limits {
                 .as_u64()
                 .expect("minItems of a decision question")
                 as usize,
+            // The property's own `description` is the rule text a refusal names, so the wording lives in
+            // the contract this check reads and nowhere else.
+            default_rule: parts["default"]["description"]
+                .as_str()
+                .expect("a description on parts.default")
+                .to_owned(),
             discovery_stages,
         }
     })
@@ -203,7 +211,14 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
     if parts.is_some() {
         deny_unknown(
             parts_value,
-            &["what", "cause", "options", "recommendation", "scope"],
+            &[
+                "what",
+                "cause",
+                "options",
+                "recommendation",
+                "default",
+                "scope",
+            ],
             "parts.",
         )?;
         what = required(parts_value, "what", "parts.", &mut missing)?;
@@ -240,6 +255,7 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
         || (stage == Some("shaping") && reference.is_some_and(|r| r.starts_with("discussion:")));
     let options_value = parts_value.get("options");
     let recommendation = text_of(parts_value, "recommendation", "parts.")?;
+    let default = text_of(parts_value, "default", "parts.")?;
     if parts.is_some() && !exempt {
         if options_value.is_none() {
             missing.push("parts.options".into());
@@ -309,6 +325,16 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
                 "must not be empty",
             ));
         }
+        match default {
+            Some("") => return Err(Refusal::unclear("parts.default", "must not be empty")),
+            Some(_) => {}
+            None => {
+                return Err(Refusal::unclear(
+                    "parts.default",
+                    limits.default_rule.as_str(),
+                ))
+            }
+        }
     }
     Ok(AskInput {
         to,
@@ -323,6 +349,7 @@ pub fn check(input: &Value) -> Result<AskInput, Refusal> {
             cause: cause.to_owned(),
             options,
             recommendation: recommendation.unwrap_or_default().to_owned(),
+            default: default.map(str::to_owned),
             scope: Scope {
                 allows: allows.unwrap_or_default().to_owned(),
                 forbids: forbids.unwrap_or_default().to_owned(),

@@ -2,7 +2,7 @@
 //! authority to ack and cancel, supersede, the view after a write, and the events with their attrs.
 
 mod store_support;
-use fgos_questions::store::State;
+use fgos_questions::store::{LoggedEvent, State};
 use fgos_questions::usecase::Which;
 use serde_json::{json, Value};
 use store_support::*;
@@ -251,6 +251,60 @@ fn options_and_recommendation_may_be_empty_only_for_discovery_stages_shaping_dis
         "parts-incomplete"
     );
     assert_eq!(relaxed(|_| {}).unwrap_err().code, "parts-incomplete");
+}
+
+#[test]
+fn a_decision_question_without_the_default_is_refused_naming_parts_default() {
+    let absent = ask_refusal(|v| {
+        v["parts"].as_object_mut().unwrap().remove("default");
+    });
+    assert_eq!(
+        (absent.code.as_str(), absent.field.as_deref()),
+        ("question-unclear", Some("parts.default"))
+    );
+    assert!(absent.rule.is_some(), "the refusal names its rule");
+    let empty = ask_refusal(|v| v["parts"]["default"] = json!(""));
+    assert_eq!(
+        (empty.code.as_str(), empty.field.as_deref()),
+        ("question-unclear", Some("parts.default"))
+    );
+}
+
+#[test]
+fn a_discovery_question_needs_no_default_because_it_offers_no_option_to_default_to() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    let mut value = input("plan:p");
+    for part in ["options", "recommendation", "default"] {
+        value["parts"].as_object_mut().unwrap().remove(part);
+    }
+    value["stage"] = json!("discovery");
+    let id = wired(&log, &who, &checkout).ask(&value).unwrap().value;
+    let asked = wired(&log, &who, &checkout).show(&id).unwrap().value.asked;
+    assert_eq!(asked.parts.default, None);
+    assert!(asked.parts.options.is_empty());
+}
+
+#[test]
+fn a_question_stored_before_the_field_existed_still_folds_and_is_shown() {
+    let (log, checkout) = (MemLog::default(), checkout());
+    let who = Fixed(Ok(head("m-1/a", "head:coder-x")));
+    log.events.borrow_mut().push(LoggedEvent {
+        event_type: "questions.asked".into(),
+        payload: json!({
+            "id": "q-old", "askedAt": "2026-11-18T01:00:00.000Z",
+            "asker": { "sessionId": "m-1/a", "handle": "a-handle", "roles": ["head:coder-x"], "machine": "m-1" },
+            "stage": "planning", "ref": { "value": "plan:p", "branch": "work", "commit": "abcdef1" },
+            "headline": "h", "blocks": "b",
+            "parts": { "what": "w", "cause": "c", "options": [option("A", true), option("B", false)], "recommendation": "A", "scope": { "allows": "x", "forbids": "y" } },
+            "migrated": false
+        }),
+    });
+    let shown = wired(&log, &who, &checkout).show("q-old").unwrap().value;
+    assert_eq!(shown.state, State::Open);
+    assert_eq!(shown.asked.parts.recommendation, "A");
+    assert_eq!(shown.asked.parts.default, None);
+    assert_eq!(shown.asked.parts.options.len(), 2);
 }
 
 #[test]
