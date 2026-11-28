@@ -1,55 +1,61 @@
-# Live check — acceptance criterion 4 (phase 03, step 4)
+# Live check rerun — acceptance criterion 4 (phase 03, step 4), after owner answer q-wvelmdqfga
+# Date: 2026-11-28
+# Rerun on the release built from main 9840b971a4 (the toolchain-cache resource now also
+# binds <home>/.cache/ort.pyke.io read-only and sets ORT_LIB_PATH).
 # Confined unit under an invocation with homeEnv: HOME, worktree
 # /home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03
 # Commands are recorded verbatim, in the order they were run. Nothing was edited.
 
 ## Step 1
-$ echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT"
-HOME=/home/vantt CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0
+$ echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT ORT_LIB_PATH=$ORT_LIB_PATH FGOS_CONFINED=$FGOS_CONFINED"; ls "$ORT_LIB_PATH"; touch "$CARGO_HOME/.probe-write" 2>&1; echo "write-probe-exit=$?"
+HOME=/home/vantt CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0 ORT_LIB_PATH=/home/vantt/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/02aac0d3b4927026292088986d7a377c657c88761b1c068be217a67b35447678 FGOS_CONFINED=1
+libonnxruntime.a
+touch: cannot touch '/home/vantt/.cargo/.probe-write': Read-only file system
+write-probe-exit=1
 
 ## Step 2
 $ export CARGO_TARGET_DIR=$(mktemp -d); s=$(date +%s.%N); timeout 1200 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -40; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
-          rust-lld: error: undefined symbol: 
-          
-          !!! The ort-sys crate could not link to ONNX Runtime because:
-          	- `libonnxruntime` is not configured via `pkg-config`, or the `pkg-config` feature is not enabled
-          	- ort-sys was instructed not to download prebuilt binaries (`cargo build --offline`), or the `download-binaries` feature is not enabled
-          	- Neither `ORT_LIB_PATH` or `ORT_IOS_XCFWK_PATH` (for iOS) were set to link to custom binaries
-          
-          To rectify this:
-          	- Compile ONNX Runtime from source and manually configure linking (see https://ort.pyke.io/setup/linking for more information)
-          	- Enable the `download-binaries` feature if the target is supported
-          	- Enable ort's `alternative-backend` feature if you intend to use a different backend (or ort-sys' `disable-linking` feature if you use this crate directly)
-          
-          >>> referenced by ort_sys.d4c179ea851be3df-cgu.0
-          >>>               ort_sys-c0a1694786afe0d2.ort_sys.d4c179ea851be3df-cgu.0.rcgu.o:(ort_sys::link_error::_TRIGGER_GENERIC) in archive /tmp/tmp.eBeSBrpviN/debug/deps/libort_sys-c0a1694786afe0d2.rlib
-          collect2: error: ld returned 1 exit status
-          
-
-error: linking with `cc` failed: exit status: 1
-  |
-  = note:  "cc" "-m64" "/tmp/tmp.eBeSBrpviN/debug/deps/rustcj5p7Yb/symbols.o" "<81 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libtest-*,libgetopts-*,librustc_std_workspace_std-*}.rlib" "/tmp/tmp.eBeSBrpviN/debug/deps/{libfgos_agent_context_engine-485d382fcc139500,libfgos_yaml_doc-4170302d9d6310b3,libsaphyr_parser-c59d332fc808bf41,libarraydeque-f639b1588062a37f,libfgos_canonical_json-d5e5cad70d8a2b58,libryu_js-43a1bcae49fb427f,libpkm_core-586c3961ba2c8b06,libjiff-d168a24e6e92e42d,libjiff_core-bf8f98b08b6e331f,libpkm_search-9ddaed651f4fc5f1,libsqlite_vec-a7b7f1cbf5493da6,libpkm_lang-cfc959eace03ccf8,liblibm-60775d82efe8ef3f,libpkm_embed-16971107570e6c35,libtokenizers-c27e2e4eb3e2b207,libesaxx_rs-ec0bcfa502be2568,libthiserror-5aca3231ce1c61a6,libunicode_normalization_alignments-1a6818e75f2e535e,libspm_precompiled-26c4b4c0a5cb405b,libbase64-92504ae8b14fed34,libunicode_segmentation-dc45464c26ac5736,libnom-f0964535423d1f13,libunicode_categories-28b48e62ee191a80,librand-49dd7955a9e1cb40,librand_chacha-139ee15a4a96082d,libppv_lite86-33731883c83d318a,librand_core-352eb6606157f8e8,libdary_heap-b8f47dd726516154,libcompact_str-c50df3a5b4a38dd6,libryu-17b2dfe690522ef3,libstatic_assertions-2eae218e886e21da,libcastaway-b963fe4dc5809f41,libmonostate-9099ba32f857ca2a,libmacro_rules_attribute-520f9b8dc018530a,librayon_cond-03d62bf7bf4653b3,libitertools-a75a937e09db5d47,librayon-15fec652db5b73ef,librayon_core-9e6b9830cc875580,libeither-959889ca0f8c273e,libfancy_regex-a7a2e0dee352cf14,libbit_set-cb3334c2329ea4e7,libbit_vec-72deca1e56618e20,libahash-a9b2639935710514,libgetrandom-bb196c5fc3400c0e,libonce_cell-d6a331dad93cfbe4,libzerocopy-89969ebee2874837,libderive_builder-9311c2b1f156119d,libort-4b91a0b3e4992c1b,libort_sys-c0a1694786afe0d2,libpkm_vault-792161a6e9137255,libcaseless-cd21f2e5fc802bf1,libsha1_smol-ae84773cfbb44258,libunsafe_libyaml-8874ba5bbf1665c2,libnotify-6c2f374151395792,libmio-4c7ce39a4efb8133,libinotify-3058b4330518d7ea,libinotify_sys-39596833d70fa5aa,liblibc-9c99fa6bdfd99e7c,libnotify_types-d26d32c22bb7863f,libignore-85f45253ccecfc8f,libwalkdir-832a84af8c753fcd,libsame_file-551e267c236e2a3c,libcrossbeam_deque-ca75084487c7aba6,libcrossbeam_epoch-810fbd8f7c3eb882,libcrossbeam_utils-c457d3c64b405ab2,libglobset-af9ad5db870004a0,liblog-299ac4958c2a1ad4,libbstr-467cdcefe034308c,libunicode_normalization-fda1f81f5c5ca343,libtinyvec-f7724ef68e81c7f4,libtinyvec_macros-e3dc21ef96f7a967,libpulldown_cmark-9d424b4128aeab0c,libunicase-efa494458ecd66b4,librusqlite-6ec86f97b711e5b7,libbitflags-b2a0dd750e3e37ce,libsmallvec-190e1e850763a51b,libhashlink-67e66d4ea0b92b0b,liblibsqlite3_sys-b2e78d7186fe9381,libfallible_streaming_iterator-324b8d374f74c071,libfallible_iterator-cb87b125f92b0476,libregex-370cbbc55487df0f,libregex_automata-48f4f81ee09adb5b,libaho_corasick-1612935c39658db5,libregex_syntax-a5d88ffc1c9db581,libsha2-ee71934ab2d5cba9,libcpufeatures-5af5d37854fd254e,libcfg_if-1ffa3f4445d9202d,libdigest-c6c8372cb96486f1,libblock_buffer-e850537298b3d0e6,libcrypto_common-128780b8d38a3337,libgeneric_array-cab0eee81a5a95c4,libtypenum-4e537d2f01be10da,libserde-24769b88af0d2595,libserde_json-40cc612aba0df795,libmemchr-c2d4bde33d1ef6c1,libzmij-d35ae4fa743ebe02,libitoa-2ec34da1e245bc15,libindexmap-4dfd9302fbcba5e1,libequivalent-ac5854c84fdc00e4,libhashbrown-57dcd87048587c62,libfoldhash-e94299ed0680b9f3,libserde_core-69fdfae18dceea28}.rlib" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,libcfg_if-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*,liblibc-*,librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-Wl,-Bdynamic" "-lgcc_s" "-lutil" "-lrt" "-lpthread" "-lm" "-ldl" "-lc" "-L" "/tmp/tmp.eBeSBrpviN/debug/deps/rustcj5p7Yb/raw-dylibs" "-B<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/bin/gcc-ld" "-fuse-ld=lld" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-L" "/tmp/tmp.eBeSBrpviN/debug/build/libsqlite3-sys-a4c9c959fe63e34e/out" "-L" "/tmp/tmp.eBeSBrpviN/debug/build/sqlite-vec-7adeb6614a3d6de0/out" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-gnu/lib" "-o" "/tmp/tmp.eBeSBrpviN/debug/deps/check-6bc47e5f4cad6cad" "-Wl,--gc-sections" "-pie" "-Wl,-z,relro,-z,now" "-nodefaultlibs"
-  = note: some arguments are omitted. use `--verbose` to show all linker arguments
-  = note: rust-lld: error: undefined symbol: 
-          
-          !!! The ort-sys crate could not link to ONNX Runtime because:
-          	- `libonnxruntime` is not configured via `pkg-config`, or the `pkg-config` feature is not enabled
-          	- ort-sys was instructed not to download prebuilt binaries (`cargo build --offline`), or the `download-binaries` feature is not enabled
-          	- Neither `ORT_LIB_PATH` or `ORT_IOS_XCFWK_PATH` (for iOS) were set to link to custom binaries
-          
-          To rectify this:
-          	- Compile ONNX Runtime from source and manually configure linking (see https://ort.pyke.io/setup/linking for more information)
-          	- Enable the `download-binaries` feature if the target is supported
-          	- Enable ort's `alternative-backend` feature if you intend to use a different backend (or ort-sys' `disable-linking` feature if you use this crate directly)
-          
-          >>> referenced by ort_sys.d4c179ea851be3df-cgu.0
-          >>>               ort_sys-c0a1694786afe0d2.ort_sys.d4c179ea851be3df-cgu.0.rcgu.o:(ort_sys::link_error::_TRIGGER_GENERIC) in archive /tmp/tmp.eBeSBrpviN/debug/deps/libort_sys-c0a1694786afe0d2.rlib
-          collect2: error: ld returned 1 exit status
-          
-
-error: could not compile `fgos-agent-context-engine` (test "store") due to 1 previous error
-error: could not compile `fgos-agent-context-engine` (test "check") due to 1 previous error
-exit=101 elapsed=17.017361150s
+   Compiling rand_chacha v0.9.0
+   Compiling fgos-yaml-doc v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/yaml-doc/rust)
+   Compiling rand v0.9.5
+   Compiling monostate-impl v0.1.18
+   Compiling tempfile v3.27.0
+   Compiling monostate v0.1.18
+   Compiling regex v1.13.1
+   Compiling fancy-regex v0.14.0
+   Compiling globset v0.4.22
+   Compiling spm_precompiled v0.1.4
+   Compiling compact_str v0.9.1
+   Compiling dary_heap v0.3.9
+   Compiling fgos-canonical-json v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/canonical-json/rust)
+   Compiling rustls-webpki v0.103.17
+   Compiling ignore v0.4.35
+   Compiling darling_macro v0.20.11
+   Compiling pkm-lang v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling darling v0.20.11
+   Compiling derive_builder_core v0.20.2
+   Compiling pkm-vault v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling derive_builder_macro v0.20.2
+   Compiling derive_builder v0.20.2
+   Compiling tokenizers v0.22.2
+   Compiling ureq v3.5.2
+   Compiling rusqlite v0.41.1
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.97s
+  Executable unittests src/lib.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/fgos_agent_context_engine-08f73b4e57e55cb6)
+  Executable tests/check.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/check-6bc47e5f4cad6cad)
+  Executable tests/compose.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/compose-f255d6e026e79024)
+  Executable tests/repository_units.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/repository_units-b1904805e74cdb4f)
+  Executable tests/rule_unit.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/rule_unit-a4a70e4087a3717a)
+  Executable tests/set.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/set-6db0e0a26ff08e8e)
+  Executable tests/store.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/store-811b778081902330)
+  Executable tests/vectors.rs (/tmp/tmp.sHO8YeBlFj/debug/deps/vectors-dc5dee7ba25b0e34)
+exit=0 elapsed=15.017243143s
 
 ## Step 3
 $ s=$(date +%s.%N); CARGO_HOME=$(mktemp -d) timeout 120 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -20; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
@@ -63,9 +69,48 @@ Caused by:
 
 Caused by:
   can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
-exit=101 elapsed=.048338777s
+exit=101 elapsed=.313706009s
 
-## Addendum — cache mounts as the sandbox actually presents them
-$ grep -E "cargo|rustup" /proc/self/mountinfo
-3418 3168 259:2 /home/vantt/.cargo /home/vantt/.cargo ro,nosuid,nodev,relatime master:1 - ext4 /dev/nvme0n1p2 rw
-3420 3168 259:2 /home/vantt/.rustup /home/vantt/.rustup ro,nosuid,nodev,relatime master:1 - ext4 /dev/nvme0n1p2 rw
+## Private-HOME rerun (homeEnv: HOME condition emulated with HOME=$(mktemp -d))
+
+# Same confined unit as above, run on 2026-11-28. Each step ran in its own shell, so
+# the exported HOME never leaked between steps. Nothing was edited.
+
+### Step 4
+$ export HOME=$(mktemp -d); echo "HOME=$HOME CARGO_HOME=$CARGO_HOME RUSTUP_HOME=$RUSTUP_HOME CARGO_NET_OFFLINE=$CARGO_NET_OFFLINE GIT_TERMINAL_PROMPT=$GIT_TERMINAL_PROMPT ORT_LIB_PATH=$ORT_LIB_PATH"; ls -A "$HOME"
+HOME=/tmp/tmp.bwewtcoOgm CARGO_HOME=/home/vantt/.cargo RUSTUP_HOME=/home/vantt/.rustup CARGO_NET_OFFLINE=true GIT_TERMINAL_PROMPT=0 ORT_LIB_PATH=/home/vantt/.cache/ort.pyke.io/dfbin/x86_64-unknown-linux-gnu/02aac0d3b4927026292088986d7a377c657c88761b1c068be217a67b35447678
+# (ls -A printed nothing: the private HOME starts empty)
+exit=0
+
+### Step 5
+$ export HOME=$(mktemp -d); export CARGO_TARGET_DIR=$(mktemp -d); s=$(date +%s.%N); timeout 600 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -15; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+   Compiling ort-sys v2.0.0-rc.15
+   Compiling ort v2.0.0-rc.15
+   Compiling pkm-embed v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-search v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling pkm-core v0.7.1 (https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb)
+   Compiling fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.30s
+  Executable unittests src/lib.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/fgos_agent_context_engine-08f73b4e57e55cb6)
+  Executable tests/check.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/check-6bc47e5f4cad6cad)
+  Executable tests/compose.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/compose-f255d6e026e79024)
+  Executable tests/repository_units.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/repository_units-b1904805e74cdb4f)
+  Executable tests/rule_unit.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/rule_unit-a4a70e4087a3717a)
+  Executable tests/set.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/set-6db0e0a26ff08e8e)
+  Executable tests/store.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/store-811b778081902330)
+  Executable tests/vectors.rs (/tmp/tmp.lXJE0ZBHeF/debug/deps/vectors-dc5dee7ba25b0e34)
+exit=0 elapsed=14.335838305s
+
+### Step 6
+$ export HOME=$(mktemp -d); s=$(date +%s.%N); CARGO_HOME=$(mktemp -d) timeout 120 cargo test -p fgos-agent-context-engine --locked --no-run 2>&1 | tail -12; echo "exit=${PIPESTATUS[0]} elapsed=$(echo "$(date +%s.%N) - $s" | bc)s"
+error: failed to get `pkm-core` as a dependency of package `fgos-agent-context-engine v0.2.0 (/home/vantt/projects/forgent-worktrees/261127-1220-confined-rust-offline-p03/packages/agent-context-engine/rust)`
+
+Caused by:
+  failed to load source for dependency `pkm-core`
+
+Caused by:
+  unable to update https://github.com/vantt/pkm?tag=v0.7.1#e4ff89bb
+
+Caused by:
+  can't checkout from 'https://github.com/vantt/pkm': you are in the offline mode (--offline)
+exit=101 elapsed=.059629804s
