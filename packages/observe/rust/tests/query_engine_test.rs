@@ -1,7 +1,7 @@
 //! The query engine: each operator once on a fixed clock, and the detections and measures that consumers define as
 //! plain queries over test-local declarations (no engine code names them).
 
-use fgos_observe::query::{run, AggValue, Query, QueryContext, QueryError, QueryResult};
+use fgos_observe::query::{run, AggValue, Having, Query, QueryContext, QueryError, QueryResult};
 use fgos_observe::record::registry::{DeclarationSource, Registry};
 use fgos_observe::record::types::Record;
 use fgos_observe::{RecordSource, SourceError, Window};
@@ -361,6 +361,38 @@ fn latest_per_keeps_the_newest_record_per_subject_or_ref_and_where_runs_before_a
     assert_eq!(
         result.rows[0].aggs["max:ts"],
         Some(AggValue::Instant(instant("2026-11-18T10:50:00Z")))
+    );
+}
+
+#[test]
+fn a_having_any_group_passes_a_group_when_one_branch_holds() {
+    // One breach with two shapes: the hour's total is over its rate, or the hour's total is under a quiet-hour floor.
+    // `anthropic` holds only the first branch (3 attempts), `google` only the second (1 attempt), and `openai` holds
+    // neither (2 attempts: not over 2 and not under 2). The rate is a parameter read inside a branch.
+    let attempts = |high: f64| {
+        let q = query(
+            r#"{"kind":["fgos.run.attempt"],"by":["gen_ai.provider.name"],"agg":["count"],
+                "having":[{"any":[[{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"param":"high"}}],
+                                   [{"lhs":{"agg":{"agg":"count"}},"op":"lt","rhs":{"const":2}}]]}]}"#,
+        );
+        groups(
+            &ask_at(&q, NOW, &[("high", high)]).unwrap(),
+            "gen_ai.provider.name",
+        )
+    };
+    assert_eq!(attempts(2.0), ["anthropic", "google"]);
+    // Every group is over a rate of 0, so the first branch carries all of them.
+    assert_eq!(attempts(0.0), ["anthropic", "google", "openai"]);
+    // A param read only inside a branch is still required.
+    let unset = query(
+        r#"{"kind":["fgos.run.attempt"],"by":["gen_ai.provider.name"],"agg":["count"],
+            "having":[{"any":[[{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"param":"high"}}]]}]}"#,
+    );
+    assert_eq!(
+        ask_at(&unset, NOW, &[]).unwrap_err(),
+        QueryError::MissingParam {
+            name: "high".into()
+        }
     );
 }
 
@@ -759,7 +791,10 @@ fn the_factor_k_can_be_a_parameter_the_caller_fills() {
     q.where_.push(
         serde_json::from_str(r#"{"field":"origin.host","op":"eq","value":"alpha"}"#).unwrap(),
     );
-    q.having[0].rhs =
+    let Having::Cond { rhs, .. } = &mut q.having[0] else {
+        panic!("watcher-overdue keeps a plain group filter first");
+    };
+    *rhs =
         serde_json::from_str(r#"{"latest":{"measure":"fgos.watcher.interval","k":{"param":"k"}}}"#)
             .unwrap();
     let rows = |k: f64| {
@@ -821,6 +856,10 @@ fn a_meaningless_use_of_the_newer_forms_is_refused_with_the_reason() {
     for any in ["[]", "[[]]"] {
         let message = refused(&format!(
             r#"{{"kind":["fgos.head.state"],"where_latest":[{{"any":{any}}}]}}"#
+        ));
+        assert!(message.contains("at least one branch"), "{message}");
+        let message = refused(&format!(
+            r#"{{"kind":["fgos.run.attempt"],"having":[{{"any":{any}}}]}}"#
         ));
         assert!(message.contains("at least one branch"), "{message}");
     }

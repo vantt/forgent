@@ -6,7 +6,9 @@
 //! `--without`, `--min-sample`, `--param name=value`, `--query <file|->` (a whole query as JSON; flags add to it).
 //!
 //! A condition is `field=value`, `field!=value`, `field^=text` (prefix), `field=a|b` (in), `field<n`, `field>n` or
-//! `field?` (exists), or the JSON object a definition file holds (a condition or an `{"any": [[...], ...]}` group). `--having`, `--join` and `--without` take that JSON object.
+//! `field?` (exists), or the JSON object a definition file holds (a condition or an `{"any": [[...], ...]}` group).
+//! `--having` takes a group filter `{lhs, op, rhs}` or an `{"any": [[...], ...]}` group of them, `--join` and
+//! `--without` take that JSON object.
 //! `--def <file|dir>` runs the named definitions in it and returns every definition's rows in one answer; a
 //! definition takes no other query flag but `--since`/`--until`, which window every definition it runs except one
 //! that declares `"window": "own"`.
@@ -396,6 +398,9 @@ mod tests {
     #[test]
     fn every_grammar_flag_reaches_the_query_and_repeated_flags_add_up() {
         let having = r#"{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"const":2}}"#;
+        // A second entry may be an `any` group, so one flag value carries two shapes of breach.
+        let any = r#"{"any":[[{"lhs":{"agg":{"agg":"count"}},"op":"gt","rhs":{"const":12}}],
+                       [{"lhs":{"agg":{"agg":"count"}},"op":"lt","rhs":{"const":1}}]]}"#;
         let join = r#"{"kind":["fgos.run.attempt"],"on":"plan"}"#;
         let without = r#"{"kind":["fgos.plan.status"],"within":"1h"}"#;
         let query = built(&[
@@ -417,6 +422,8 @@ mod tests {
             "ref:plan",
             "--having",
             having,
+            "--having",
+            any,
             "--join",
             join,
             "--without",
@@ -450,7 +457,13 @@ mod tests {
         assert_eq!(refs, [("plan", "p1"), ("lane", "l1")]);
         assert_eq!(query.since.as_deref(), Some("-1h"));
         assert_eq!(query.latest_per, Some(LatestPer::Ref("plan".into())));
-        assert_eq!(query.having, [serde_json::from_str(having).unwrap()]);
+        assert_eq!(
+            query.having,
+            [
+                serde_json::from_str(having).unwrap(),
+                serde_json::from_str(any).unwrap()
+            ]
+        );
         assert_eq!(query.join, [serde_json::from_str(join).unwrap()]);
         assert_eq!(query.without, [serde_json::from_str(without).unwrap()]);
         assert_eq!(query.min_sample, 3);

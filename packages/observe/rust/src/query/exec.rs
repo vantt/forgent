@@ -223,16 +223,49 @@ fn operand_value(
     }
 }
 
+/// Every entry holds; an `any` entry holds when every entry of one of its branches does. An operand with no value
+/// fails its own test.
 fn passes_having(names: &Names, ctx: &QueryContext, having: &[Having], items: &[Item]) -> bool {
-    having.iter().all(|h| {
-        match (
-            operand_value(names, ctx, &h.lhs, items),
-            operand_value(names, ctx, &h.rhs, items),
-        ) {
-            (Some(a), Some(b)) => compare(a, h.op, b),
-            _ => false,
+    having.iter().all(|entry| match entry {
+        Having::Cond { lhs, op, rhs } => {
+            match (
+                operand_value(names, ctx, lhs, items),
+                operand_value(names, ctx, rhs, items),
+            ) {
+                (Some(a), Some(b)) => compare(a, *op, b),
+                _ => false,
+            }
         }
+        Having::Any { any } => any
+            .iter()
+            .any(|branch| passes_having(names, ctx, branch, items)),
     })
+}
+
+/// Checks every operand of a `having` list, groups included, so a param or aggregate used only inside a branch is
+/// still resolved. An `any` group needs at least one branch and every branch at least one entry.
+fn check_having(names: &Names, ctx: &QueryContext, having: &[Having]) -> Result<(), QueryError> {
+    for entry in having {
+        match entry {
+            Having::Cond { lhs, rhs, .. } => {
+                check_operand(names, ctx, lhs)?;
+                check_operand(names, ctx, rhs)?;
+            }
+            Having::Any { any } => {
+                if any.is_empty() || any.iter().any(Vec::is_empty) {
+                    return Err(invalid(
+                        "having",
+                        "any",
+                        "an any group needs at least one branch, and every branch at least one condition",
+                    ));
+                }
+                for branch in any {
+                    check_having(names, ctx, branch)?;
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 fn unmeasured(reason: String) -> QueryResult {
@@ -304,10 +337,7 @@ pub fn run(query: &Query, ctx: &QueryContext) -> Result<QueryResult, QueryError>
     for agg in &query.agg {
         agg_measures.push(names.agg_measure(agg)?);
     }
-    for h in &query.having {
-        check_operand(&names, ctx, &h.lhs)?;
-        check_operand(&names, ctx, &h.rhs)?;
-    }
+    check_having(&names, ctx, &query.having)?;
     let since = query
         .since
         .as_deref()
