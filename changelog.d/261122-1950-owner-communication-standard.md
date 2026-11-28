@@ -1,0 +1,2 @@
+- Changed: every agent loads one communication standard (tiêu chuẩn giao tiếp) for asking, reporting and presenting to the owner; it replaces the decision-question template, and an agent whose message fell short records a friction under the new owner-communication layer.
+- Added: owner questions state what happens if no answer comes (parts.default), show their options lettered A to D with the recommended one first, and accept the letter as the answer.
