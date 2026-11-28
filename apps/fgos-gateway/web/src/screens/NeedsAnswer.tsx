@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ApiClient } from '../api/client'
 import { GatewayUnreachableError } from '../api/errors'
 import { hostOf, isNonLoopbackHost } from '../lib/network'
-import type { ListQuestionsData, QuestionDetail } from '../api/types'
+import type { ListQuestionsData, QuestionDetail, QuestionOptionDetail } from '../api/types'
 
 // S04 — Questions needing answer (docs/platform/ui-spec/architecture/screens/S04-questions-
 // needing-answer.md). Renders exactly what GET /v1/questions returns, in three groups: store
@@ -18,6 +18,44 @@ export interface NeedsAnswerProps {
 /** The id of the Work item behind an `fgos ask` row's `work:<id>` ref. */
 function workIdOf(ref: string): string {
   return ref.startsWith('work:') ? ref.slice('work:'.length) : ref
+}
+
+interface ShownOption {
+  /** `A` for the first option the owner reads, `B` for the second, and so on. */
+  letter: string
+  option: QuestionOptionDetail
+}
+
+/**
+ * The options in the order the owner reads them: the recommended one first, then the rest as the asker wrote them.
+ * The answer command `fgos questions answer <id> --option <letter>` speaks in these letters, so the display and the
+ * letter the owner types cannot drift.
+ */
+function shownOptions(options: QuestionOptionDetail[]): ShownOption[] {
+  const recommended = options.filter((option) => option.recommended === true)
+  const rest = options.filter((option) => option.recommended !== true)
+  return [...recommended, ...rest].map((option, index) => ({
+    letter: String.fromCharCode('A'.charCodeAt(0) + index),
+    option,
+  }))
+}
+
+/**
+ * The five parts as the gateway serves them: the same shape as `QuestionDetail['asked']['parts']`, plus the stated
+ * default, which the API type does not carry yet.
+ */
+type QuestionParts = QuestionDetail['asked']['parts'] & { default?: string }
+
+/** The letter and the option's own label; a label already starting with its letter and a dot is not doubled. */
+function shownLabel({ letter, option }: ShownOption): string {
+  const prefix = `${letter}.`
+  return option.label.startsWith(prefix) ? option.label : `${prefix} ${option.label}`
+}
+
+/** What the asker does, and when, if no answer comes. */
+function statedDefault(parts: QuestionParts): string | null {
+  const value = parts.default
+  return typeof value === 'string' && value.trim() !== '' ? value : null
 }
 
 export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswerProps) {
@@ -168,6 +206,7 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
         {questions.length > 0 && <h2 className="text-xs font-semibold uppercase text-ink-muted">Questions</h2>}
         {questions.map((q) => {
           const detail = details[q.id]
+          const defaultLine = detail ? statedDefault(detail.asked.parts as QuestionParts) : null
           return (
             <div key={q.id} data-testid={`row-${q.id}`} className="rounded-xl border border-border bg-surface p-4 shadow-sm">
               <span className="text-sm font-semibold text-ink">{q.headline}</span>
@@ -197,21 +236,21 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
                   <p>
                     <strong>Cause:</strong> {detail.asked.parts.cause}
                   </p>
-                  <fieldset className="space-y-1">
-                    {detail.asked.parts.options.map((option) => (
-                      <label key={option.label} className="block rounded-lg border border-border p-2">
+                  <fieldset data-testid={`options-${q.id}`} className="space-y-1">
+                    {shownOptions(detail.asked.parts.options).map((shown) => (
+                      <label key={shown.option.label} className="block rounded-lg border border-border p-2">
                         <input
                           type="radio"
                           name={`option-${q.id}`}
-                          data-testid={`option-${q.id}-${option.label}`}
-                          checked={picked[q.id] === option.label}
-                          onChange={() => setPicked((prev) => ({ ...prev, [q.id]: option.label }))}
+                          data-testid={`option-${q.id}-${shown.option.label}`}
+                          checked={picked[q.id] === shown.option.label}
+                          onChange={() => setPicked((prev) => ({ ...prev, [q.id]: shown.option.label }))}
                           disabled={stale}
                         />{' '}
-                        <strong>{option.label}</strong>
-                        {option.recommended === true ? ' (recommended)' : ''}: {option.does}
+                        <strong>{shownLabel(shown)}</strong>
+                        {shown.option.recommended === true ? ' (recommended)' : ''}: {shown.option.does}
                         <span className="block text-xs text-ink-muted">
-                          gain: {option.gain} · harm: {option.harm} · cost: {option.cost}
+                          gain: {shown.option.gain} · harm: {shown.option.harm} · cost: {shown.option.cost}
                         </span>
                       </label>
                     ))}
@@ -219,6 +258,11 @@ export function NeedsAnswer({ client, baseUrl, onOpenItem, onBack }: NeedsAnswer
                   <p>
                     <strong>Recommendation:</strong> {detail.asked.parts.recommendation}
                   </p>
+                  {defaultLine && (
+                    <p data-testid={`default-${q.id}`}>
+                      <strong>Default if no answer:</strong> {defaultLine}
+                    </p>
+                  )}
                   <p>
                     <strong>Scope of the answer:</strong> allows {detail.asked.parts.scope.allows}; forbids{' '}
                     {detail.asked.parts.scope.forbids}

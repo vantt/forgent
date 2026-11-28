@@ -98,11 +98,17 @@ copy and receive the answer back); the wake-up of an idle or gone asker (supervi
 | Verb | Effect |
 |---|---|
 | `fgos questions [list] [--all] [--answered] [--json]` | One line per question: headline, recommended option, `blocks`, age, answer command; a "needs you" count first. Open gates and `fgos ask` items appear beside the store's questions through the doctor bridge request `work-questions`, fail-open (`work-sources: unavailable <reason>`). `--open` is not accepted. |
-| `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. |
+| `show <id>` | The five parts, each option's cost, the asker's handle and role, any conflict. Options are shown recommended first, each prefixed `A.` to `D.`; a line `Default if no answer: <default>` follows the recommendation. |
 | `ask --ref <ref> --input <file\|-> [--migrated] [--supersedes <id>]` | Checks shape and ref, fills the asker, mints the id, appends `questions.asked`, returns the id. A decision question states `parts.default` (section 2), refused `question-unclear` naming the field when absent. `--supersedes` cancels the old question with reason `superseded:<new id>`. |
-| `answer <id> [--option <label>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
+| `answer <id> [--option <label\|letter>] [--text <t>] [--source <s>]` | Appends `questions.answered` once. `--source` is the caller's route (`secretary`, `gateway:<caller>`) and is kept as `via`. |
 | `ack <id>` | Appends `questions.acked`. |
 | `cancel <id> --reason <t>` | Appends `questions.cancelled`. |
+
+**The letters are one order.** `questions list`, `show`, the answer command and the gateway dashboard all show the
+options recommended first, then the rest as the asker wrote them, each prefixed with the letter of its place (`A.` to
+`D.`). A label that already starts with its own letter and a dot is shown as is, never doubled. The same order gives
+the display and the letter an answer names, so the two cannot drift: `show` prints the command with that letter,
+`fgos questions answer <id> --option A`. The dashboard shows the same letters, order and default line.
 
 **Head-socket verbs.** A confined head reaches the door through its request socket: `questions ask`, `questions ack`
 and `questions cancel` for every head, `questions answer` for the secretary only. They are declared in
@@ -117,6 +123,11 @@ the store.
 |---|---|
 | answer | only the owner: refused with `answer-not-owner` when an agent CLI is among the caller's process ancestors (a walk of the process tree matching the kernel names of the known agent CLIs; env is never read). Exceptions: the secretary head answers through its socket with `--source secretary`, and `by` is the owner; the detached gateway and a terminal with no agent ancestor pass as the owner |
 | ack, cancel | the asker session; any session holding the same `head:` role (a rotated successor, or a successor started with the gone asker's role); any head session for a question whose asker held no `head:` role or which is `migrated` |
+
+**How an answer names its option.** `--option` takes the exact label of an option, or the letter (`A` to `D`, in
+either case) of its place on screen. The letter comes first, so a label that is itself one letter cannot shadow the
+place it names. A letter past the last option names no option and is refused `question-unclear` on `option`, as an
+unknown label is. The record keeps the option's own label, not the letter.
 
 **The owner rule guards against mistakes, not attack.** It stops an agent answering in the owner's place by accident. It
 is not a security boundary: a determined local process can still reach the store.
