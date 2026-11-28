@@ -90,7 +90,7 @@ them defeats the question.
 A session's own questions to the owner are asked only with `fgos questions ask` (a Work item parked with
 `fgos ask <id>` is that item's gate, a different door): the door checks the measurable rules — a one-line headline
 of at most 120 characters, 2-4 options with a recommended one, scope allows/forbids, what it blocks. This standard
-holds the rules a program cannot measure. `fgos ask` and the AskUserQuestion hook check the parts through
+holds the rules a program cannot measure. `fgos questions ask` requires `parts.default` whenever options are given: one sentence saying what the asker does, and when, if no answer comes (shown as "Default if no answer:"). `fgos ask` and the AskUserQuestion hook check the parts through
 `src/state/decision-question.mjs`.
 
 ## Part C. Khi nào và ở đâu để nói (when and where to speak)
