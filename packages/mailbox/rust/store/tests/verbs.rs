@@ -239,9 +239,8 @@ fn spawn_named_copy(dir: &std::path::Path, parent: &str, name: &str) -> Child {
 fn a_claude_head_without_a_session_file_takes_its_version_from_the_executable_it_runs() {
     let fgos = TempFgos::new("verb-version-exe");
     let cli = fgos_mailbox_core::Cli::new("claude").unwrap();
-    let read = |head: &str| {
-        fgos_mailbox::adapters::version::recipient_version(&cli, head, &no_versions())
-    };
+    let read =
+        |head: &str| fgos_mailbox::adapters::version::recipient_version(&cli, head, &no_versions());
 
     let versioned = spawn_named_copy(&fgos.scratch(), "versions", "9.8.7");
     assert_eq!(read(&versioned.head_text()).as_deref(), Some("9.8.7"));
