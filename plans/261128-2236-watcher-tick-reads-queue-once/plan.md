@@ -1,7 +1,7 @@
 ---
 contract: plan-v1
 title: "The watcher tick reads the supervision queue once: batch raise with one fold, and the fold through the checkpointed read"
-status: draft
+status: ready
 priority: P1
 blockedBy: []
 base: 556d3179381b32248e731c598da2f9e17b8b30b7
