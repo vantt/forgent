@@ -20,44 +20,45 @@ pub const PROFILE: Profile = Profile {
     composer_state,
 };
 
-/// The composer's own line starts with `╰─`; its right edge carries a hint
-/// (`⇧⇥ to change thinking effort`) set off by a long run of spaces.
+/// The composer's own line starts with `╰─`; its right edge may carry a hint.
 const COMPOSER_MARK: &str = "╰─";
-/// A run of spaces this long separates the right-aligned hint from the draft;
-/// typed text never has a run that wide.
-const HINT_GAP: usize = 8;
+/// The status line directly above the composer line starts with this while the
+/// agent is idle; a busy omp swaps it for a spinner glyph.
+const IDLE_STATUS_MARK: &str = "π";
+/// Right-aligned hints omp draws on an otherwise empty composer line.
+const KNOWN_HINTS: &[&str] = &["⇧⇥ to change thinking effort"];
 /// Only the composer's own line and a few draft continuation lines may follow
 /// the status line, so a `╰─` further up is transcript, not the composer.
 const COMPOSER_TAIL_LINES: usize = 3;
 
 /// omp draws the status line (` π > model > ...`) and, under it, the composer
-/// line `╰─ <draft>`. Text after the mark, without the right-aligned hint, is
-/// the draft; nothing is an empty composer. A screen whose last non-blank lines
-/// hold no `╰─` line has no composer on it, which stays unknown.
+/// line `╰─ <draft>`. A screen with no `╰─` line at the bottom, or whose status
+/// line is not idle (`π`), is unknown. The composer is empty only when the line
+/// is blank or holds exactly a known hint, and nothing follows it.
 fn composer_state(screen: &str, inspection: &Inspection) -> ComposerState {
+    let lines: Vec<&str> = screen
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .collect();
+    let first_tail = lines.len().saturating_sub(COMPOSER_TAIL_LINES);
+    let Some(mark) = lines[first_tail..]
+        .iter()
+        .rposition(|line| line.trim_start().starts_with(COMPOSER_MARK))
+        .map(|at| at + first_tail)
+    else {
+        return ComposerState::Unknown;
+    };
+    let status_is_idle = mark > 0 && lines[mark - 1].trim_start().starts_with(IDLE_STATUS_MARK);
+    if !status_is_idle {
+        return ComposerState::Unknown;
+    }
     if !inspection.prompt_text.trim().is_empty() {
         // Any text the detector reads out of the composer is a draft or chip.
         return ComposerState::NotEmpty;
     }
-    let tail: Vec<&str> = screen
-        .lines()
-        .filter(|line| !line.trim().is_empty())
-        .collect();
-    let tail = &tail[tail.len().saturating_sub(COMPOSER_TAIL_LINES)..];
-    let Some(mark) = tail
-        .iter()
-        .rposition(|line| line.trim_start().starts_with(COMPOSER_MARK))
-    else {
-        return ComposerState::Unknown;
-    };
-    let first = tail[mark].trim_start()[COMPOSER_MARK.len()..].trim_end();
-    let first = if first.starts_with(&" ".repeat(HINT_GAP)) {
-        // Only the hint is on the line.
-        ""
-    } else {
-        first.split(&" ".repeat(HINT_GAP)).next().unwrap_or("")
-    };
-    if first.trim().is_empty() && tail[mark + 1..].iter().all(|line| line.trim().is_empty()) {
+    let rest = lines[mark].trim_start()[COMPOSER_MARK.len()..].trim();
+    let rest_is_empty = rest.is_empty() || KNOWN_HINTS.contains(&rest);
+    if rest_is_empty && lines[mark + 1..].is_empty() {
         ComposerState::Empty
     } else {
         ComposerState::NotEmpty

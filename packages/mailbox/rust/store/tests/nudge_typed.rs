@@ -67,9 +67,10 @@ fn typed_versions_are_separate_from_push_versions_and_never_enable_deferred_hook
 
 #[test]
 fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unread() {
-    for (version, queue_refusal, typed_refusal, expected_seen, expected_path) in [
+    for (version, untested, queue_refusal, typed_refusal, expected_seen, expected_path) in [
         (
             "0.162.1",
+            true,
             None,
             None,
             vec![NudgeChannel::CodexQueue],
@@ -77,6 +78,7 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
         ),
         (
             "0.166.0",
+            true,
             Some("queue-down"),
             None,
             vec![NudgeChannel::CodexQueue, NudgeChannel::Typed],
@@ -84,13 +86,14 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
         ),
         (
             "0.166.0",
+            true,
             Some("queue-down"),
             Some("composer-not-empty"),
             vec![NudgeChannel::CodexQueue, NudgeChannel::Typed],
             "local-next-tool-call",
         ),
         // A version neither channel was measured on: nothing is attempted.
-        ("0.163.0", None, None, vec![], "local-next-tool-call"),
+        ("0.163.0", true, None, None, vec![], "local-next-tool-call"),
     ] {
         let fgos = TempFgos::new("typed-send");
         let record = fgos.record();
@@ -152,12 +155,14 @@ fn sends_name_the_actual_local_path_and_a_typed_wake_is_not_repeated_while_unrea
                 .text
                 .contains(&format!("could not be nudged ({cause})")));
         }
-        if !TestedClis::embedded().lists_version("codex", version) {
-            // A version no recording covers is reported as untested, whatever channel it has.
-            assert!(sent.text.contains(&format!(
+        // A version no recording covers is reported as untested, whatever channel it has.
+        assert_eq!(
+            sent.text.contains(&format!(
                 "Its CLI version {version} is not one this mailbox was tested against; the hook still delivers, but nothing beyond that is verified."
-            )));
-        }
+            )),
+            untested,
+            "untested-version notice for {version}"
+        );
         if expected_path == "local-typed" {
             let second = send(
                 &record,

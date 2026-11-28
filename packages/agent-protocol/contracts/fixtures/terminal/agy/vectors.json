@@ -885,11 +885,12 @@
       "name": "composer-state-start-banner",
       "step": "composer-state",
       "version": "1.5.18",
+      "source": "synthesized: the real start-banner screen recorded at 1.4.2 with the banner line rewritten to 1.5.18 (no 1.5.18 start frame was captured); unknown comes from the start-banner rule, not a version mismatch",
       "script": {
         "frames": [
           {
             "at": 0,
-            "file": "start-banner"
+            "file": "start-banner-banner-updated"
           }
         ]
       },

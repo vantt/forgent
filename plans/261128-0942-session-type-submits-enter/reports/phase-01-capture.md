@@ -14,6 +14,12 @@ The other machine's versions are not known.
 
 ## Changes
 
+- review fixes: the agy `start-banner` vector now uses a banner-rewritten 1.5.18 copy, so `unknown` comes from
+  the start-banner rule, not a version mismatch; every `*-banner-updated.txt` copy carries its original's
+  `.insp.json`. omp `composer_state` is `unknown` unless the status line directly above `╰─` starts with `π`,
+  and `empty` only for a blank line or exactly the known thinking-effort hint (no gap heuristic); new vectors:
+  working frame, chip, spinner-led status, text after a wide gap. The `nudge_typed` table now carries an
+  explicit untested-version flag asserted on every row.
 - claude: pin moved to 2.1.332. The vector harness holds one version per vector, so the old 2.1.302 real
   frames cannot stay as proofs: their banner makes the predicate return `unknown`. The existing
   `version-bump-yields-unknown` vector owns the older-version case, so the duplicate

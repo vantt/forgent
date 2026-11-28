@@ -762,6 +762,74 @@
       "expect": {
         "composerState": "unknown"
       }
+    },
+    {
+      "name": "composer-state-busy-working-frame-is-unknown",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real working screen recorded 2026-10-18 from omp on herdr; the busy status line leads with a spinner glyph, not π",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "working"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-paste-chip-in-composer-is-not-empty",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "real composer with its attachment chip recorded from omp on herdr",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "file": "chip-in-composer"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
+    },
+    {
+      "name": "composer-state-spinner-led-status-line-is-unknown",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: a busy status line led by a spinner glyph above an empty composer line; no working footer, so the predicate itself decides",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": " ⠦ 2s > ◑ model > (sub) ▶─2%─\n╰─\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "unknown"
+      }
+    },
+    {
+      "name": "composer-state-text-after-a-wide-gap-is-not-empty",
+      "step": "composer-state",
+      "version": "18.11.2",
+      "source": "synthesized: the composer line holds a draft after a long run of spaces; a wide gap alone is not a hint",
+      "script": {
+        "frames": [
+          {
+            "at": 0,
+            "screen": " π > ◑ model > (sub) ▶─2%─\n╰─                                                            foo\n"
+          }
+        ]
+      },
+      "expect": {
+        "composerState": "not-empty"
+      }
     }
   ]
 }
