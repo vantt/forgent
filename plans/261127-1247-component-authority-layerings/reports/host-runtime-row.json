@@ -1,0 +1,28 @@
+{
+  "id": "host-runtime",
+  "canonical": "host-runtime",
+  "aliases": [
+    "host runtime"
+  ],
+  "meaning": "The shared host runtime crate: exit codes, contract loading, civil time, and the routing of a host command to its operation provider.",
+  "layer": "kernel",
+  "tier": 3,
+  "paths": [
+    "packages/host-runtime/"
+  ],
+  "exceptions": [],
+  "owns": [
+    "host command routing and its route, manifest and annotation contracts",
+    "host exit codes",
+    "operation provider routing"
+  ],
+  "mustNotOwn": [
+    "the verbs themselves",
+    "runtime lifecycle truth"
+  ],
+  "spec": "docs/platform/host-invocation-routing/spec.md",
+  "source": [
+    "packages/host-runtime/"
+  ],
+  "status": "live"
+}

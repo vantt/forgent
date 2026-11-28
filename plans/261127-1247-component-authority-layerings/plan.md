@@ -1,11 +1,11 @@
 ---
 contract: plan-v1
 title: "Component authority declares four layerings as data, with fixed rule kinds in code"
-description: "Step A of CAS-D5: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; layering values sit on component rows under the layering id; the architecture checks run per fixed rule kind (order-downward, isolation, port-wiring) read from the model; no hardcoded layer or tier list remains."
+description: "Step A of CAS-D5 against CAS-D1..D24: the model declares hexagon, stack, orchestration-ring and domain-scope with their definitions; values sit on component rows; the checks run per fixed rule kind read from the model, measured before they block; ownerless and retired rows are cleaned; no hardcoded layer or tier list remains."
 status: draft
 priority: P2
 blockedBy: []
-base: c37f38d84ffd165e2defd603bc07614faae50091
+base: 89a347aeab781be7070386e1992a03b3110f2d07
 source:
   - plans/discussions/ds-zfqskcns7j-component-authority-scope-and-levels/DISCUSSION.md
   - p-adv35azsca
@@ -13,12 +13,11 @@ created: 2026-11-27
 footprint:
   - plans/261127-1247-component-authority-layerings/**
   - docs/platform/component-authority/spec.md
-  - packages/component-authority/model/layers.yaml
-  - packages/component-authority/model/components.yaml
-  - packages/component-authority/model/contracts.yaml
+  - packages/component-authority/model/**
   - packages/component-authority/contracts/model.v1.json
   - packages/component-authority/rust/src/**
   - packages/component-authority/rust/tests/**
+  - apps/fgos/tests/authority.rs
   - test/architecture.test.mjs
   - test/report/decision-index.test.mjs
   - docs/platform/component-boundary.md
@@ -29,130 +28,239 @@ footprint:
   - docs/platform/observe/spec.md
   - docs/platform/workflow/spec.md
   - docs/platform/vision.md
-  - CHANGELOG.md
+  - changelog.d/261127-1247-component-authority-layerings.md
 ---
 
 # Component authority declares four layerings
 
-Mode: standard (cross-module model and schema change, one shared data file, no runtime behaviour change outside checks and the model reader).
+Mode: standard (cross-module model and schema change, hot shared data files, no runtime
+behaviour change outside the model reader, the declare and locate doors, and the checks).
+
+Re-planned 2026-11-28 against CAS-D1..D24 (owner answer `q-to4kq6l5bw` = A). The first version
+was written from CAS-D1..D13. Phase 1's branch `component-authority-layerings/p01` (123eaf5f07,
+reviewed, not landed) is reused: phase 1 amends it for CAS-D14..D24 instead of starting over.
+The decisions that replace earlier ones are applied as the discussion orders them: CAS-D15 keeps
+only its parts (1) definition, (2) `T8-delivery` and (3) `sameAs`; CAS-D16 sets the ring values
+and `source: declared`; CAS-D12 stands (no `fromLayering`); CAS-D22 replaces the `work-driver`
+parts of CAS-D15 and CAS-D19.
 
 ## Outcome
 
 `packages/component-authority/model/layers.yaml` declares four layerings, `hexagon`, `stack`,
-`orchestration-ring` and `domain-scope`, each with `id`, `aliases`, `questions`, `meaning`,
-`granularity`, `distinctFrom`, `values` (each with its own `meaning`), `rules` and `source`
-(CAS-D8). Every component row carries its value for each declared layering under a field named
-after the layering (`hexagon`, `stack`, `orchestration-ring`); path-level departures sit in the
-component's existing `exceptions` (CAS-D9, CAS-D10). The schema, the Rust crate and the Node
-architecture test read the value lists from the model; no list of layer names or tier range is
-written in code. The architecture checks run through three rule kinds fixed in code,
-`order-downward`, `isolation` and `port-wiring`, chosen per layering by its `rules` (CAS-D5).
-The hand-written layering guards (A4 Work-layer, "lower tiers do not import Dispatch") are
-folded into the layering that owns them. T7 and T8 are swapped (`T7-domain`, `T8-work`,
-CAS-D13). The prose that used the old vocabulary is corrected and the layering definitions are
-rendered into `architecture-map.md` §3 from the model.
+`orchestration-ring` and `domain-scope`, each with the CAS-D8 fields and a `meaning` per value.
+Every live or designed component row carries `hexagon`, `stack` and `orchestration-ring`
+values; path departures sit in the component's `exceptions` (CAS-D9, CAS-D10). The schema, the
+Rust crate and the Node architecture test read the value lists from the model; no list of value
+names or tier range is written in code. Three rule kinds fixed in code, `order-downward`,
+`isolation` and `port-wiring`, run per layering as the model's `rules` choose (CAS-D5); every
+new rule was measured in report mode first and blocks only once clean (CAS-D23). The
+hand-written layering guards are folded into the layering that owns them. `source` is merged
+into `paths`, and every file under the model's `coverage.roots` belongs to exactly one component
+(CAS-D17). The declare door sees every layering at once, checks the ring against the stack and
+`sameAs` words, and refuses a row that owns nothing (CAS-D14, CAS-D15, CAS-D20). The model has
+no retired rows, no `h-*` rows, no `team-cognition-engine` and no `work-driver`; old ids resolve
+through `aliases`; `host-runtime` owns `packages/host-runtime/` (CAS-D20..D22). `stack` is
+`T0-native` .. `T9-surface` with `T4-agent-runtime`, `T7-domain`, `T8-delivery` (CAS-D7, D13,
+D15, D18). The layering definitions are rendered into `architecture-map.md` §3 from the model
+and the prose uses the new vocabulary.
 
 ## Acceptance criteria
 
-1. `layers.yaml` declares the four layerings with every CAS-D8 field, and every value has a
-   non-empty `meaning`; checked by a Rust model test in
-   `packages/component-authority/rust/tests/model_checks.rs` (`cargo test -p component-authority`).
-2. Every component row carries `hexagon`, `stack` and `orchestration-ring`; `layer`, `tier`,
-   `tierNames`, `tierExceptions`, top-level `layers` and `rules` are gone from the model and
-   schema. `rg -n "LAYER_NAMES|TIER_RANGE|\"entry\", \"use-case\"" packages/component-authority/rust/src packages/component-authority/contracts`
-   prints nothing.
-3. Each rule kind has one fixture violation that its check catches, in `test/architecture.test.mjs`;
-   the A4 Work-layer guard and the "lower tiers do not import Dispatch" guard run as
-   `orchestration-ring` and `stack` `order-downward` (the old hand lists `WORK_LAYER_MODULES`
-   and the `lower` directory list are deleted).
-4. `runner` declares its hexagon departures by path in `exceptions`; ports are declared on the
-   contract index (`contracts.yaml`), not guessed from file names; components not yet split
-   are listed as named debt.
-5. `npm test` and `cargo test --workspace` green on the integrated tree.
-6. `docs/platform/component-boundary.md` §4 (module = packaging unit, CAS-D1),
-   `docs/platform/architecture-map.md` §3 (rendered layering definitions) and
-   `docs/platform/vision.md` §6 Known gaps use the new vocabulary; `fgos authority render --check`
-   reports no drift.
-7. `work-state`, `runner` and its subcomponents, and `supervision` carry `stack: T8-work`; the
+Numbers in brackets are the hand-off acceptance numbers of the discussion.
+
+1. [core] `layers.yaml` declares the four layerings with every CAS-D8 field (`id`, `aliases`,
+   `questions`, `meaning`, `granularity`, `distinctFrom`, `values` each with `meaning`, `rules`,
+   `source`), `source` only `declared` or `fromPaths`; checked by
+   `cargo test -p component-authority` (model test in `rust/tests/model_checks.rs`). (1)
+2. [core] Every `live`/`designed` component carries `hexagon`, `stack`, `orchestration-ring`;
+   no row carries `layer`, `tier` or `source`; `tierNames`, `tierExceptions`, top-level
+   `layers` and `rules` are gone. `rg -n "LAYER_NAMES|TIER_RANGE" packages/component-authority/rust/src packages/component-authority/contracts`
+   prints nothing, and the schema's value enums are filled from the model, not written by hand. (2, 11)
+3. [core] Each rule kind has one fixture violation its check catches, in
+   `test/architecture.test.mjs`; `stack` catches an upward Cargo crate dependency and `hexagon`
+   catches a wrong-rank Rust `use`, each by a fixture; the A4 Work-layer guard and "lower tiers
+   do not import Dispatch" run as `stack` `order-downward` (the hand lists `WORK_LAYER_MODULES`
+   and the `lower` directory list are deleted), and the edge reader still catches a dynamic
+   `import()`, a `require()` and a one-hop re-export. (3, 11)
+4. [core] `runner` declares its hexagon departures by path in `exceptions` (`anti-loop`,
+   `recovery`, `rigor` domain; `github-adapter`, `worktree` infra) and its ring departures
+   (`loop.mjs` orchestrator, `operation-choice.mjs` router, `work-dispatch.mjs` launcher; default
+   launcher); ports are declared on `contracts.yaml` rows (`port: {kind, implementers}`); every
+   remaining real violation is a named `exceptions` line with a reason (no baseline list). (4, 15, 16)
+5. [core] `npm test` and `cargo test --workspace` green on the integrated tree;
+   `fgos release check --worktree <integration worktree>` passes. (5)
+6. [core] `docs/platform/component-boundary.md` §4 (module = packaging unit, CAS-D1),
+   `docs/platform/architecture-map.md` §3 (layering definitions rendered from the model) and
+   `docs/platform/vision.md` §6 Known gaps use the new vocabulary; the Work/Domain order gap is
+   closed; `fgos authority render --check` reports no drift. (6, 7)
+7. [core] `stack` values: Work rows (`work-state`, `runner`, `supervision`) carry `T8-delivery`;
    Domain rows (`domain-components`, `coding-domain`, `group-thinking`, `domain-registry-loader`,
-   `enduser-docs-*`) carry `stack: T7-domain`; the vision.md §6 Known gap about the Work and
-   Domain order is closed (CAS-D13).
+   `enduser-docs-*`) carry `T7-domain`; `run-supervisor`, `launch-gate`, `agent-mailbox` carry
+   `T4-agent-runtime`; `src/report/knowledge-resolver.mjs` is a `T8-delivery` exception. (7, 9, 12)
+8. [core] `fgos authority declare` refuses a component missing a value for any `declared`
+   layering, and refuses an `orchestration-ring` order that runs against `stack`, naming both
+   layerings and the component pair; `fgos authority locate` answers all four layerings; each by
+   a test in `declare.rs` / `locate.rs`. (8)
+9. [core] Values sharing a word across layerings carry `sameAs` (or the declared
+   `distinctFrom` of `hexagon.domain`); the declare door refuses a `sameAs` pair whose two sides
+   disagree on a component; `orchestration-ring` has the values `surface`, `orchestrator`,
+   `launcher`, `router`, `driver`, `dispatcher`, `none`, `source: declared`. (9, 10)
+10. [core] Every file under `coverage.roots` (`src/`, `bin/`, `packages/`, `apps/`, `domains/`,
+    declared in the model) minus `coverage.ignore` belongs to exactly one component by longest
+    prefix; the crate pairs of CAS-D17 (1) are split parent/child by directory. (11)
+11. [core] No `retired` row remains; every `live` contract has a `live`/`designed` provider;
+    `agent-mailbox` is `live`; `host-runtime` is declared through `fgos authority declare` and
+    owns `packages/host-runtime/` and the 11 former `host-invocation-routing` contracts;
+    `fgos authority locate <old id>` returns the successor. (12, 14)
+12. [core] The declare door refuses a row that owns nothing (CAS-D20); the 8 `h-*` rows are
+    gone, `docs/platform/runner/` is in `runner.paths`, and the governance holder table still
+    lists every runner spec file; each `documentation` family row points to a plan or is
+    removed. (13)
+13. [core] No `team-cognition-engine` or `work-driver` row; `fgos authority locate work-driver`
+    returns `runner`; the secretary has a backlog row for the hardcoded `MODEL_DIR` and one for
+    splitting `src/util/` to its owning components. (15)
+14. [core] `reports/measure-layerings.md` records, per layering and rule, the violation count
+    measured in report mode, and how each was resolved (model fix or named exception); no new
+    rule blocks before its count is zero. (16)
 
 ## Non-goals
 
-- Step B: `fgos authority check` owning the checks (CAS-D5 "B sau"); the checks stay in
-  `test/architecture.test.mjs`.
-- Q2 of the discussion: what component-authority owns, the hash ids of `runner` subcomponents,
-  `paths: []` of `domain-components`, `coding-domain`, `group-thinking`, and the `supervision`
-  crates that no component maps.
-- Splitting every mixed-role component (CAS-D10 "áp dần"); only `runner` is split now, the rest
-  is named debt.
-- `fromLayering` (dropped, CAS-D12); a general rule interpreter (RUL104).
-- Renaming "module" in `core/instructions/design-principles.md` (left open in the discussion, §3 row 7).
+- Step B, `fgos authority check` (CAS-D24): the checks stay in `test/architecture.test.mjs`.
+- `paths: []` of `domain-components`, `coding-domain`, `group-thinking` (hand-off "open").
+- Splitting `runner` or any other mixed-role component (CAS-D10 "áp dần", CAS-D22 (2)); the
+  departures are path exceptions.
+- Splitting `src/util/` into owning components (CAS-D19: a separate item; here each file gets
+  its rank by exception).
+- Fixing the hardcoded `MODEL_DIR` (CAS-D22 (3): its own backlog row).
+- `fromLayering`, a general rule interpreter, a baseline file (CAS-D12, RUL104, CAS-D24 (5)).
+- Refactoring code to satisfy a rule (CAS-D23: A changes data and checks only).
 
 ## Authority map
 
 | New thing | Model row | Note |
 |---|---|---|
-| Layering definitions in `layers.yaml` (`layerings` rows) and their schema def | component-authority | `fgos authority locate "the model declares each layering with its definition, values and rule kinds"` → `component-authority`. Replaces `layers`, `rules`, `tierNames`; survivor: `layerings`; retired: `layers.yaml` `layers`, `rules`, `tierNames`, `tierExceptions`. |
-| Layering value fields on component rows (`hexagon`, `stack`, `orchestration-ring`) | component-authority | survivor: field named after the layering; retired: component fields `layer`, `tier` and exception fields `layer`, `tier`. |
-| Three rule kinds `order-downward`, `isolation`, `port-wiring` | component-authority | Checks live in `test/architecture.test.mjs` (CAS-D5 step A). survivor: one function per rule kind; retired: the import-one-way test, the two tier tests, the domain-siloing loop, the "lower tiers do not import Dispatch" test, the A4 `WORK_LAYER_MODULES` reach guard. |
-| Port declaration on a contract-index row (`port: {kind, implementers}`) | component-authority | Extends the contract index the crate already owns (CAS-D10). No new row kind. |
-| Named debt of a layering (components not yet split) | component-authority | A `debt` list on the layering row (component id, reason, owning backlog row). Planner decision, see Risks. |
-| Rendered view `architecture-map-layerings` | component-authority | New view in the existing render door (`render.rs`), same markers contract. |
+| Layering rows in `layers.yaml` (`layerings`, `sameAs`, `distinctFrom`) and their schema def | component-authority | `fgos authority locate "the model declares each layering with its definition, values and rule kinds"` returns `component-authority`. survivor: `layerings`; retired: `layers.yaml` `layers`, `rules`, `tierNames`, `tierExceptions`. |
+| Layering value fields on component rows and in `exceptions` | component-authority | survivor: field named after the layering; retired: component and exception fields `layer`, `tier`. |
+| `coverage.roots` / `coverage.ignore` in the model | component-authority | survivor: model-declared coverage; retired: the hardcoded `src/`+`bin/` `.mjs` scan in `test/architecture.test.mjs:225`. |
+| `paths` as the one ownership field | component-authority | survivor: `paths`; retired: component field `source` (render "Source links" reads `paths`). |
+| Three rule kinds `order-downward`, `isolation`, `port-wiring` | component-authority | One function per kind in `test/architecture.test.mjs` (step A). survivor: the kind functions; retired: the import-one-way test, the two tier tests, the domain-siloing loop, the "lower tiers do not import Dispatch" test, the A4 `WORK_LAYER_MODULES` reach guard. |
+| Edge readers: Rust `use`/`mod` and Cargo crate dependencies | component-authority | Reuse `lexRust` (`scripts/lib/rust-source.mjs`) and the Cargo.toml reading already in `test/architecture.test.mjs:1947-1990`; no new module. |
+| Declare-door checks: every declared layering, ring-vs-stack, `sameAs`, owns-something, live-contract provider | component-authority | Extends `rust/src/declare.rs`; no new door. |
+| `locate` answers four layerings and resolves old ids by `aliases` | component-authority | Extends `rust/src/locate.rs`. |
+| Port on a contract row (`port: {kind, implementers}`) | component-authority | Extends the contract index (CAS-D10). |
+| Rendered view `architecture-map-layerings` | component-authority | New view in `render.rs` `view_definitions`, same marker contract. |
+| Component `host-runtime` | declare: component host-runtime | CAS-D21; owner approval `q-o2r2zblera`; row draft `reports/host-runtime-row.json`. Overlaps retired `host-invocation-routing`: survivor: host-runtime; retired: components.yaml row `host-invocation-routing`. |
+| Rows merged into survivors | component-authority | survivor: runner; retired: rows `work-driver` and `h-*` (CAS-D20, CAS-D22). survivor: fgos-gateway; retired: rows `herdr-web-dashboard`, `ui-spec`. survivor: workflow and run-result; retired: row `agent-coordination` (CAS-D21). |
 
 ## Phases
 
 | id | title | depends-on | footprint | wave | status |
 |---|---|---|---|---|---|
 | 1 | [Spec first](phase-01-spec-first.md) | - | docs/platform/component-authority/spec.md | 1 | ready |
-| 2 | [Layerings in the model, fields renamed](phase-02-layerings-in-the-model.md) | 1 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, test/architecture.test.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | ready |
-| 3 | [Rule kinds in code](phase-03-rule-kinds-in-code.md) | 2 | test/architecture.test.mjs | 3 | ready |
-| 4 | [Hexagon by CAS-D4 and ports](phase-04-hexagon-and-ports.md) | 2, 3 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 4 | ready |
-| 5 | [Orchestration ring and folded guards](phase-05-orchestration-ring.md) | 3, 4 | packages/component-authority/model/layers.yaml, packages/component-authority/model/components.yaml, test/architecture.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 5 | ready |
-| 6 | [Rendered definitions and prose](phase-06-rendered-definitions-and-prose.md) | 5 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md | 6 | ready |
-| 7 | [Integrate](phase-07-integrate.md) | 6 | CHANGELOG.md, plans/261127-1247-component-authority-layerings/reports/ | 7 | ready |
+| 2 | [Model shape, values and every caller](phase-02-model-shape.md) | 1 | packages/component-authority/model/, packages/component-authority/contracts/model.v1.json, packages/component-authority/rust/src/, packages/component-authority/rust/tests/, apps/fgos/tests/authority.rs, test/architecture.test.mjs, test/report/decision-index.test.mjs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 2 | draft |
+| 3 | [Row cleanup: owners, retired rows, merges](phase-03-row-cleanup.md) | 2 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, packages/component-authority/model/decision-kinds.yaml, packages/component-authority/rust/src/render.rs, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 3 | draft |
+| 4 | [Declare and locate see every layering](phase-04-declare-and-locate.md) | 3 | packages/component-authority/model/layers.yaml, packages/component-authority/rust/src/declare.rs, packages/component-authority/rust/src/locate.rs, packages/component-authority/rust/src/model.rs, packages/component-authority/rust/tests/, apps/fgos/tests/authority.rs | 4 | draft |
+| 5 | [Rule kinds in report mode, measured](phase-05-rule-kinds-measured.md) | 3 | test/architecture.test.mjs, plans/261127-1247-component-authority-layerings/reports/measure-layerings.md | 4 | draft |
+| 6 | [Data to clean: ranks, exceptions, ports, owners](phase-06-data-to-clean.md) | 4, 5 | packages/component-authority/model/components.yaml, packages/component-authority/model/contracts.yaml, plans/261127-1247-component-authority-layerings/reports/measure-layerings-after.md, docs/platform/component-boundary.md, docs/platform/architecture-map.md, docs/platform/README.md, docs/platform/governance.md, docs/platform/system-overview/spec.md, docs/platform/observe/spec.md, docs/platform/workflow/spec.md | 5 | draft |
+| 7 | [Rules block, hand guards folded](phase-07-rules-block.md) | 6 | test/architecture.test.mjs | 6 | draft |
+| 8 | [Rendered definitions and prose](phase-08-rendered-definitions-and-prose.md) | 6 | packages/component-authority/rust/src/render.rs, docs/platform/architecture-map.md, docs/platform/component-boundary.md, docs/platform/vision.md | 6 | draft |
+| 9 | [Integrate](phase-09-integrate.md) | 7, 8 | changelog.d/261127-1247-component-authority-layerings.md, plans/261127-1247-component-authority-layerings/reports/closing.md | 7 | draft |
 
-The waves are serial because `components.yaml`, `layers.yaml`, `test/architecture.test.mjs`
-and the rendered docs are hot files that four phases must write in turn; each phase leaves
-`npm test` and `cargo test --workspace` green on its own, so the gate holds on a tree with only
-the first phases landed. Contract check: `node scripts/plan-contract-check.mjs --plan
-plans/261127-1247-component-authority-layerings`; footprint check: `fgos resource-check --plan
-plans/261127-1247-component-authority-layerings`.
+Phase 1 is `ready` (the owner question does not touch it). Phases 2-9 are `draft` until
+`q-o2r2zblera` is answered, because phase 2 starts with the `host-runtime` declare and every
+later phase builds on phase 2.
 
-Prior art reused: the component `exceptions` field (84 lines on 14 components) carries the
-path departures, so no second exception store is added and `tierExceptions` (0 lines) is
-deleted (CAS-D9); the render door and its markers carry the new view; the contract index
-carries ports; the Node import lexers (`scripts/lib/js-source-lexer.mjs`) stay the edge source.
+Why mostly serial: `components.yaml`, `contracts.yaml`, `test/architecture.test.mjs` and the
+seven rendered docs are hot files with one writer per wave. Phases 4 and 5 run together (the
+door code and the test file are disjoint); phases 7 and 8 run together (test file vs. render
+code and prose). Every phase leaves `npm test` and `cargo test --workspace` green on its own, so
+the gate holds on a tree with only the first phases landed. Contract check:
+`node scripts/plan-contract-check.mjs --plan plans/261127-1247-component-authority-layerings`;
+footprint check: `fgos resource-check --plan plans/261127-1247-component-authority-layerings`.
+
+Prior art reused: the component `exceptions` field carries every path departure (no second
+store; `tierExceptions`, 0 lines, is deleted, CAS-D9); the render door and its markers carry the
+new view; the contract index carries ports; the Node import lexer in the test, `lexRust`, and the
+Cargo.toml reading of `test/architecture.test.mjs:1947-1990` stay the edge sources (CAS-D17 (3));
+the declare door's existing approval, alias and provider checks are extended, not duplicated.
+
+## Unattended run
+
+### Host steps
+
+| step | argv | executor |
+|---|---|---|
+| declare `host-runtime` before the model shape changes (phase 2 step 1, in the phase-2 worktree) | fgos authority declare --kind component --row plans/261127-1247-component-authority-layerings/reports/host-runtime-row.json --approved-by q-o2r2zblera --dir <phase-2 worktree> | lead |
+| render the ownership views after each model change (phases 2, 3, 6, 8) | fgos authority render --dir <phase worktree> | lead |
+| full gate on the integrated tree (phase 9) | fgos release check --worktree <integration worktree> | lead |
+
+`fgos can-i` on 2026-11-28 answered `ask` for `authority declare` (no head row grants it), so
+that run files one owner question carrying the exact argv; `q-o2r2zblera` already approves its
+content. `release check` is `allow` for the lead. Render after phase 2 runs from the worktree's
+own code (`npm run fgos:dev -- authority render`), since the activated release reads the old
+model shape; a unit sandbox runs it as part of its phase.
+
+### Cleanup
+
+Standing rule. The p01 worktree (`forgent-worktrees/261127-1247-component-authority-layerings-p01`)
+is reused by phase 1, not superseded.
+
+### Beyond the rule
+
+| item | question |
+|---|---|
+| new component `host-runtime` (`fgos authority declare --kind component`) | q-o2r2zblera |
+
+### Split
+
+Parallel where footprints are disjoint (phases 4 with 5, 7 with 8), otherwise serial because the
+model files and the test file are hot; one big step per phase rather than staged
+compatibility, since CAS-D23 already makes each new rule land report-only and the revert path is
+a per-phase merge revert with no state outside the worktree.
 
 ## Owner questions
 
-None. Every decision this plan needs is locked in CAS-D1 to CAS-D13; the one gap (where named
-debt lives) is decided below under Risks, inside the approved frame ("phần chưa tách ghi nợ có
-tên", hand-off non-goals).
+- `q-o2r2zblera`: Approve declaring the new component host-runtime (CAS-D21) so the layerings
+  plan can go ready?
+
+Decided by the planner inside the approved frame, not asked:
+
+- **Named debt lives in `exceptions`, not in a `debt` list on the layering.** p01's spec added
+  a `debt` list; CAS-D23 ("vi phạm thật thì ghi ngoại lệ có tên và lý do") and CAS-D24 (5) ("không
+  thêm baseline") place every real violation in `exceptions`. Phase 1 removes `debt` from p01.
+- **When the hexagon count is "too large to name" (CAS-D23).** The phase-5 measure stops the
+  plan when resolving the `hexagon` violations would need more than 150 new `exceptions` lines
+  after the CAS-D4 re-rank and the CAS-D19 rows; the lead then asks the owner with the measure
+  attached and does not loosen a rule. 150 is about twice today's 84 exception lines.
+- **`host-runtime` stack value.** Declared `tier: 3` (T3-event) because `observe` (T3) and
+  `execution` (T5) depend on it (CAS-D21 note); phase 6 splits its routing part by path
+  exception if the measure demands it.
+- **`sameAs` pairs.** `orchestration-ring.surface` sameAs `stack.T9-surface`;
+  `domain-scope.domain` sameAs `stack.T7-domain`; `hexagon.domain` distinctFrom all three
+  (CAS-D15 (3)). Phase 4 checks there is no other shared word.
 
 ## Risks and rollback
 
-- **Field rename breaks other projects' models.** Projects with `.fgos/authority/model/` that
-  wrote `layer`/`tier` rows fail to load after the rename. The loader refuses an old field by
-  name with a message that names the new field (no compatibility reader, L10); CHANGELOG says
-  so (phase 7). The empty model a new project starts from declares no layering, so a project
-  without layerings needs no layering fields.
-- **Re-ranking `hexagon` by CAS-D4 surfaces many violations** (infra moves to the bottom;
-  `runner`, `workflow`, `execution-core` are infra today). Phase 4 measures first, reassigns
-  defaults, writes `runner` exceptions, and records every other component whose code still
-  breaks `port-wiring` as named debt on the layering (`debt` list: component, reason, backlog
-  row). Proof point for validating: the phase-4 measure report lists the violation count before
-  and after.
-- **Named debt location is a planner decision**: a `debt` list on the layering row, not on the
-  component, because debt is "this component does not yet meet this layering's rules". If the
-  validating reviewer rejects it, the alternative is a backlog row per component with no model
-  field; the check then cannot skip them and phase 4 would have to keep `port-wiring` off.
-- **Ring values need judgment on 87 rows**; `stack` cross-check catches a reversed pair.
-- **Rollback**: each phase is one commit series on its own branch; revert the phase's merge
-  commits in reverse order. Phase 2 is the only one that changes the model's shape; reverting it
-  restores `layer`/`tier`.
+- **The field rename breaks other projects' models** (`.fgos/authority/model/` with
+  `layer`/`tier`/`source`). The loader refuses each old field by name and names its new field
+  (no compatibility reader, L10); the changelog fragment says so. The empty bootstrap model
+  declares no layering, so a new project's declare needs no layering value.
+- **The measure finds too many hexagon violations.** Stop rule above; proof point for
+  validating: `reports/measure-layerings.md` counts per layering before phase 6.
+- **Removing retired rows drops history readers rely on.** `locate` resolves the old id through
+  the successor's `aliases` (acceptance 11), and the decision history keeps the narrative.
+- **`authority declare` is `ask` for heads.** The run waits for one owner answer at phase 2
+  step 1; the content is pre-approved by `q-o2r2zblera`, so the answer is mechanical.
+- **Ring values on ~60 rows need judgment.** The ring-vs-stack check of phase 4 catches a
+  reversed pair; the §7 scan table of the discussion is the input.
+- **No baseline proof here.** The planner's sandbox cannot load the native addon
+  (`git-addon-not-shipped`), so `test/architecture.test.mjs` was not run on `base`; phase 2's
+  first step records the baseline result.
+- **Rollback**: each phase is one branch; revert its merge commits in reverse wave order.
+  Phase 2 is the only shape change; reverting it restores `layer`/`tier`/`source`. The
+  `host-runtime` row is removed by reverting phase 2.
 
 ## Outstanding questions
 
-None
+- `q-o2r2zblera`: Approve declaring the new component host-runtime (CAS-D21) so the layerings
+  plan can go ready?
